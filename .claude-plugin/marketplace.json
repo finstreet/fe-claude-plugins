@@ -1,0 +1,18 @@
+{
+    "name": "fe-plugin",
+    "owner": {
+      "name": "Patrick Engelkes",
+      "email": "patrick.engelke@finstreet.de"
+    },
+    "plugins": [
+      {
+        "name": "automation",
+        "source": "./plugins/automation",
+        "description": "Plugin for automating development with all @finstreet frontend libraries",
+        "version": "0.0.1",
+        "author": {
+          "name": "Patrick Engelkes"
+        }
+      }
+    ]
+  }

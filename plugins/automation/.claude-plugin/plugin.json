@@ -1,0 +1,8 @@
+{
+    "name": "automation",
+    "description": "Plugin for automating development with all @finstreet frontend libraries",
+    "version": "0.0.1",
+    "author": {
+        "name": "Patrick Engelkes"
+    }
+}
