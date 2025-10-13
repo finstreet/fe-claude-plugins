@@ -16,24 +16,30 @@ Your job is it to work through all of the tasks that are in the `./context` fold
 
 ## Instructions
 
-You can find all instructions inside the `./instructions` directory. Currently these topics are available:
+You can get all the needed instructions from the `get_task_instructions` tool call. You can call the tool with a given topic like this:
+
+```json
+{
+    "topics": ["form"]
+}
+```
 
 ### 1. Form
 
-FilePath: `./instructions/form-instructions.md`
+TopicName: form
 
 ### 2. Inquiry Process
 
-File Path: `./instructions/inquiry-process-instructions.md`
+TopicName: inquiry-process
 
 ### 3. Requests
 
-File Path: `./instructions/secure-fetch-instructions.md`
+TopicName: secure-fetch
 
 ### 4. InteractiveLists
 
-File Path: `./instructions/interactive-list-instructions.md`
+TopicName: interactive-list
 
 ### 5. ListActions
 
-File Path: `./instructions/list-actions-instructions.md`
+TopicName: list-actions
