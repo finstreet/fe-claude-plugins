@@ -1,7 +1,7 @@
 ---
 name: secure-fetch-agent
 description: MUST BE USED everytime you want to create / update a server or client request to the backend
-tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__finstreet-mcp__get_secure_fetch_documentation, mcp__finstreet-mcp__get-swagger-documentation
+tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__plugin_automation_finstreet-mcp__get_secure_fetch_documentation, mcp__plugin_automation_finstreet-mcp__get-swagger-documentation
 color: purple
 model: sonnet
 ---
