@@ -1,7 +1,7 @@
 ---
 name: modal-agent
 description: Use this agent when you need to create modal dialogs, popup windows, or overlay components in the application. This includes confirmation dialogs, form modals, information modals, and any other modal-based UI elements. <example>Context: The user wants to create a modal for deleting a user. user: "Create a modal for confirming user deletion" assistant: "I'll use the modal-creator agent to create a confirmation modal for user deletion" <commentary>Since the user wants to create a modal component, use the modal-creator agent to handle the modal creation with proper structure and internationalization.</commentary></example> <example>Context: The user needs a modal to display form data. user: "I need a modal that shows a form for editing user details" assistant: "Let me use the modal-creator agent to create an edit form modal" <commentary>The user is requesting a modal with a form, so the modal-creator agent should be used to create the modal structure while potentially coordinating with form-building agents for the form content.</commentary></example>
-tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, TodoWrite, WebSearch
+tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, TodoWrite
 model: sonnet
 ---
 

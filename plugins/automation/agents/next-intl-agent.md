@@ -1,7 +1,7 @@
 ---
 name: next-intl-agent
 description: Use this agent when you need to translate text strings in the project using the next-intl library. This includes adding new translations to the messages/de.json file, updating existing translations, or ensuring that components are properly using translated strings instead of hardcoded text. <example>Context: The user wants to add translations for a new feature or component. user: "I need to add translations for the new user profile page" assistant: "I'll use the next-intl-agent agent to help add the necessary translations to the messages file." <commentary>Since the user needs to add translations for a new feature, use the next-intl-agent agent to properly structure and add the translations to messages/de.json.</commentary></example> <example>Context: The user notices hardcoded text in a component. user: "This button has hardcoded text 'Submit' instead of using translations" assistant: "Let me use the next-intl-agent agent to fix this hardcoded text and add the proper translation." <commentary>The user identified hardcoded text that should be translated, so use the next-intl-agent agent to replace it with a proper translation key.</commentary></example>
-tools: Bash, Glob, Grep, LS, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, WebFetch, TodoWrite, WebSearch, ListMcpResourcesTool, ReadMcpResourceTool
+tools: Bash, Glob, Grep, LS, Read, Edit, MultiEdit, Write, TodoWrite
 model: sonnet
 color: purple
 ---

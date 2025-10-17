@@ -1,7 +1,7 @@
 ---
 name: inquiry-process-agent
 description: This agent should ONLY be called if it is a clear delegation from the inquiry-process-orchestrator or if it is explicitly mentioned by the user. This agent has all the knowledge about setting up an InquiryProcess with the various @finstreet packages.
-tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__finstreet-mcp__get_inquiry_process, mcp__finstreet-mcp__get_secure_fetch_documentation
+tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__plugin_automation_finstreet-mcp__get_inquiry_process, mcp__plugin_automation_finstreet-mcp__get_secure_fetch_documentation
 color: green
 model: sonnet
 ---

@@ -1,7 +1,7 @@
 ---
 name: form-agent
 description: Call this agent when you have to do anything that is related to forms
-tools: LS, ExitPlanMode, Edit, Read, MultiEdit, Write, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__finstreet-mcp__get_forms_documentation, mcp__finstreet-mcp__get_secure_fetch_documentation
+tools: LS, ExitPlanMode, Edit, Read, MultiEdit, Write, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__plugin_automation_finstreet-mcp__get_forms_documentation, mcp__plugin_automation_finstreet-mcp__get_secure_fetch_documentation
 color: green
 model: sonnet
 ---

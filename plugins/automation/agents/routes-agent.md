@@ -1,7 +1,7 @@
 ---
 name: routes-agent
 description: Call this agent when you have to do anything that is related to forms
-tools: LS, ExitPlanMode, Edit, Read, MultiEdit, Write, NotebookRead, NotebookEdit, WebFetch, TodoWrite, WebSearch, ListMcpResourcesTool, ReadMcpResourceTool
+tools: LS, ExitPlanMode, Edit, Read, MultiEdit, Write, TodoWrite
 color: red
 model: sonnet
 ---
