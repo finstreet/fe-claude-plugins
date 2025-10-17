@@ -110,7 +110,7 @@ export const OpenCreateBeneficialOwnerModalButton = ({
 
   return (
     <Button onClick={handleClick}>
-      <Typography as={"p"}>{tButtons("createBeneficialOwner")}</Typography>
+      {tButtons("createBeneficialOwner")}
     </Button>
   );
 };
