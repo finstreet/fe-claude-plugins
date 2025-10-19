@@ -47,6 +47,36 @@ The filePath is `features/propertyManagement/forms/additionalInformation` - you 
 }
 ```
 
+### TaskGroup structure
+```json
+"{parentPath}": {
+   "taskGroups": {
+      "{taskGroupName}": {
+         "label": "",
+         "taskPanels": {
+            "{taskPanelName}": {
+               "label": "",
+               // some custom properties possible
+               // if there are subtasks 
+               "subtasks": {
+                  "{subTaskName}": {
+                     "title": "",
+                     "actionLabel": ""
+                  }
+               }
+            }
+         },
+         "actionPanel": {
+            "{actionPanelName}": {
+               "title": "",
+               "disabledHint: "",
+            }
+         }
+      }
+   }
+}
+```
+
 ## InquiryProcess structure
 
 ```json
