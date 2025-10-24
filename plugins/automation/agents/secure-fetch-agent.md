@@ -29,19 +29,20 @@ The `get_secure_fetch_documentation` tool fetches documentation for the @finstre
 
 #### Available Topics
 
-- server - get the documentation for server requests
-- client - get the documentation for client requests
+- overview: Overview of the @finstreet/secure-fetch library
+- schema: Building the request schemas
+- endpoint-config: Building the endpoint configuration`,
 
-You can call these topics like this. In most of the cases you only need to fetch the documentation for one topic. If you need both documentations you can add both topics to the array and get everything that you need.
+You can call these topics like this. ALWAYS call all of the topics to fully understand how to implement a request. You can do it like this:
 
 {
-"topics": ["server"]
+"topics": ["overview", "schema", "endpoint-config"]
 }
 
 ## Task approach
 
 1. Fetch the swagger documentation with the `get-swagger-documentation` tool
-2. Fetch the correct secure fetch documentation with the `get_secure_fetch_documentation` tool
+2. Fetch the secure-fetch documentation
 3. Check if there are schemas that you can reuse inside the provided directoy
 4. Implement the required schemas and requests
 
