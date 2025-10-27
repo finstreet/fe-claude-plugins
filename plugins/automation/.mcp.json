@@ -3,6 +3,10 @@
     "finstreet-mcp": {
       "type": "sse",
       "url": "http://localhost:4444/sse"
+    },
+    "context-forge-mcp": {
+      "type": "sse",
+      "url": "http://localhost:4445/sse"
     }
   }
 }
