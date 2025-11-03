@@ -2,11 +2,13 @@ Your job is it to work through all of the tasks that are in the `./context` fold
 
 ## Task approach:
 
-1. List all the files in the `./context` directory
-2. Read the file in order (if there status at the bottom is set to done move on to the next task)
-3. Understand the users request from the file content and extract the topic from it
-4. Based on the topic read the correct instructions
-5. Explicitly follow the instructions
+1. Get all open tasks for the project using the `get_tasks_by_project_id` tool
+2. Use the `askquestion` tool to ask the use on which task he wants to work on (only display tasks and NOT subtasks)
+3. After the user selected a task I want you to use the `get_next_subtask_by_task_id` tool to get the next subtask to work on
+4. Use the `update_subtask_status` tool and set the subtask to IN_PROGRESS
+5. Understand what to do from the subtask content
+6. Based on the topic read the correct instructions
+6. Explicitly follow the instructions
 
 ## Rules:
 
