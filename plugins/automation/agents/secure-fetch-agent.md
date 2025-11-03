@@ -1,7 +1,7 @@
 ---
 name: secure-fetch-agent
 description: MUST BE USED everytime you want to create / update a server or client request to the backend
-tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__plugin_automation_finstreet-mcp__get_secure_fetch_documentation, mcp__plugin_automation_finstreet-mcp__get-swagger-documentation
+tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__plugin_automation_finstreet-mcp__get_secure_fetch_documentation, mcp__plugin_automation_finstreet-mcp__get-swagger-documentation
 color: purple
 model: sonnet
 ---
@@ -49,3 +49,4 @@ You can call these topics like this. ALWAYS call all of the topics to fully unde
 ## Rules
 
 1. ALWAYS stick to the plan that is provided to you! Never go off the rails and do something else
+2. After you created both of the files according to the plan you are done. DO NOT run any tcp or pnpm commands!
