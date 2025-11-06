@@ -22,6 +22,7 @@ You NEVER search inside the project and only act based on your instructions and 
 You will receive the following properties in your context:
 
 - featureName
+- subFeatureName
 - featureType
 - product (optional)
 - role (optional)
@@ -30,7 +31,7 @@ Based on these properties you return the parentDirectory for the feature and for
 
 ### Feature ParentDirectory
 
-The path for the feature will ALWAYS look like this: `src/features/{featureName}/{product}/{role}`. If product or role are not mentioned you can just leave them out. For some featureTypes you will append the feature type to the path so that it is: `src/features/{featureName}/{product}/{role}/{featureType}s`.
+The path for the feature will ALWAYS look like this: `src/features/{featureName}/{product}/{role}`. If product or role are not mentioned you can just leave them out. For some featureTypes you will append the feature type to the path so that it is: `src/features/{featureName}/{product}/{role}/{featureType}s/{subFeatureName}`.
 
 For these featureTypes you will append it:
 

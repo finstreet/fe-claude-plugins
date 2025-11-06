@@ -23,6 +23,7 @@ You will be assigned a specific task from a paraent agent that you should follow
 2. Determine if a component is a @finstreet/ui component (if you can find it inside the components list) - all other components are from PandaCSS or implemented in this project
 3. Fetch the documentation from all @finstreet/ui components by calling the `get_components` tool
 4. Implement the UI as described in the main task with the components that I told you
+5. You are DONE after adding the component - do NOT execute any type checks or run builds
 
 ## Core respnsibilities
 
@@ -40,3 +41,4 @@ You will be assigned a specific task from a paraent agent that you should follow
 - all patterns from PandaCSS can be imported with this path:
   `import { Box, Grid, HStack, VStack } from "@styled-system/jsx";`
   ALWAYS make sure to use the correct import paths for all components
+
