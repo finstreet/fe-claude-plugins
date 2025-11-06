@@ -1,5 +1,5 @@
 ---
-name: local-parent-directory-agent
+name: parent-directory-agent
 description: This agent MUST BE USED when you have to determine the parentDirectory for a given feature
 tools: mcp__plugin_automation_context-forge-mcp__get_subtask_by_id, mcp__plugin_automation_context-forge-mcp__update_subtask_content
 color: cyan
