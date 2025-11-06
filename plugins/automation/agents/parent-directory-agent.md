@@ -31,7 +31,7 @@ Based on these properties you return the parentDirectory for the feature and for
 
 ### Feature ParentDirectory
 
-The path for the feature will ALWAYS look like this: `src/features/{featureName}/{product}/{role}`. If product or role are not mentioned you can just leave them out. For some featureTypes you will append the feature type to the path so that it is: `src/features/{featureName}/{product}/{role}/{featureType}s/{subFeatureName}`.
+The path for the feature will ALWAYS look like this: `src/features/{featureName}/{product}/{role}`. If product or role are not mentioned you can just leave them out. For some featureTypes you will append the feature type and the subFeatureName to the path so that it is: `src/features/{featureName}/{product}/{role}/{featureType}s/{subFeatureName}`.
 
 For these featureTypes you will append it:
 
@@ -51,16 +51,18 @@ Here are some examples to make it more clear:
 #### Feature type appended
 
 - featureName: legalRepresentatives
+- subFeatureName: create
 - product: hoaLoan
 - role: pm
 - featureType: form
-- _Feature ParentDirectory_: src/features/legalRepresentatives/hoaLoan/pm/forms/
+- _Feature ParentDirectory_: src/features/legalRepresentatives/hoaLoan/pm/forms/create
 
 #### Missing product and role
 
-- featureName: legalRepresentatives
-- featureType: form
-- _Feature ParentDirectory_: src/features/legalRepresentatives/forms/
+- featureName: userManagement
+- subFeatureName: pendingUsers
+- featureType: interactiveList
+- _Feature ParentDirectory_: src/features/userManagement/interactiveLists/pendingUsers/
 
 ### Request ParentDirectory
 
