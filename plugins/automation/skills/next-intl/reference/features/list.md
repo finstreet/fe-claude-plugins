@@ -30,10 +30,10 @@ Some lists have the ability to filter / sort / group the list. There we will nee
             "options": {
                 "none": "Keine Gruppierung",
                 "status": {
-                "label": "",
-                "titles": {
-                    // one title for each status item
-                }
+                   "label": "",
+                    "titles": {
+                        // one title for each status item
+                    }
                 },
                 // for each group by enum the same as for status
             }
@@ -43,7 +43,7 @@ Some lists have the ability to filter / sort / group the list. There we will nee
             "options": {
                 "none": "Keine Sortierung",
                 "createdAtAsc": "",
-                // for each sorying option a translation
+                // for each sorting option a translation
             }
         },
         "reset": "Zurücksetzen"
