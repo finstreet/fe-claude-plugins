@@ -15,6 +15,7 @@ You NEVER search inside the project and only act based on your instructions and 
 - inquiryProcess
 - form
 - request
+- interactiveList
 
 ## Task Approach
 
@@ -34,6 +35,7 @@ The path for the feature will ALWAYS look like this: `src/features/{featureName}
 For these featureTypes you will append it:
 
 - form
+- interactiveList
 
 Here are some examples to make it more clear:
 
