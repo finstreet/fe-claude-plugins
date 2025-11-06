@@ -21,11 +21,11 @@ Some lists have the ability to filter / sort / group the list. There we will nee
     "{listName}": {
       "actions": {
         "label": "Suchen & Filtern",
-        "search": {
+        "search": { // only add this if searching is enabled
             "label": "Suche",
             "placeholder": "Suche nach Anfragen",
         },
-        "groupBy": {
+        "groupBy": { // only add this if grouping is enabled
             "label": "Gruppieren nach",
             "options": {
                 "none": "Keine Gruppierung",
@@ -38,7 +38,7 @@ Some lists have the ability to filter / sort / group the list. There we will nee
                 // for each group by enum the same as for status
             }
         },
-        "sortBy": {
+        "sortBy": { // only add this if sorting is enabled
             "label": "Sortieren nach",
             "options": {
                 "none": "Keine Sortierung",
