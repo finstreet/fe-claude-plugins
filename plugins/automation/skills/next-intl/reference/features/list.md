@@ -111,7 +111,9 @@ For sorting you look for the `sort` parameter and add translations for all enums
 
 ### Grouping 
 
-Grouping is a bit trickier. IGNORE all keys that are `sort`, `search_tearm` or from type `string`. For all others either use the `enum` values and translate them to german or for booleans you can just go with `true` and `false` as keys and translate them to `Ja` and `Nein`
+Grouping is a bit trickier. IGNORE all keys that are `sort`, `search_tearm` or that have the type: `string`. For all others either use the `enum` values and translate them to german or for booleans you can just go with `true` and `false` as keys and translate them to `Ja` and `Nein`
+
+From the example above there is `case_manager_id_eq: type: string`. Just ignore this since there are no sensible values for groupings. Do this with ALL properties from type string!
 
 
 
