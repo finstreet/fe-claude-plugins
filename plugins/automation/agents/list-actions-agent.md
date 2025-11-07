@@ -45,4 +45,4 @@ ALWAYS call the overview topic and decide based on your context which informatio
 
 ## Rules
 
-1. ALWAYS stick to the plan that is provided to you! Never go off the rails and do something elsse
+1. ALWAYS stick to the plan that is provided to you! Never go off the rails and do something else
