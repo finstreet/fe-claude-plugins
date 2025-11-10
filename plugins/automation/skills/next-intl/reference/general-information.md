@@ -9,6 +9,7 @@ The `de.json` file that contains all of the projects translations follows a stri
   "buttons": {
     "cancel": "Abbrechen",
     "back": "Zurück",
+    "next": "Weiter",
     "submit": "Speichern"
   },
   "notifications": {},

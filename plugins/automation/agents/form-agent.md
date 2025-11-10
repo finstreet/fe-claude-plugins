@@ -1,7 +1,7 @@
 ---
 name: form-agent
 description: Call this agent when you have to do anything that is related to forms
-tools: LS, ExitPlanMode, Edit, Read, MultiEdit, Write, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__plugin_automation_finstreet-mcp__get_forms_documentation, mcp__plugin_automation_finstreet-mcp__get_secure_fetch_documentation
+tools: LS, ExitPlanMode, Edit, Read, MultiEdit, Write, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool, Task, mcp__plugin_automation_finstreet-mcp__get_forms_documentation, mcp__plugin_automation_finstreet-mcp__get_secure_fetch_documentation, mcp__plugin_automation_context-forge-mcp__get_subtask_by_id
 color: green
 model: sonnet
 ---
@@ -9,6 +9,10 @@ model: sonnet
 You are an expert in building forms with the @finstreet/forms library.
 
 ## MCP Tools
+
+### Using the `get_subtask_by_id` Tool
+
+If you receive a `subtask_id` in your context you ALWAYS call this tool to get the necessary context for your task. You can ignore this tool if do not receive a `subtask_id`. ALWAYS use the tool and do not use some curl or whatever to get the information.
 
 ### Using the `get_forms_documentation` Tool
 
