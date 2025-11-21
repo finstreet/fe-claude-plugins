@@ -57,4 +57,4 @@ usage - How to make use of requests created with the @finstreet/secure-fetch lib
 
 ## Rules
 
-1. ALWAYS stick to the plan that is provided to you! Never go off the rails and do something elsse
+1. ALWAYS stick to the plan that is provided to you! Never go off the rails and do something else
