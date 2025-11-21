@@ -32,6 +32,7 @@ The `get_secure_fetch_documentation` tool fetches documentation for the @finstre
 - overview: Overview of the @finstreet/secure-fetch library
 - schema: Building the request schemas
 - endpoint-config: Building the endpoint configuration`,
+- usage: How to use the endpoint config in the end (only use this if explicitly mentioned)
 
 You can call these topics like this. ALWAYS call all of the topics to fully understand how to implement a request. You can do it like this:
 
