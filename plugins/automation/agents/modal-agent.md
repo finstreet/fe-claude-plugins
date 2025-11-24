@@ -59,6 +59,8 @@ export const useAssignCaseModal = create<AssignCaseModalStore>((set) => ({
 
 ## The UI
 
+Check out the translations for the modal within your context. There will often be a `title` and a `subheading.` The exmaple below will show how to build the title and subheading:
+
 ```tsx path={parent}/modal.ts
 "use client";
 
@@ -70,9 +72,14 @@ import {
 import { useAssignCaseModal } from "./store";
 import { Suspense } from "react";
 import { AssignCaseForm } from "@/features/operationsInquiries/forms/assignCaseForm/AssignCaseForm";
+import { useTranslations } from "next-intl";
+import { Headline } from "@finstreet/ui/components/base/Headline";
+import { Typography } from "@finstreet/ui/components/base/Typography";
+import { VStack } from "@styled-system/jsx";
 
 export const AssignCaseModal = () => {
   const { isOpen, data, setIsOpen } = useAssignCaseModal();
+  const t = useTranslations("translation.string.from.context");
 
   if (!data) {
     return null;
@@ -82,7 +89,12 @@ export const AssignCaseModal = () => {
 
   return (
     <Modal open={isOpen} onClose={() => setIsOpen(false)}>
-      <ModalTitle>Fall zuweisen</ModalTitle>
+      <ModalTitle>
+        <VStack gap={1} alignItems={"flex-start"}>
+          <Headline>{t("title")}</Headline>
+          <Typography color={"text.dark"}>{t("subheading")}</Typography>
+        </VStack>
+      </ModalTitle>
       <ModalContent></ModalContent>
     </Modal>
   );
