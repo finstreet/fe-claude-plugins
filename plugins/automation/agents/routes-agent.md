@@ -97,4 +97,5 @@ I want you to answer with the following format. Do NOT add anything else! This i
 RoutesKey: `routes.fsp.hoaAccount.inquiry.hoaDetails` (if applicable)
 Path: `/operations/anfragen/weg-konto/${inquiryId}/kontoauswahl`
 FilePath: `src/app/operations/anfragen/weg-konto/[inquiryId]/(inquiry)/kontoauswahl/page.tsx`
+RouteType: `inquiry` | `portal`
 ```
