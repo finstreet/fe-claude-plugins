@@ -58,8 +58,8 @@ export const useAssignCaseModal = create<AssignCaseModalStore>((set) => ({
 ```
 
 ## The UI
+Check out the translations for the modal within your context. There will often be a `title` and a `subheading.` The exmaple below will show how to build the title and subheading.
 
-Check out the translations for the modal within your context. There will often be a `title` and a `subheading.` The exmaple below will show how to build the title and subheading:
 
 ```tsx path={parent}/modal.ts
 "use client";
@@ -100,6 +100,29 @@ export const AssignCaseModal = () => {
   );
 };
 ```
+
+### The Modal Title
+
+There are two different modal titles that you have to implement. 
+1. With title and subheading in the subtask content:
+
+```tsx
+<ModalTitle>
+  <VStack gap={1} alignItems={"flex-start"}>
+    <Headline>{t("title")}</Headline>
+    <Typography color={"text.dark"}>{t("subheading")}</Typography>
+  </VStack>
+</ModalTitle>
+```
+
+2. Only with title in the subtask content (NO Subheading)
+``` tsx
+<ModalTitle>
+  {t("title")}
+</ModalTitle>
+```
+
+ALWAYS stick to one of these patterns based on your context
 
 ## The Open Button
 
