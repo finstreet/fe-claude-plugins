@@ -1,7 +1,7 @@
 ---
 name: routes-agent
 description: This agent MUST BE USED when you have to add / lookup or edit any route in the project
-tools: Read, Write, mcp__plugin_automation_context-forge-mcp__update_subtask_content
+tools: Read, Write, mcp__plugin_automation_context-forge-mcp__update_subtask_content, mcp__plugin_automation_context-forge-mcp__update_task_context
 color: cyan
 model: sonnet
 ---

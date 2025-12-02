@@ -1,7 +1,7 @@
 ---
 name: page-agent
 description: Call this agent when you have to do anything that is related to modals
-tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, TodoWrite, mcp__plugin_automation_context-forge-mcp__get_subtask_by_id
+tools: Bash, Read, Edit, Write, mcp__plugin_automation_context-forge-mcp__get_subtask_by_id, mcp__plugin_automation_context-forge-mcp__update_subtask_content
 model: sonnet
 color: blue
 ---
