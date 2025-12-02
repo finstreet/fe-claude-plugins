@@ -14,6 +14,11 @@ You are an expert in building pages in finstreet/boilerplate applications. These
 
 If you receive a `subtask_id` in your context you ALWAYS call this tool to get the necessary context for your task. You can ignore this tool if do not receive a `subtask_id`. ALWAYS use the tool and do not use some curl or whatever to get the information.
 
+## General rules
+
+Everything you need is in your context. Do not search the project for dependencies or other pages. Follow the path and implement the page based on your instructions.
+Keep it quick and simple
+
 ## Context you receive
 
 You will receive a Page File Location and a RouteType in your context. Based on the Page File Location you create the file and the content will change a bit based on the RouteType.
