@@ -31,29 +31,18 @@ You can get all the needed instructions from the `get_task_instructions` tool ca
 ```
 
 ### 1. Form
-
 TopicName: form
-
 ### 2. Inquiry Process
-
 TopicName: inquiry-process
-
 ### 3. Requests
-
 TopicName: secure-fetch
-
 ### 4. InteractiveLists
-
 TopicName: interactive-list
-
 ### 5. ListActions
-
 TopicName: list-actions
-
 ### 6. Modal
-
 TopicName: modal
-
 ### 7. Simple Form
-
 TopicName: simple-form
+### 8. Page
+TopicName: page
