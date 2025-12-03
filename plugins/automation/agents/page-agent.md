@@ -27,7 +27,7 @@ You will receive a Page File Location and a RouteType in your context. Based on 
 
 ### Metadata
 
-The page always exports a metadata object with the title:
+The page always exports a metadata object with the title. Here we do NOT need to use the translations. Use the title as is. Only use the translations inside the page component.
 
 ```tsx
 import { Metadata } from "next";

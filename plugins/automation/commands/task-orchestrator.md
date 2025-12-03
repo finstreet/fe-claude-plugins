@@ -19,6 +19,7 @@ Your job is it to work through all of the tasks that are in the `./context` fold
 4. Commit your changes after you are done with a subtask
 5. Create a PR after you are done with all subtasks
 6. Use the `update_task_status` after all subtasks are done to set the status to `DONE`
+7. Ignore diagnostic warnings - some components will be added later on that make use of unused variables for example.
 
 ## Instructions
 
