@@ -111,6 +111,88 @@ export async function {formName}FormAction(
 
 ALWAYS return `handleFormRequestError(result.error)` in the error case. Check the backend function config to determine if `pathVariables` and/or `payload` are required.
 
+### With `revalidatePath`
+
+Use `revalidatePath` from `next/cache` to invalidate cached data after mutations. Two common patterns:
+
+**Pattern 1: revalidatePath + redirect** (page forms that navigate after success)
+
+```typescript
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+export async function {formName}FormAction(
+  state: {FormName}FormState,
+  formData: {FormName}OutputType,
+): Promise<{FormName}FormState> {
+  const result = await putSomeResource({ ... });
+
+  if (result.success) {
+    const url = "/target/path";
+    revalidatePath(url);
+    redirect(url);
+  } else {
+    return handleFormRequestError(result.error);
+  }
+}
+```
+
+**Pattern 2: revalidatePath + return** (modal forms that stay on the same page)
+
+```typescript
+if (result.success) {
+  revalidatePath(routes.operations.loans.index);
+  return { error: null, message: null };
+} else {
+  return handleFormRequestError(result.error);
+}
+```
+
+You can revalidate multiple paths if needed:
+
+```typescript
+revalidatePath(routes.operations.loans.index);
+revalidatePath(routes.operations.loans.details(formData.financingCaseId));
+```
+
+### Extra context parameters via closure
+
+When a form action needs additional context (e.g., `portal`, `product`), pass them via a closure in the formConfig. The action signature gets extra parameters:
+
+```typescript
+// In formConfig:
+const { portal } = usePortal();
+
+serverAction: (state, formData) =>
+  {formName}FormAction(state, formData, portal),
+
+// In formAction:
+import { Portal } from "@/shared/types/Portal";
+
+export async function {formName}FormAction(
+  state: {FormName}FormState,
+  formData: {FormName}OutputType,
+  portal: Portal,
+): Promise<{FormName}FormState> {
+  // Use portal for conditional routing:
+  const url = portal === "propertyManager"
+    ? routes.propertyManager.loans.details(formData.id)
+    : routes.operations.loans.details(formData.id);
+
+  revalidatePath(url);
+  redirect(url);
+}
+```
+
+Some actions take multiple extra params:
+
+```typescript
+serverAction: (state, formData) =>
+  {formName}FormAction(state, formData, portal, product),
+```
+
 ### No redirect, no backend
 
 ```typescript
@@ -286,21 +368,85 @@ export function use{FormName}FormConfig(): FormConfig<
 }
 ```
 
-### With cancel button (e.g., in a modal)
+### Modal form config
+
+For forms rendered inside modals, the config needs:
+- `usePortal()` for portal-aware server actions
+- `useSuccessAction` to close the modal on success
+- Cancel button calling `setIsOpen(false)`
+- Server action closure passing `portal`
 
 ```tsx
+import { usePortal } from "@/shared/context/portal/portalContext";
+
+export function use{FormName}FormConfig(
+  defaultValues: {FormName}DefaultValues,
+  setIsOpen: (open: boolean) => void,
+): FormConfig<{FormName}FormState, {FormName}Type, {FormName}OutputType> {
+  const t = useTranslations("buttons");
+  const { portal } = usePortal();
+  const fields = use{FormName}FormFields();
+
+  return {
+    fields,
+    defaultValues,
+    schema: {formName}Schema,
+    fieldNames: createFormFieldNames(fields),
+    serverAction: (state, formData) =>
+      {formName}FormAction(state, formData, portal),
+    useSuccessAction: () => {
+      return (formState: {FormName}FormState) => {
+        setIsOpen(false);
+      };
+    },
+    useErrorAction: () => {
+      return (formState: {FormName}FormState) => {
+        console.error(formState?.error);
+      };
+    },
+    renderFormActions: (isPending: boolean) => {
+      return (
+        <HStack mt={12} justifyContent={"space-between"}>
+          <Button
+            type="button"
+            variant="text"
+            onClick={() => { setIsOpen(false); }}
+          >
+            {t("cancel")}
+          </Button>
+          <Button loading={isPending} type="submit" icon={<FaArrowRight />}>
+            {t("submit")}
+          </Button>
+        </HStack>
+      );
+    },
+  };
+}
+```
+
+### With back button using `useRouter`
+
+For forms that need a back/cancel button navigating to the previous page:
+
+```tsx
+import { useRouter } from "next/navigation";
+import { FaArrowLeft } from "react-icons/fa6";
+
+const router = useRouter();
+
 renderFormActions: (isPending: boolean) => {
   return (
     <HStack mt={12} justifyContent={"space-between"}>
       <Button
         type="button"
         variant="text"
-        onClick={() => { setIsOpen(false); }}
+        icon={<FaArrowLeft />}
+        onClick={() => router.back()}
       >
-        {t("cancel")}
+        {t("back")}
       </Button>
       <Button loading={isPending} type="submit" icon={<FaArrowRight />}>
-        {t("submit")}
+        {t("next")}
       </Button>
     </HStack>
   );
@@ -337,6 +483,95 @@ export const {FormName}FormFields = ({
 ```
 
 NEVER render hidden fields in this component.
+
+### Side-by-Side Fields with `FieldsHStack`
+
+Use `FieldsHStack` and `FieldsHStackItem` for responsive side-by-side field layouts. The `span` prop controls width out of 12 columns.
+
+```tsx
+import {
+  Fields,
+  FieldsHStack,
+  FieldsHStackItem,
+} from "@finstreet/ui/components/pageLayout/Fields";
+
+<Fields>
+  <FieldsHStack>
+    <FieldsHStackItem span={8}>
+      <DynamicFormField fieldName={fieldNames.street} />
+    </FieldsHStackItem>
+    <FieldsHStackItem span={4}>
+      <DynamicFormField fieldName={fieldNames.houseNumber} />
+    </FieldsHStackItem>
+  </FieldsHStack>
+  <DynamicFormField fieldName={fieldNames.postalCode} />
+</Fields>
+```
+
+Common span combinations: `8/4` (street/number), `6/6` (equal halves), `3/3/3/3` (quarters).
+
+### Grouped Fields with `Fieldset` / `FieldsetLegend`
+
+Use `Fieldset` to group related fields with an optional legend and disabled state:
+
+```tsx
+import {
+  Fieldset,
+  FieldsetLegend,
+} from "@finstreet/ui/components/base/Form/Fieldset";
+
+<Fieldset disabled={!editable}>
+  <Fields>
+    <FieldsetLegend>{t("fieldSets.person.title")}</FieldsetLegend>
+    <DynamicFormField fieldName={fieldNames.firstName} />
+    <DynamicFormField fieldName={fieldNames.lastName} />
+  </Fields>
+</Fieldset>
+```
+
+Multiple `Fieldset` blocks can be stacked with `VStack`:
+
+```tsx
+<VStack gap={8} alignItems="stretch">
+  <Fieldset>
+    <Fields>
+      <FieldsetLegend>{t("fieldSets.address.title")}</FieldsetLegend>
+      <DynamicFormField fieldName={fieldNames.street} />
+      <DynamicFormField fieldName={fieldNames.city} />
+    </Fields>
+  </Fieldset>
+  <Fieldset>
+    <Fields>
+      <FieldsetLegend>{t("fieldSets.contact.title")}</FieldsetLegend>
+      <DynamicFormField fieldName={fieldNames.email} />
+      <DynamicFormField fieldName={fieldNames.phone} />
+    </Fields>
+  </Fieldset>
+</VStack>
+```
+
+### Conditional JSX with `useWatch`
+
+When you need to conditionally render custom JSX (not just show/hide a DynamicFormField — use `renderCondition` for that), use `useWatch` from `react-hook-form`:
+
+```tsx
+import { useWatch } from "react-hook-form";
+
+export const {FormName}FormFields = ({ fieldNames }: {FormName}FormFieldsProps) => {
+  const accountType = useWatch({ name: fieldNames.accountType });
+
+  return (
+    <Fields>
+      <DynamicFormField fieldName={fieldNames.accountType} />
+      {accountType === "fixedDeposit" && (
+        <SomeCustomComponent />
+      )}
+    </Fields>
+  );
+};
+```
+
+Import `useWatch` from `react-hook-form` (not from `@finstreet/forms/rhf`).
 
 ### With Array Fields
 

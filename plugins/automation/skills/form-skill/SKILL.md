@@ -93,11 +93,32 @@ import { DeepPartial, useFieldArray } from "@finstreet/forms/rhf";
 // UI components
 import { Button } from "@finstreet/ui/components/base/Button";
 import { HStack, VStack, Box } from "@styled-system/jsx";
-import { Fields } from "@finstreet/ui/components/pageLayout/Fields";
+import { Fields, FieldsHStack, FieldsHStackItem } from "@finstreet/ui/components/pageLayout/Fields";
 import { Typography } from "@finstreet/ui/components/base/Typography";
+import { Fieldset, FieldsetLegend } from "@finstreet/ui/components/base/Form/Fieldset";
 
 // Translations
 import { useTranslations } from "next-intl";
+
+// Date parsing for datepicker constraints (minDate/maxDate)
+import { parseDate } from "@ark-ui/react";
+
+// Boolean to YesNo mapping for default values
+import { transformBooleanToYesNoOption } from "@/shared/components/form/YesNoRadioGroup/options";
+
+// Cache revalidation in form actions
+import { revalidatePath } from "next/cache";
+
+// Portal and product context (for modal forms and portal-aware actions)
+import { usePortal } from "@/shared/context/portal/portalContext";
+import { useProduct } from "@/shared/context/product/productContext";
+import { Portal, Product } from "@/shared/types/Portal";
+
+// Router for back navigation in formConfig
+import { useRouter } from "next/navigation";
+
+// Conditional rendering in FormFields beyond renderCondition
+import { useWatch } from "react-hook-form";
 ```
 
 ## Step-by-Step Reference
@@ -124,6 +145,19 @@ When a form action needs IDs (e.g., `financingCaseId`), they MUST be:
 |------------|--------------|
 | `input` | `""` |
 | All others | `undefined` |
+
+When backend returns booleans for `yes-no-radio-group` fields, map them using `transformBooleanToYesNoOption`:
+
+```typescript
+import { transformBooleanToYesNoOption } from "@/shared/components/form/YesNoRadioGroup/options";
+
+return {
+  ...defaultValues,
+  isSubCommunity: transformBooleanToYesNoOption(backendValues.isSubCommunity),
+};
+```
+
+This converts `boolean | null | undefined` → `YesNoOptions.YES | YesNoOptions.NO | undefined`.
 
 ## FormState Type
 

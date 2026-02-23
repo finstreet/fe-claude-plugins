@@ -84,3 +84,89 @@ Key differences from select/radio options:
 - Uses `id` instead of `value`
 - Requires an `icon` property
 - Optional `subLabel` for additional description text
+
+## Options from API Responses
+
+When options depend on backend data (dynamic labels, dynamic sublabels, API-provided lists), pass the API response as a parameter to the options hook:
+
+```typescript
+// path: {parent}/options/useAccountKindOptions.ts
+import { useTranslations } from "next-intl";
+import { FaHouse } from "react-icons/fa6";
+import { GetOptionsResponseType } from "@/shared/backend/models/someResource";
+
+export enum AccountKindOptions {
+  CHECKING_ACCOUNT = "checkingAccount",
+  FIXED_DEPOSIT = "fixedDeposit",
+}
+
+export function useAccountKindOptions(
+  options: GetOptionsResponseType,
+) {
+  const t = useTranslations("accountKinds.items");
+
+  return [
+    {
+      label: t("checkingAccount.label"),
+      subLabel: `${options.overnightDepositInterestRate}%`, // Dynamic from backend
+      id: AccountKindOptions.CHECKING_ACCOUNT,
+      icon: FaHouse,
+    },
+    {
+      label: t("fixedDeposit.label"),
+      subLabel: `${options.fixedDepositRate}%`, // Dynamic from backend
+      id: AccountKindOptions.FIXED_DEPOSIT,
+      icon: FaHouse,
+    },
+  ];
+}
+```
+
+Then pass the API data through to the options hook in useFormFields:
+
+```typescript
+export function use{FormName}FormFields(
+  options: GetOptionsResponseType,
+): FormFieldsType<{FormName}Type> {
+  const accountKindOptions = useAccountKindOptions(options);
+  // ...
+}
+```
+
+## Inline Options from API Data
+
+For simple cases where a separate options hook would be overkill, map API data directly in useFormFields:
+
+```typescript
+export function use{FormName}FormFields(
+  options: GetOptionsResponseType,
+): FormFieldsType<{FormName}Type> {
+  const t = useTranslations("{namespace}.fields");
+
+  return {
+    investmentDurations: {
+      type: "select",
+      label: t("investmentDurations.label"),
+      items: options.durations.map((d) => ({
+        label: `${d.amount} ${d.displayUnit}`,
+        value: d.amount.toString(),
+      })),
+    },
+    department: {
+      type: "select",
+      label: t("department.label"),
+      items: options.departments.map((dept) => ({
+        label: dept.label,
+        value: dept.value,
+      })),
+    },
+  };
+}
+```
+
+When useFormFields accepts parameters, the formConfig must pass them through:
+
+```typescript
+// In useFormConfig:
+const fields = use{FormName}FormFields(options);
+```

@@ -103,7 +103,22 @@ birthDate: {
 },
 ```
 
-No additional properties.
+Additional properties:
+- `minDate?: DateValue` — earliest selectable date
+- `maxDate?: DateValue` — latest selectable date
+
+Use `parseDate()` from `@ark-ui/react` to create `DateValue` instances:
+
+```typescript
+import { parseDate } from "@ark-ui/react";
+
+debitDate: {
+  type: "datepicker",
+  label: t("debitDate.label"),
+  minDate: parseDate(options.minDebitDate),   // e.g. parseDate("2024-01-01") or parseDate(new Date(...))
+  maxDate: parseDate(options.maxDebitDate),
+},
+```
 
 ## `select`
 
@@ -173,6 +188,42 @@ usagePurposes: {
 Additional properties:
 - `options: SelectableCardOption[]` - **required** - array of `{ id: string; label: string; subLabel?: string; icon: ComponentType }`
 - `selectType: "single" | "multiple"` - **required**
+- `columns?: { base: number; lg: number }` — responsive column layout (e.g., `{ base: 1, lg: 3 }`)
+- `iconSize?: "s" | "m" | "l"` — icon size
+
+## `file-upload`
+
+For file upload fields. Schema should use `z.any().array()`.
+
+```typescript
+fspDocument: {
+  type: "file-upload",
+  label: t("fspDocument.label"),
+  maxFiles: 1,
+  showPreviewList: true,
+  translations: {
+    dropzone: t("fspDocument.fileInputTranslations.dropzone"),
+    acceptedTypes: t("fspDocument.fileInputTranslations.acceptedTypes"),
+    maxFileSize: t("fspDocument.fileInputTranslations.maxFileSize"),
+    processing: t("fspDocument.fileInputTranslations.processing"),
+  },
+  maxFileSize: Constants.maxFileSize,
+  acceptedTypes: ["application/pdf"],
+},
+```
+
+Additional properties:
+- `maxFiles: number` - **required** — maximum number of files
+- `showPreviewList: boolean` - **required** — whether to show file preview
+- `translations: { dropzone: string; acceptedTypes: string; maxFileSize: string; processing: string }` - **required**
+- `maxFileSize: number` - **required** — max size in bytes
+- `acceptedTypes: string[]` - **required** — MIME types (e.g., `["application/pdf"]`)
+
+Schema for file upload fields:
+
+```typescript
+fspDocument: z.any().array(),
+```
 
 ## `array`
 

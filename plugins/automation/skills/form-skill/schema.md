@@ -123,6 +123,74 @@ export type {FormName}FormConfig = FormConfig<{FormName}FormState, {FormName}Typ
 export type {FormName}DefaultValues = DeepPartial<{FormName}Type>;
 ```
 
+## Dynamic Schema Functions
+
+When schema validation depends on runtime data (e.g., date ranges from an API response), create a function that returns the schema:
+
+```typescript
+import * as z from "@/lib/zod";
+import dayjs from "dayjs";
+
+export function use{FormName}Schema(minDate: string, maxDate: string) {
+  return z
+    .object({
+      debitDate: z.trimmedString().min(1),
+      // ... other fields
+    })
+    .superRefine((data, ctx) => {
+      const parsed = dayjs(data.debitDate, "YYYY-MM-DD");
+      if (parsed.isBefore(dayjs(minDate))) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["debitDate"],
+          params: { errorType: CustomErrorType.DATE_TOO_EARLY, date: minDate },
+        });
+      }
+      if (parsed.isAfter(dayjs(maxDate))) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["debitDate"],
+          params: { errorType: CustomErrorType.DATE_TOO_LATE, date: maxDate },
+        });
+      }
+    });
+}
+```
+
+In the formConfig, call the function with values from the API:
+
+```typescript
+schema: use{FormName}Schema(options.minDate, options.maxDate),
+```
+
+Type exports for dynamic schemas use `ReturnType`:
+
+```typescript
+export type {FormName}Type = z.input<ReturnType<typeof use{FormName}Schema>>;
+export type {FormName}OutputType = z.output<ReturnType<typeof use{FormName}Schema>>;
+```
+
+## Conditional Schema with `.omit()`
+
+When certain fields should only be validated based on a condition (e.g., a permission flag), use `.omit()` in the formConfig:
+
+```typescript
+// In useFormConfig:
+schema: fieldRequired
+  ? {formName}Schema
+  : {formName}Schema.omit({ conditionalField: true }),
+```
+
+Real example — omitting a field when not required by permissions:
+
+```typescript
+schema: propertyManagementTaxIdRequired
+  ? additionalInformationSchema
+  : additionalInformationSchema.omit({ propertyManagementTaxId: true }),
+```
+
+This is preferred over making the field `.optional()` when the field's visibility is determined by external conditions (not form values).
+
 ## Create / Update Schema Pattern
 
 For forms with both create and update, export a base schema and an extended one:
