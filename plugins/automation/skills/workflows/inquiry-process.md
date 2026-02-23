@@ -1,8 +1,3 @@
----
-name: inquiry-process-workflow
-description: "End-to-end inquiry process creation workflow. Determines routes, resolves parent directories, adds translations, and creates all inquiry process files sequentially. Use when creating a complete inquiry process feature from scratch."
----
-
 # Inquiry Process Workflow
 
 End-to-end orchestration for creating an inquiry process feature.

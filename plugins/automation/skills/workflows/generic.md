@@ -1,8 +1,3 @@
----
-name: generic-workflow
-description: "Generic feature creation workflow. Resolves parent directories and delegates to a general-purpose agent. Use when creating a feature that doesn't fit any specific workflow type."
----
-
 # Generic Workflow
 
 End-to-end orchestration for creating a generic feature.

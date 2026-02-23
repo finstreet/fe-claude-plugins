@@ -1,17 +1,12 @@
----
-name: modal-workflow
-description: "End-to-end modal creation workflow. Resolves parent directories, adds translations, and creates the modal component. Use when creating a complete modal feature from scratch."
----
+# Interactive List Workflow
 
-# Modal Workflow
-
-End-to-end orchestration for creating a modal feature.
+End-to-end orchestration for creating an interactive list feature.
 
 ## Input
 
 You will receive one of:
 - A `subtaskId` — call `get_subtask_by_id` to fetch context (featureName, subFeatureName, featureType, product, role, metadata)
-- Direct arguments via $ARGUMENTS: featureName, subFeatureName, featureType, product, role, metadata
+- Direct arguments via $ARGUMENTS: featureName, subFeatureName, featureType, product, role
 
 ## Steps
 
@@ -36,16 +31,14 @@ Spawn a `general-purpose-agent` with the following context and instructions:
 - featureType
 - product (optional)
 - role (optional)
-- metadata
-- content: ALWAYS pass the full content that you receive from the subtask. Do NOT add anything else, just pass this down.
 
 #### Instructions
 
-You MUST use the `next-intl-skill` to add the correct translations for the modal and update the subtask content with its findings after it is done.
+You MUST use the `next-intl-skill` to add the correct translations for the interactive list and update the subtask content with its findings after it is done.
 
-### Step 3: Implement the modal
+### Step 3: Implement the InteractiveList
 
-Spawn a `modal-agent` to implement everything that is needed for the modal. Always pass the following information:
+Spawn the `ui-agent` with the following context and instructions:
 
 #### Context
 
@@ -54,6 +47,10 @@ Spawn a `modal-agent` to implement everything that is needed for the modal. Alwa
 - featureType
 - product (optional)
 - role (optional)
+
+#### Instructions
+
+Your task is to build an `InteractiveList` based on the context that you received. The file path for the interactiveList is `{featurePath}/{FeatureName}PresentationList.tsx`.
 
 ## Rules
 

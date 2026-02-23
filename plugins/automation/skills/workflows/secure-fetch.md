@@ -1,8 +1,3 @@
----
-name: secure-fetch-workflow
-description: "End-to-end secure fetch (API requests) creation workflow. Resolves parent directories, creates all request schemas and endpoint configs sequentially, and updates task context with usage documentation. Use when creating API request integrations from scratch."
----
-
 # Secure Fetch Workflow
 
 End-to-end orchestration for creating secure fetch (API request) features.

@@ -1,5 +1,5 @@
 ---
-name: form-guide-skill
+name: form-skill
 description: "Complete guide to implementing forms using the @finstreet/forms library. Covers the full file creation order: options, schema, useFormFields, formAction, getDefaultValues, useFormConfig, FormFields component, and Form component. Use when building, modifying, or debugging any form in the finstreet context."
 ---
 

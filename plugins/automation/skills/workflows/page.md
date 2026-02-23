@@ -1,8 +1,3 @@
----
-name: page-workflow
-description: "End-to-end page creation workflow. Determines routes, adds translations, and creates the page component. Use when creating a complete page feature from scratch."
----
-
 # Page Workflow
 
 End-to-end orchestration for creating a page feature.

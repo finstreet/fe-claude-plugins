@@ -1,8 +1,3 @@
----
-name: task-group-workflow
-description: "End-to-end task group creation workflow. Adds translations and creates all task group files sequentially. Use when creating a complete task group feature from scratch."
----
-
 # Task Group Workflow
 
 End-to-end orchestration for creating a task group feature.

@@ -1,8 +1,3 @@
----
-name: simple-form-workflow
-description: "Simple form creation workflow. Delegates to the simple-form-agent with full context. Use when creating a simple form that doesn't require the full form workflow (no parent path resolution or translations needed)."
----
-
 # Simple Form Workflow
 
 Orchestration for creating a simple form feature.

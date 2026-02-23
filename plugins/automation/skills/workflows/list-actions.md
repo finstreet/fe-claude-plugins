@@ -1,8 +1,3 @@
----
-name: list-actions-workflow
-description: "End-to-end list actions (pagination) creation workflow. Resolves parent directories, adds translations, and creates all pagination files sequentially. Use when adding pagination and actions to an existing interactive list."
----
-
 # List Actions Workflow
 
 End-to-end orchestration for creating list actions (pagination) for an interactive list.

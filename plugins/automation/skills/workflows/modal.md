@@ -1,17 +1,12 @@
----
-name: interactive-list-workflow
-description: "End-to-end interactive list creation workflow. Resolves parent directories, adds translations, and creates the InteractiveList component. Use when creating a complete interactive list feature from scratch."
----
+# Modal Workflow
 
-# Interactive List Workflow
-
-End-to-end orchestration for creating an interactive list feature.
+End-to-end orchestration for creating a modal feature.
 
 ## Input
 
 You will receive one of:
 - A `subtaskId` — call `get_subtask_by_id` to fetch context (featureName, subFeatureName, featureType, product, role, metadata)
-- Direct arguments via $ARGUMENTS: featureName, subFeatureName, featureType, product, role
+- Direct arguments via $ARGUMENTS: featureName, subFeatureName, featureType, product, role, metadata
 
 ## Steps
 
@@ -36,14 +31,16 @@ Spawn a `general-purpose-agent` with the following context and instructions:
 - featureType
 - product (optional)
 - role (optional)
+- metadata
+- content: ALWAYS pass the full content that you receive from the subtask. Do NOT add anything else, just pass this down.
 
 #### Instructions
 
-You MUST use the `next-intl-skill` to add the correct translations for the interactive list and update the subtask content with its findings after it is done.
+You MUST use the `next-intl-skill` to add the correct translations for the modal and update the subtask content with its findings after it is done.
 
-### Step 3: Implement the InteractiveList
+### Step 3: Implement the modal
 
-Spawn the `ui-agent` with the following context and instructions:
+Spawn a `modal-agent` to implement everything that is needed for the modal. Always pass the following information:
 
 #### Context
 
@@ -52,10 +49,6 @@ Spawn the `ui-agent` with the following context and instructions:
 - featureType
 - product (optional)
 - role (optional)
-
-#### Instructions
-
-Your task is to build an `InteractiveList` based on the context that you received. The file path for the interactiveList is `{featurePath}/{FeatureName}PresentationList.tsx`.
 
 ## Rules
 

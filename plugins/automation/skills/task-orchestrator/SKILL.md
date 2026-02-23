@@ -23,27 +23,16 @@ Your job is it to work through all of the tasks that are in the `./context` fold
 
 ## Instructions
 
-You can get all the needed instructions from the `get_task_instructions` tool call. You can call the tool with a given topic like this:
+Use the `automation:workflows` skill to dispatch to the correct workflow for each subtask. Pass the workflow type as the first argument and the subtaskId as the second:
 
-```json
-{
-    "topics": ["form"]
-}
+```
+/workflows <type> <subtaskId>
 ```
 
-### 1. Form
-TopicName: form
-### 2. Inquiry Process
-TopicName: inquiry-process
-### 3. Requests
-TopicName: secure-fetch
-### 4. InteractiveLists
-TopicName: interactive-list
-### 5. ListActions
-TopicName: list-actions
-### 6. Modal
-TopicName: modal
-### 7. Simple Form
-TopicName: simple-form
-### 8. Page
-TopicName: page
+Available workflow types: `form`, `modal`, `page`, `inquiry-process`, `interactive-list`, `list-actions`, `secure-fetch`, `simple-form`, `task-group`, `generic`.
+
+As a fallback, you can also fetch raw documentation via the `get_task_instructions` tool:
+
+```json
+{ "topics": ["form"] }
+```
