@@ -44,7 +44,12 @@ import { css, cx } from "@styled-system/css";
 ### PandaCSS Recipes
 
 ```typescript
+// Pre-defined recipes (config-level)
 import { transition } from "@styled-system/recipes";
+
+// Runtime recipe creators (code-level)
+import { cva, type RecipeVariantProps } from "@styled-system/css";
+import { sva } from "@styled-system/css";
 ```
 
 ### @finstreet/ui Components
@@ -77,6 +82,7 @@ Detailed documentation for each pattern category:
 - For **VStack, HStack, Box, Flex, Center, Divider** patterns, see [layout-patterns.md](layout-patterns.md)
 - For **Grid, GridItem, CardsGridLayout** patterns, see [grid-patterns.md](grid-patterns.md)
 - For **css(), cx(), styled, transition, conditional styles**, see [styling-utilities.md](styling-utilities.md)
+- For **cva (atomic recipes), sva (slot recipes), variant props**, see [recipes.md](recipes.md)
 - For **breakpoints, hideFrom/hideBelow, responsive props**, see [responsive-design.md](responsive-design.md)
 
 ## Rules
