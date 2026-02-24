@@ -22,25 +22,15 @@ Invoke the `automation:parent-directory` skill to resolve the correct paths for 
 
 ### Step 2: Add translations
 
-Spawn a `general-purpose-agent` with the following context and instructions:
+Invoke the `automation:next-intl` skill. ALWAYS pass the following information:
 
-#### Context
+- metadata
 
-- subtask_id
-- featureName
-- featureType
-- product (optional)
-- role (optional)
-
-#### Instructions
-
-You MUST use the `next-intl-skill` to add the correct translations for the interactive list and update the subtask content with its findings after it is done.
+The skill will add the correct translations for the interactive list and update the subtask content with its findings after it is done. Your ONLY task in this step is to add the translations. DO NOT make any other changes! You are DONE with this step after the translations have been added and the subtask content has been updated.
 
 ### Step 3: Implement the InteractiveList
 
-Spawn the `ui-agent` with the following context and instructions:
-
-#### Context
+Invoke the `automation:ui-skill` skill to build the InteractiveList. ALWAYS pass the following information:
 
 - subtask_id
 - featureName
@@ -48,12 +38,10 @@ Spawn the `ui-agent` with the following context and instructions:
 - product (optional)
 - role (optional)
 
-#### Instructions
-
-Your task is to build an `InteractiveList` based on the context that you received. The file path for the interactiveList is `{featurePath}/{FeatureName}PresentationList.tsx`.
+The file path for the interactiveList is `{featurePath}/{FeatureName}PresentationList.tsx`.
 
 ## Rules
 
 1. Execute steps sequentially — each step depends on the previous
-2. Always pass prior findings (paths, created files) to subsequent agents
-3. Each agent must update subtask content with its findings
+2. Always pass prior findings (paths, created files) to subsequent steps
+3. Each step must update subtask content with its findings

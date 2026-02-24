@@ -19,9 +19,9 @@ Route to the correct workflow based on the first argument.
 | `interactive-list` | End-to-end interactive list creation (parent paths, translations, list component) | [interactive-list.md](./interactive-list.md) |
 | `list-actions` | End-to-end list actions/pagination creation for interactive lists | [list-actions.md](./list-actions.md) |
 | `secure-fetch` | End-to-end secure fetch/API request creation (parent paths, schemas, endpoints) | [secure-fetch.md](./secure-fetch.md) |
-| `simple-form` | Simple form creation (delegates directly to simple-form-agent) | [simple-form.md](./simple-form.md) |
+| `simple-form` | Simple form creation (delegates to form skill) | [simple-form.md](./simple-form.md) |
 | `task-group` | End-to-end task group creation (translations, all task group files) | [task-group.md](./task-group.md) |
-| `generic` | Generic feature creation (parent paths, general-purpose agent) | [generic.md](./generic.md) |
+| `generic` | Generic feature creation (parent paths, general implementation) | [generic.md](./generic.md) |
 
 ## Input Contract
 
@@ -37,5 +37,5 @@ Route to the correct workflow based on the first argument.
 5. Follow the loaded workflow instructions exactly
 
 ## Rules
-1. In each workflow I want you to spawn a new `general-purpose` subagent if not specified otherwise and invoke the skill / task inside of the subagent. Never run these in the main thread.
-2. Tell all agents for the subtasks (if not otherwise specified) to not look for patterns in the codebase! They should follow the plan and implement everything according to their instructions! They should only try to find necessart information if absolutely necessary!
+1. For each step in a workflow, spawn a new `general-purpose` subagent (if not specified otherwise) and invoke the skill / task inside of the subagent. Never run these in the main thread.
+2. Tell all subagents (if not otherwise specified) to not look for patterns in the codebase! They should follow the plan and implement everything according to their instructions! They should only try to find necessary information if absolutely necessary!

@@ -39,7 +39,7 @@ Invoke the `automation:form-skill` skill. It contains the complete guide for imp
 - role (optional)
 - List of all files created previously
 
-ALWAYS tell the agent to follow these rules:
+ALWAYS tell the skill to follow these rules:
 - you can create all files in parallel
 
 ### Step 4: Update task context with usage documentation

@@ -35,46 +35,25 @@ Invoke the `automation:parent-directory` skill to resolve the correct paths for 
 
 ### Step 3: Add translations
 
-Spawn a `general-purpose-agent` with the following context and instructions:
+Invoke the `automation:next-intl` skill. ALWAYS pass the following information:
 
-#### Context
+- metadata
 
-- subtask_id
-- featureName
-- featureType
-- product (optional)
-- role (optional)
-
-#### Instructions
-
-You MUST use the `next-intl-skill` to add the correct translations for the inquiry process and update the subtask content with its findings after it is done.
+The skill will add the correct translations for the inquiry process and update the subtask content with its findings after it is done. Your ONLY task in this step is to add the translations. DO NOT make any other changes! You are DONE with this step after the translations have been added and the subtask content has been updated.
 
 ### Step 4: Implement the inquiry process
 
-Get the inquiry process overview documentation from the `get_inquiry_process` tool. Follow the order from the documentation and create ALL necessary files in sequence. You ALWAYS spawn one `inquiry-process-agent` for each file. Spawn all of these subagents in sequence — never in parallel. ALWAYS pass this to the subagents:
-
-#### Context
+Invoke the `automation:inquiry-process` skill. It contains the complete guide for implementing inquiry processes. Follow the order from the skill and create ALL necessary files. ALWAYS pass the following information:
 
 - subtask_id
 - featureName
 - featureType
 - product (optional)
 - role (optional)
-
-#### Files created
-
-- List all files that were created previously
-
-#### Instructions
-
-- ONLY mention which file to create! Do NOT give any other instructions as the subagent will receive them from the respective tool calls
+- List of all files created previously
 
 ## Rules
 
 1. Execute steps sequentially — each step depends on the previous
-2. Always pass prior findings (paths, created files) to subsequent agents
-3. Each agent must update subtask content with its findings
-4. Use the `get_inquiry_process` tool to get documentation topics:
-   ```json
-   { "topics": ["overview"] }
-   ```
+2. Always pass prior findings (paths, created files) to subsequent steps
+3. Each step must update subtask content with its findings

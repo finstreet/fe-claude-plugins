@@ -22,27 +22,15 @@ Invoke the `automation:parent-directory` skill to resolve the correct paths for 
 
 ### Step 2: Add translations
 
-Spawn a `general-purpose-agent` with the following context and instructions:
+Invoke the `automation:next-intl` skill. ALWAYS pass the following information:
 
-#### Context
-
-- subtask_id
-- featureName
-- featureType
-- product (optional)
-- role (optional)
 - metadata
-- content: ALWAYS pass the full content that you receive from the subtask. Do NOT add anything else, just pass this down.
 
-#### Instructions
-
-You MUST use the `next-intl-skill` to add the correct translations for the modal and update the subtask content with its findings after it is done.
+The skill will add the correct translations for the modal and update the subtask content with its findings after it is done. Your ONLY task in this step is to add the translations. DO NOT make any other changes! You are DONE with this step after the translations have been added and the subtask content has been updated.
 
 ### Step 3: Implement the modal
 
-Spawn a `modal-agent` to implement everything that is needed for the modal. Always pass the following information:
-
-#### Context
+Invoke the `automation:modal` skill to implement everything that is needed for the modal. ALWAYS pass the following information:
 
 - subtask_id
 - featureName
@@ -53,5 +41,5 @@ Spawn a `modal-agent` to implement everything that is needed for the modal. Alwa
 ## Rules
 
 1. Execute steps sequentially — each step depends on the previous
-2. Always pass prior findings (paths, created files) to subsequent agents
-3. Each agent must update subtask content with its findings
+2. Always pass prior findings (paths, created files) to subsequent steps
+3. Each step must update subtask content with its findings

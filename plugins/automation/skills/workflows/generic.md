@@ -22,9 +22,7 @@ Invoke the `automation:parent-directory` skill to resolve the correct paths for 
 
 ### Step 2: Implement requirements
 
-ALWAYS spawn a `general-purpose-agent` for this task and give it the following context and instructions:
-
-#### Context
+Follow the instructions in content and metadata to implement the needed changes. ALWAYS pass the following information:
 
 - featureName
 - subFeatureName
@@ -34,12 +32,8 @@ ALWAYS spawn a `general-purpose-agent` for this task and give it the following c
 - content
 - metadata
 
-#### Instructions
-
-Follow the instructions in content and metadata to implement the needed changes.
-
 ## Rules
 
 1. Execute steps sequentially — each step depends on the previous
-2. Always pass prior findings (paths, created files) to subsequent agents
-3. Each agent must update subtask content with its findings
+2. Always pass prior findings (paths, created files) to subsequent steps
+3. Each step must update subtask content with its findings

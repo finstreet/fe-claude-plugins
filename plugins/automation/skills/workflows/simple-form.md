@@ -12,9 +12,7 @@ You will receive one of:
 
 ### Step 1: Implement the SimpleForm
 
-ALWAYS spawn a `simple-form-agent` for this task and give it the following context and instructions:
-
-#### Context
+Invoke the `automation:form-skill` skill. ALWAYS pass the following information:
 
 - featureName
 - subFeatureName
@@ -24,11 +22,9 @@ ALWAYS spawn a `simple-form-agent` for this task and give it the following conte
 - content
 - metadata
 
-#### Instructions
-
 Follow the instructions in content and metadata to implement the needed changes.
 
 ## Rules
 
-1. Pass all available context to the simple-form-agent
-2. The agent handles all implementation details — do not add extra instructions
+1. Pass all available context to the skill
+2. The skill handles all implementation details — do not add extra instructions
