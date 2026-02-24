@@ -30,7 +30,7 @@ The skill will add the correct translations for the form and update the subtask 
 
 ### Step 3: Implement the form
 
-Invoke the `automation:form-skill` skill. It contains the complete guide for implementing forms using `@finstreet/forms`. Follow the file creation order from the skill exactly and create ALL necessary files in sequence for the form. ALWAYS pass the following information:
+Invoke the `automation:form-skill` skill. It contains the complete guide for implementing forms using `@finstreet/forms`. Follow the file creation order from the skill exactly and create ALL necessary files. ALWAYS pass the following information:
 
 - subtask_id
 - featureName
@@ -38,6 +38,10 @@ Invoke the `automation:form-skill` skill. It contains the complete guide for imp
 - product (optional)
 - role (optional)
 - List of all files created previously
+
+ALWAYS tell the agent to follow these rules:
+- you can create all files in parallel
+- DO NOT look through the codebase for similar patterns, your instructions are enough to implement the given feature
 
 ### Step 4: Update task context with usage documentation
 
