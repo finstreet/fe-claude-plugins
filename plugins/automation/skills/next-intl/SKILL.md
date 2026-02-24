@@ -13,3 +13,7 @@ ALWAYS start by reading the `./reference/general-information.md` file!
 1. Look up the correct documentation for a given featureType inside `./reference/features/`. There is one Markdown file for each featureType that explains the translations.
 2. Based on the reference and the context that you receive correctly add the translation to the `de.json` file.
 3. Build the answer according to the `./reference/response.md` file
+
+## Rules
+
+1. DO NOT look through the codebase for patterns or information. You can implement everything based on your skills context and the provided instructions. You are only allowed to search through the codebase if absolutely necessary!

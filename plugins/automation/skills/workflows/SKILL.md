@@ -37,4 +37,5 @@ Route to the correct workflow based on the first argument.
 5. Follow the loaded workflow instructions exactly
 
 ## Rules
-In each workflow I want you to spawn a new `general-purpose` subagent if not specified otherwise and invoke the skill / task inside of the subagent. Never run these in the main thread.
+1. In each workflow I want you to spawn a new `general-purpose` subagent if not specified otherwise and invoke the skill / task inside of the subagent. Never run these in the main thread.
+2. Tell all agents for the subtasks (if not otherwise specified) to not look for patterns in the codebase! They should follow the plan and implement everything according to their instructions! They should only try to find necessart information if absolutely necessary!
