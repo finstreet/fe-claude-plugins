@@ -35,3 +35,6 @@ Route to the correct workflow based on the first argument.
 3. Load the matching `.md` file from this directory
 4. Pass `$ARGUMENTS[1..]` as the workflow's input
 5. Follow the loaded workflow instructions exactly
+
+## Rules
+In each workflow I want you to spawn a new `general-purpose` subagent if not specified otherwise and invoke the skill / task inside of the subagent. Never run these in the main thread.

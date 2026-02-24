@@ -6,14 +6,13 @@ End-to-end orchestration for creating a form feature.
 
 You will receive one of:
 - A `subtaskId` — call `get_subtask_by_id` to fetch context (featureName, subFeatureName, featureType, product, role, metadata)
-- After each step fetch the update subtask content to get the findings from the previous task and pass the update to the new one
 - Direct arguments via $ARGUMENTS: featureName, subFeatureName, featureType, product, role
 
 ## Steps
 
 ### Step 1: Get parent paths
 
-Start a `general-purpose` subagent and tell it to invoke the `automation:parent-directory` skill to resolve the correct paths for this feature. It will update the subtask content with its findings after it is done. ALWAYS pass the following information:
+Invoke the `automation:parent-directory` skill to resolve the correct paths for this feature. It will update the subtask content with its findings after it is done. ALWAYS pass the following information:
 
 - featureName
 - subFeatureName (which is the name of the subtask)
@@ -23,7 +22,7 @@ Start a `general-purpose` subagent and tell it to invoke the `automation:parent-
 
 ### Step 2: Add translations
 
-Start a `general-purpose` subagent and tell it to invoke the `automation:next-intl-skill` skill. ALWAYS pass the following information:
+Invoke the `automation:next-intl-skill` skill. ALWAYS pass the following information:
 
 - metadata
 
@@ -31,7 +30,7 @@ The skill will add the correct translations for the form and update the subtask 
 
 ### Step 3: Implement the form
 
-Start a `general-purpose` subagent and tell it to invoke the `automation:form-skill` skill. It contains the complete guide for implementing forms using `@finstreet/forms`. Follow the file creation order from the skill exactly and create ALL necessary files in sequence for the form. ALWAYS pass the following information:
+Invoke the `automation:form-skill` skill. It contains the complete guide for implementing forms using `@finstreet/forms`. Follow the file creation order from the skill exactly and create ALL necessary files in sequence for the form. ALWAYS pass the following information:
 
 - subtask_id
 - featureName
