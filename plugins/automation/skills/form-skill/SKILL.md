@@ -7,6 +7,16 @@ description: "Complete guide to implementing forms using the @finstreet/forms li
 
 This project uses `@finstreet/forms`, a type-safe form library built on react-hook-form, Zod, and custom UI components. Every form follows a strict file structure and creation order.
 
+## Mode Selection
+
+When this skill is invoked, determine the mode:
+
+### Build Mode (default for workflows)
+If you receive a **subtask ID**, **metadata**, or a **structured field spec** (JSON with `workflow`, `form`, and `fields` keys), skip intake and go directly to [File Creation Order](#file-creation-order).
+
+### Interactive Mode (direct user invocation)
+If the user describes a form informally (e.g., "I need a form with firstName, lastName...") without providing a structured spec, follow [intake.md](intake.md) to gather all required information via `AskUserQuestion` and create a JIRA ticket with the compiled specification. Interactive mode does NOT build the form — it only produces the ticket.
+
 ## Architecture
 
 ```
