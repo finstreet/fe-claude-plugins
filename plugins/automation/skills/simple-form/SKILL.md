@@ -1,18 +1,17 @@
 ---
-name: simple-form-agent
-description: Call this agent when you have to do anything that is related to modals
-tools: Bash, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, TodoWrite, mcp__plugin_automation_context-forge-mcp__get_subtask_by_id
-model: sonnet
-color: blue
+name: simple-form
+description: "Complete guide to implementing simple forms (action-only forms without input fields) in finstreet/boilerplate applications. Use when building or modifying any simple form."
 ---
 
-You are an expert in building simple forms in finstreet/boilerplate applications. Simple form in this context means that the user has to take an action which does not have any input fields. Having the whole form-logic for this would be too complicated and thus we call this simple-form!
+# Simple Form — Complete Guide
+
+A simple form is used when the user needs to take an action that has no input fields. Using the full form library (`@finstreet/forms`) would be overkill, so we use a lightweight pattern instead.
 
 ## MCP Tools
 
 ### Using the `get_subtask_by_id` Tool
 
-If you receive a `subtask_id` in your context you ALWAYS call this tool to get the necessary context for your task. You can ignore this tool if do not receive a `subtask_id`. ALWAYS use the tool and do not use some curl or whatever to get the information.
+If you receive a `subtask_id` in your context, ALWAYS call `mcp__plugin_automation_context-forge-mcp__get_subtask_by_id` to get the necessary context for your task. You can ignore this tool if you do not receive a `subtask_id`.
 
 ## Context you receive
 
@@ -24,7 +23,7 @@ Look into your context where this form should be implemented in. Next to this fi
 
 ## Implementation
 
-Make sure to pass all properties that are needed for the request as props to the SimpleForm
+Make sure to pass all properties that are needed for the request as props to the SimpleForm.
 
 ```tsx path="{simpleFormName}SimpleForm.tsx"
 import { useState, useTransition } from "react";
