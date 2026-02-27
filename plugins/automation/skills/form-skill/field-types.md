@@ -191,6 +191,71 @@ Additional properties:
 - `columns?: { base: number; lg: number }` — responsive column layout (e.g., `{ base: 1, lg: 3 }`)
 - `iconSize?: "s" | "m" | "l"` — icon size
 
+## `combobox`
+
+An async search-driven dropdown that fetches suggestions as the user types. Combobox fields require a **search hook** that defines how to fetch items, what happens on select, and what happens on clear. See [file-templates.md](file-templates.md#combobox-search-hook) for the hook template.
+
+```typescript
+const { onSelect, onClear, getItems } = usePropertyManagementSearch();
+
+propertyManagementSuggestions: {
+  type: "combobox",
+  label: t("propertyManagementSuggestions.label"),
+  caption: t("propertyManagementSuggestions.caption"),
+  onSelect,
+  onClear,
+  getItems,
+},
+```
+
+Additional properties:
+- `getItems: (searchQuery: string) => Promise<ComboboxItems>` - **required** - async function to fetch suggestions
+- `onSelect: (item: ComboboxItem, setValue: UseFormSetValue<any>) => void` - **required** - handler when user selects an item, typically populates other form fields
+- `onClear: (setValue: UseFormSetValue<any>) => void` - **required** - handler when user clears the selection, typically resets related form fields
+- `items?: ComboboxItems` - static list of items (alternative to `getItems` for non-async use)
+- `searchLengthTrigger?: number` - minimum characters before search triggers
+- `renderItem?: (item: ComboboxItem) => ReactNode` - custom rendering for dropdown items
+
+Example with `renderItem` (showing postal code + city name):
+
+```typescript
+const { onSelect, onClear, getItems } = usePostalCodeSearch({
+  cityFieldName: "city",
+  postalCodeFieldName: "postalCode",
+});
+
+postalCode: {
+  type: "combobox",
+  label: t("postalCode.label"),
+  onSelect,
+  onClear,
+  getItems,
+  renderItem: (item) => `${item.value} ${item.data.name}`,
+},
+```
+
+Import `ComboboxItem` from `@finstreet/ui/components/base/Combobox` when typing the hook:
+
+```typescript
+import { ComboboxItem } from "@finstreet/ui/components/base/Combobox";
+```
+
+The `ComboboxItem` type supports a generic `data` property for custom data:
+
+```typescript
+type ComboboxItem<Data = any> = {
+  label: string;
+  value: string | number;
+  disabled?: boolean;
+  key?: string;
+  data?: Data;
+};
+```
+
+**Schema:** Combobox fields are typically validated as `z.trimmedString().optional()` or `z.trimmedString().min(1)` depending on whether selection is required. The combobox field itself is often a search trigger — the **real data** gets populated into other form fields via `onSelect`.
+
+**Default value:** `undefined`
+
 ## `file-upload`
 
 For file upload fields. Schema should use `z.any().array()`.

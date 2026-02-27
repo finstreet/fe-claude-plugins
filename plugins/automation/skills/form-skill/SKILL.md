@@ -27,6 +27,8 @@ Form Component ("use client")
 parentDirectory/
   ├── options/                          # Optional - only if select/radio/selectable-cards fields exist
   │   └── use{OptionName}Options.ts
+  ├── hooks/                            # Optional - only if combobox fields exist
+  │   └── use{HookName}Search.ts
   ├── {formName}Schema.ts
   ├── use{FormName}FormFields.ts
   ├── {formName}FormAction.ts
@@ -59,13 +61,14 @@ parentDirectory/
 ALWAYS create files in this exact sequence:
 
 1. **Options** - `options/use{OptionName}Options.ts` (only for select, radio-group, selectable-cards fields)
-2. **Schema** - `{formName}Schema.ts`
-3. **useFormFields** - `use{FormName}FormFields.ts`
-4. **FormAction** - `{formName}FormAction.ts`
-5. **DefaultValues** - `get{FormName}DefaultValues.ts`
-6. **useFormConfig** - `use{FormName}FormConfig.tsx`
-7. **FormFields** - `{FormName}FormFields.tsx` (skip if only hidden fields)
-8. **Form** - `{FormName}Form.tsx`
+2. **Combobox Hooks** - `hooks/use{HookName}Search.ts` (only for combobox fields)
+3. **Schema** - `{formName}Schema.ts`
+4. **useFormFields** - `use{FormName}FormFields.ts`
+5. **FormAction** - `{formName}FormAction.ts`
+6. **DefaultValues** - `get{FormName}DefaultValues.ts`
+7. **useFormConfig** - `use{FormName}FormConfig.tsx`
+8. **FormFields** - `{FormName}FormFields.tsx` (skip if only hidden fields)
+9. **Form** - `{FormName}Form.tsx`
 
 ## Key Imports
 
@@ -119,6 +122,10 @@ import { useRouter } from "next/navigation";
 
 // Conditional rendering in FormFields beyond renderCondition
 import { useWatch } from "react-hook-form";
+
+// Combobox types (for search hooks)
+import { ComboboxItem } from "@finstreet/ui/components/base/Combobox";
+import { UseFormSetValue } from "react-hook-form";
 ```
 
 ## Step-by-Step Reference
@@ -126,6 +133,7 @@ import { useWatch } from "react-hook-form";
 Each step has detailed documentation in a supporting file:
 
 - For **Options** patterns, see [options.md](options.md)
+- For **Combobox hooks** (search hooks for combobox fields), see [field-types.md](field-types.md#combobox) and [file-templates.md](file-templates.md#combobox-search-hook)
 - For **Schema** patterns (basic, dependent, array, custom validations), see [schema.md](schema.md)
 - For **Field types** reference (all available types and their configs), see [field-types.md](field-types.md)
 - For **File templates** (action, config, fields component, form, default values), see [file-templates.md](file-templates.md)
@@ -144,6 +152,7 @@ When a form action needs IDs (e.g., `financingCaseId`), they MUST be:
 | Field Type | Default Value |
 |------------|--------------|
 | `input` | `""` |
+| `combobox` | `undefined` |
 | All others | `undefined` |
 
 When backend returns booleans for `yes-no-radio-group` fields, map them using `transformBooleanToYesNoOption`:

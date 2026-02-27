@@ -2,6 +2,203 @@
 
 Complete templates for each file in the form creation order.
 
+## 0. Combobox Search Hook
+
+File: `hooks/use{HookName}Search.ts`
+
+Create one hook per combobox field. Each hook returns `{ onSelect, onClear, getItems }`.
+
+### Required information to create a combobox hook
+
+To create a combobox search hook, you need:
+
+1. **API function** - The client-side fetch function to call for suggestions (e.g., `getPropertyManagement` from a secure-fetch client module)
+2. **Response data type** - The TypeScript type of each item in the API response
+3. **Field mapping** - Which API response fields map to which form fields on select (e.g., `data.name` → `setValue("name", ...)`)
+4. **Fields to clear** - Which form fields to reset when the user clears the combobox
+5. **"Not found" item** (optional) - Whether to include a fallback item when the search finds no match, and what it should do (typically calls `onClear`)
+6. **Custom item rendering** (optional) - Whether items need a `renderItem` function for display
+
+### Basic template
+
+```typescript
+import { ComboboxItem } from "@finstreet/ui/components/base/Combobox";
+import { UseFormSetValue } from "react-hook-form";
+import {
+  get{ResourceName} as get{ResourceName}Suggestions,
+  {ResourceName}ResponseDataType,
+  {ResourceName}ResponseType,
+} from "@/shared/backend/models/{resource}/client";
+
+type {ResourceName}SuggestionItem = ComboboxItem<{ResourceName}ResponseDataType>;
+type {ResourceName}SuggestionItems = {ResourceName}SuggestionItem[];
+
+export function use{ResourceName}Search() {
+  const onSelect = (
+    { data }: ComboboxItem,
+    setValue: UseFormSetValue<any>,
+  ) => {
+    if (data) {
+      setValue("fieldA", data.fieldA, { shouldValidate: true });
+      setValue("fieldB", data.fieldB, { shouldValidate: true });
+      // ... map all relevant fields
+    }
+  };
+
+  const onClear = (setValue: UseFormSetValue<any>) => {
+    setValue("{comboboxFieldName}", undefined);
+    setValue("fieldA", "");
+    setValue("fieldB", "");
+    // ... reset all fields that onSelect populates
+  };
+
+  const getItems = async (
+    searchQuery: string,
+  ): Promise<{ResourceName}SuggestionItems> => {
+    const response = await get{ResourceName}Suggestions({
+      pathVariables: { input: searchQuery },
+    });
+
+    return mapSearchItems(response);
+  };
+
+  return {
+    onSelect,
+    onClear,
+    getItems,
+  };
+}
+
+function mapSearchItems(data: {ResourceName}ResponseType): {ResourceName}SuggestionItems {
+  if (!data) return [];
+
+  return data.map((item) => ({
+    label: item.name,
+    value: item.name,
+    data: item,
+  }));
+}
+```
+
+### With "not found" item
+
+When the search should offer a fallback "not found" option that clears related fields:
+
+```typescript
+import { useTranslations } from "next-intl";
+
+export function use{ResourceName}Search() {
+  const t = useTranslations("{translationNamespace}.search");
+
+  const onSelect = (
+    { data }: ComboboxItem,
+    setValue: UseFormSetValue<any>,
+  ) => {
+    if (data?.notFound) {
+      onClear(setValue);
+    } else if (data) {
+      setValue("name", data.name, { shouldValidate: true });
+      setValue("street", data.street, { shouldValidate: true });
+      // ... map all relevant fields
+    }
+  };
+
+  const onClear = (setValue: UseFormSetValue<any>) => {
+    setValue("{comboboxFieldName}", undefined);
+    setValue("name", "");
+    setValue("street", "");
+    // ... reset all fields
+  };
+
+  const getItems = async (
+    searchQuery: string,
+  ): Promise<{ResourceName}SuggestionItems> => {
+    const response = await get{ResourceName}Suggestions({
+      pathVariables: { input: searchQuery },
+    });
+
+    const notFoundItem: {ResourceName}SuggestionItem = {
+      label: t("notFoundLabel"),
+      value: t("notFoundLabel"),
+      data: {
+        // ... empty/default values for all data fields
+        notFound: true,
+      },
+    };
+
+    return [notFoundItem, ...mapSearchItems(response)];
+  };
+
+  return {
+    onSelect,
+    onClear,
+    getItems,
+  };
+}
+```
+
+### Parameterized hook (reusable across forms)
+
+When the same search logic is used across multiple forms with different field names:
+
+```typescript
+type Use{ResourceName}SearchOptions = {
+  fieldNameA: string;
+  fieldNameB: string;
+};
+
+export function use{ResourceName}Search({
+  fieldNameA,
+  fieldNameB,
+}: Use{ResourceName}SearchOptions) {
+  const onSelect = (
+    { data }: ComboboxItem,
+    setValue: UseFormSetValue<FieldValues>,
+  ) => {
+    if (data) {
+      setValue(fieldNameA, data.valueA, { shouldValidate: true });
+      setValue(fieldNameB, data.valueB, { shouldValidate: true });
+    }
+  };
+
+  const onClear = (setValue: UseFormSetValue<FieldValues>) => {
+    setValue(fieldNameA, "", { shouldValidate: true });
+    setValue(fieldNameB, "", { shouldValidate: true });
+  };
+
+  const getItems = async (searchQuery: string) => {
+    const response = await get{ResourceName}(searchQuery);
+    return mapSearchItems(response);
+  };
+
+  return { onSelect, onClear, getItems };
+}
+```
+
+Import `FieldValues` from `react-hook-form` when using parameterized field names.
+
+### Usage in useFormFields
+
+```typescript
+import { use{ResourceName}Search } from "./hooks/use{ResourceName}Search";
+
+export function use{FormName}FormFields(): FormFieldsType<{FormName}Type> {
+  const t = useTranslations("{translationNamespace}");
+  const { onSelect, onClear, getItems } = use{ResourceName}Search();
+
+  return {
+    {comboboxFieldName}: {
+      type: "combobox",
+      label: t("fields.{comboboxFieldName}.label"),
+      onSelect,
+      onClear,
+      getItems,
+    },
+    // ... other fields populated by onSelect
+  };
+}
+```
+
 ## 1. useFormFields Hook
 
 File: `use{FormName}FormFields.ts`
