@@ -87,14 +87,16 @@ When the search should offer a fallback "not found" option that clears related f
 ```typescript
 import { useTranslations } from "next-intl";
 
+export const MANUAL_ENTRY_VALUE = "notFound";
+
 export function use{ResourceName}Search() {
   const t = useTranslations("{translationNamespace}.search");
 
   const onSelect = (
-    { data }: ComboboxItem,
+    { data, value }: ComboboxItem,
     setValue: UseFormSetValue<any>,
   ) => {
-    if (data?.notFound) {
+    if (value === MANUAL_ENTRY_VALUE) {
       onClear(setValue);
     } else if (data) {
       setValue("name", data.name, { shouldValidate: true });
@@ -119,10 +121,9 @@ export function use{ResourceName}Search() {
 
     const notFoundItem: {ResourceName}SuggestionItem = {
       label: t("notFoundLabel"),
-      value: t("notFoundLabel"),
+      value: MANUAL_ENTRY_VALUE,
       data: {
         // ... empty/default values for all data fields
-        notFound: true,
       },
     };
 
@@ -136,6 +137,44 @@ export function use{ResourceName}Search() {
   };
 }
 ```
+
+### Per-combobox fields state hook
+
+File: `hooks/use{Name}FieldsState.ts` (next to `use{Name}Search.ts`)
+
+Create one hook per combobox that has a "not found" item. It controls the visibility and disabled state of the fields that the combobox populates.
+
+```typescript
+import { useMemo } from "react";
+import { useWatch } from "react-hook-form";
+import { MANUAL_ENTRY_VALUE } from "./use{Name}Search";
+
+export function use{Name}FieldsState(comboboxFieldName: string) {
+  const selectedValue = useWatch({ name: comboboxFieldName });
+
+  const { showDataInputs, fieldsetDisabled } = useMemo(() => {
+    if (selectedValue === undefined) {
+      return { showDataInputs: false, fieldsetDisabled: false };
+    } else if (selectedValue === MANUAL_ENTRY_VALUE) {
+      return { showDataInputs: true, fieldsetDisabled: false };
+    } else {
+      return { showDataInputs: true, fieldsetDisabled: true };
+    }
+  }, [selectedValue]);
+
+  return { showDataInputs, fieldsetDisabled };
+}
+```
+
+| `selectedValue`          | `showDataInputs` | `fieldsetDisabled` |
+|--------------------------|-------------------|--------------------|
+| `undefined`              | `false`           | `false`            |
+| `=== MANUAL_ENTRY_VALUE` | `true`            | `false`            |
+| anything else            | `true`            | `true`             |
+
+### Usage of fields state hook in FormFields
+
+See the [full FormFields example with fields state hook](#with-combobox-fields-state-hook) in the FormFields Component section below.
 
 ### Parameterized hook (reusable across forms)
 
@@ -746,6 +785,58 @@ Multiple `Fieldset` blocks can be stacked with `VStack`:
   </Fieldset>
 </VStack>
 ```
+
+### With Combobox Fields State Hook
+
+When a combobox has a "not found" item, use the [per-combobox fields state hook](file-templates.md#per-combobox-fields-state-hook) to conditionally show and disable the fields that the combobox populates. The combobox field itself is always visible; the populated fields appear inside a `<Fieldset>` that is disabled when a real suggestion is selected and editable when the user picks the manual-entry option.
+
+```tsx
+import { {FormName}Type } from "./{formName}Schema";
+import { FieldNamesType, FormFieldsType } from "@finstreet/forms";
+import { DynamicFormField } from "@/shared/components/form/DynamicFormField";
+import {
+  Fields,
+  FieldsHStack,
+  FieldsHStackItem,
+} from "@finstreet/ui/components/pageLayout/Fields";
+import { Fieldset } from "@finstreet/ui/components/base/Form/Fieldset";
+import { use{Name}FieldsState } from "./hooks/use{Name}FieldsState";
+
+type {FormName}FormFieldsProps = {
+  fieldNames: FieldNamesType<FormFieldsType<{FormName}Type>>;
+};
+
+export const {FormName}FormFields = ({
+  fieldNames,
+}: {FormName}FormFieldsProps) => {
+  const { showDataInputs, fieldsetDisabled } = use{Name}FieldsState(
+    fieldNames.{comboboxFieldName},
+  );
+
+  return (
+    <Fields>
+      <DynamicFormField fieldName={fieldNames.{comboboxFieldName}} />
+      {showDataInputs ? (
+        <Fieldset disabled={fieldsetDisabled}>
+          <Fields>
+            <DynamicFormField fieldName={fieldNames.name} />
+            <FieldsHStack>
+              <FieldsHStackItem span={4}>
+                <DynamicFormField fieldName={fieldNames.postalCode} />
+              </FieldsHStackItem>
+              <FieldsHStackItem span={8}>
+                <DynamicFormField fieldName={fieldNames.city} />
+              </FieldsHStackItem>
+            </FieldsHStack>
+          </Fields>
+        </Fieldset>
+      ) : null}
+    </Fields>
+  );
+};
+```
+
+The hook receives the combobox field name from `fieldNames` so it can watch the selected value. The `<Fieldset disabled>` makes all nested inputs read-only when the user picked a real suggestion (data comes from the API). When the user picks the "not found" sentinel, the fieldset is enabled so they can type manually.
 
 ### Conditional JSX with `useWatch`
 

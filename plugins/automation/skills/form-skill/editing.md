@@ -33,6 +33,7 @@ When editing, always work **top-down**: schema first, then downstream files.
 |------|--------|
 | `options/use{Name}Options.ts` | Create new file (only if `select`, `radio-group`, or `selectable-cards`) |
 | `hooks/use{Name}Search.ts` | Create new file (only if `combobox`) — see [file-templates.md](file-templates.md#combobox-search-hook) |
+| `hooks/use{Name}FieldsState.ts` | Create new file (only if combobox has a "not found" item) — see [file-templates.md](file-templates.md#per-combobox-fields-state-hook) |
 | `{formName}Schema.ts` | Add field to schema object with correct validation |
 | `use{FormName}FormFields.ts` | Add field config with type, label, and any options |
 | `get{FormName}DefaultValues.ts` | Add default value (`""` for input, `undefined` for others) |
@@ -54,6 +55,7 @@ Reverse of adding. Update files in any order, but ensure consistency:
 | `{formName}FormAction.ts` | Remove field from backend payload if present |
 | `options/use{Name}Options.ts` | Delete file if no other field uses these options |
 | `hooks/use{Name}Search.ts` | Delete file if no other combobox field uses this hook |
+| `hooks/use{Name}FieldsState.ts` | Delete file if the associated search hook is deleted |
 
 ### Change a Field Type
 
@@ -85,8 +87,10 @@ The files that need updating depend on what the type changes to/from:
 
 | File | Change |
 |------|--------|
-| `hooks/use{Name}Search.ts` | Create search hook if it doesn't exist |
+| `hooks/use{Name}Search.ts` | Create search hook if it doesn't exist. Export `MANUAL_ENTRY_VALUE` if including a "not found" item. |
+| `hooks/use{Name}FieldsState.ts` | Create fields state hook if search hook has a "not found" item |
 | `use{FormName}FormFields.ts` | Add `onSelect`, `onClear`, `getItems` (and optionally `renderItem`) from the search hook |
+| `{FormName}FormFields.tsx` | If fields state hook exists, use `showDataInputs` / `fieldsetDisabled` with `<Fieldset>` |
 
 **Changing from `combobox` to another type:**
 
@@ -94,6 +98,8 @@ The files that need updating depend on what the type changes to/from:
 |------|--------|
 | `use{FormName}FormFields.ts` | Remove `onSelect`/`onClear`/`getItems`/`renderItem` properties |
 | `hooks/use{Name}Search.ts` | Delete if no other combobox field uses it |
+| `hooks/use{Name}FieldsState.ts` | Delete if the associated search hook is deleted |
+| `{FormName}FormFields.tsx` | Remove `use{Name}FieldsState` usage and `<Fieldset>` wrapper if present |
 
 **Changing to/from `yes-no-radio-group`:**
 
@@ -222,11 +228,12 @@ Delete the old single `use{FormName}FormConfig.tsx` and `{FormName}Form.tsx`.
 
 | File | Change |
 |------|--------|
-| `hooks/use{Name}Search.ts` | Create search hook with `onSelect`, `onClear`, `getItems` |
+| `hooks/use{Name}Search.ts` | Create search hook with `onSelect`, `onClear`, `getItems`. Export `MANUAL_ENTRY_VALUE` if including a "not found" item. |
+| `hooks/use{Name}FieldsState.ts` | Create fields state hook (only if search hook has a "not found" item) — see [file-templates.md](file-templates.md#per-combobox-fields-state-hook) |
 | `{formName}Schema.ts` | Add combobox field (typically `z.trimmedString().optional()`) and any fields populated by `onSelect` |
 | `use{FormName}FormFields.ts` | Import and destructure the search hook, add combobox field config with `type: "combobox"` |
 | `get{FormName}DefaultValues.ts` | Add `undefined` for combobox field, `""` for any new input fields populated by `onSelect` |
-| `{FormName}FormFields.tsx` | Add `<DynamicFormField>` for the combobox and any new visible fields |
+| `{FormName}FormFields.tsx` | Add `<DynamicFormField>` for the combobox. If fields state hook exists, use `showDataInputs` / `fieldsetDisabled` with `<Fieldset>` for the populated fields. |
 | `{formName}FormAction.ts` | Add fields populated by `onSelect` to the backend payload (the combobox field itself is usually not sent) |
 
 The combobox field acts as a search trigger — `onSelect` populates other form fields with the selected item's data. The combobox field value itself is rarely sent to the backend.

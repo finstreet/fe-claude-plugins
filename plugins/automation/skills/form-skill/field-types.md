@@ -252,6 +252,8 @@ type ComboboxItem<Data = any> = {
 };
 ```
 
+**"Not found" item and fields state hook:** When a combobox includes a "not found" / manual-entry option, the search hook MUST export a `MANUAL_ENTRY_VALUE` constant and use it as the sentinel item's `value`. Pair it with a **per-combobox fields state hook** (`hooks/use{Name}FieldsState.ts`) that controls visibility and disabled state of the fields populated by `onSelect`. See [file-templates.md](file-templates.md#per-combobox-fields-state-hook) for both templates.
+
 **Schema:** Combobox fields are typically validated as `z.trimmedString().optional()` or `z.trimmedString().min(1)` depending on whether selection is required. The combobox field itself is often a search trigger — the **real data** gets populated into other form fields via `onSelect`.
 
 **Default value:** `undefined`
