@@ -137,7 +137,8 @@ Each step has detailed documentation in a supporting file:
 - For **Combobox hooks** (search hooks and fields state hooks for combobox fields), see [field-types.md](field-types.md#combobox) and [file-templates.md](file-templates.md#combobox-search-hook)
 - For **Schema** patterns (basic, dependent, array, custom validations), see [schema.md](schema.md)
 - For **Field types** reference (all available types and their configs), see [field-types.md](field-types.md)
-- For **File templates** (action, config, fields component, form, default values), see [file-templates.md](file-templates.md)
+- For **Default values** (field-type defaults, backend prefill, transformation patterns, nested objects), see [default-values.md](default-values.md)
+- For **File templates** (action, config, fields component, form), see [file-templates.md](file-templates.md)
 - For **Editing existing forms** (adding/removing fields, changing types, adding prefill, etc.), see [editing.md](editing.md)
 
 ## Hidden Fields and IDs
@@ -148,26 +149,9 @@ When a form action needs IDs (e.g., `financingCaseId`), they MUST be:
 3. Extracted from `formData` in the form action
 4. NEVER rendered in the FormFields component
 
-## Default Values by Field Type
+## Default Values
 
-| Field Type | Default Value |
-|------------|--------------|
-| `input` | `""` |
-| `combobox` | `undefined` |
-| All others | `undefined` |
-
-When backend returns booleans for `yes-no-radio-group` fields, map them using `transformBooleanToYesNoOption`:
-
-```typescript
-import { transformBooleanToYesNoOption } from "@/shared/components/form/YesNoRadioGroup/options";
-
-return {
-  ...defaultValues,
-  isSubCommunity: transformBooleanToYesNoOption(backendValues.isSubCommunity),
-};
-```
-
-This converts `boolean | null | undefined` → `YesNoOptions.YES | YesNoOptions.NO | undefined`.
+For field-type defaults, templates, transformation patterns, and nested objects, see [default-values.md](default-values.md).
 
 ## FormState Type
 

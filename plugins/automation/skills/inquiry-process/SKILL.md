@@ -21,15 +21,20 @@ InquiryProcess
 ```
 features/{purpose}InquiryProcess/
   ├── components/
-  │   └── {Purpose}ProgressBar.tsx
+  │   ├── {Purpose}ProgressBar.tsx
+  │   └── {StepName}Page.tsx           ← Feature page component per step
   ├── forms/
-  │   └── (added per step, not part of this skill)
+  │   └── {stepName}/
+  │       └── get{StepName}DefaultValues.ts  ← Default values transformer per step
   ├── utils/
   │   └── get{Purpose}InitialProgressState.ts
   └── {Purpose}InquiryProcess.types.ts
 
 app/{role}/{purpose}-inquiry/[inquiryId]/
-  └── layout.tsx               ← NOT inside the feature dir
+  ├── layout.tsx               ← NOT inside the feature dir
+  └── (inquiry)/
+      └── {step-slug}/
+          └── page.tsx         ← Thin Next.js page per step
 ```
 
 ## File Creation Order
@@ -88,6 +93,7 @@ import { fetchWithErrorHandling } from "@/shared/backend/fetchWithErrorHandling"
 - For the **initial progress state** setup, see [initial-progress-state.md](initial-progress-state.md)
 - For the **ProgressBar component**, see [progress-bar.md](progress-bar.md)
 - For the **layout file**, see [layout.md](layout.md)
+- For **step pages and default value handling**, see [step-page.md](step-page.md)
 
 ## Rules
 

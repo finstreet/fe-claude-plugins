@@ -462,56 +462,7 @@ export async function update{FormName}FormAction(
 
 File: `get{FormName}DefaultValues.ts`
 
-### Simple (no backend prefill)
-
-```typescript
-import { {FormName}DefaultValues } from "./{formName}Schema";
-
-export function get{FormName}DefaultValues({ inquiryId }: { inquiryId: string }) {
-  const defaultValues = {
-    inquiryId,
-    name: "",           // input fields default to ""
-    amount: undefined,  // all other fields default to undefined
-  } as const satisfies {FormName}DefaultValues;
-
-  return defaultValues;
-}
-```
-
-### With backend prefill
-
-```typescript
-import { {FormName}DefaultValues } from "./{formName}Schema";
-import { BackendType } from "@/shared/backend/models/...";
-
-export function get{FormName}DefaultValues({
-  inquiryId,
-  backendValues,
-}: {
-  inquiryId: string;
-  backendValues?: BackendType;
-}) {
-  const defaultValues = {
-    inquiryId,
-    name: "",
-    amount: undefined,
-  } as const satisfies {FormName}DefaultValues;
-
-  if (!backendValues) {
-    return defaultValues;
-  }
-
-  return {
-    ...defaultValues,
-    name: backendValues.name,
-    amount: backendValues.amount ?? defaultValues.amount,
-  };
-}
-```
-
-Default values by field type:
-- `input` fields: `""`
-- All other fields: `undefined`
+For templates, field-type defaults, transformation patterns (boolean→YesNo, number→string, enum casting), and nested objects, see [default-values.md](default-values.md).
 
 ## 4. useFormConfig Hook
 
