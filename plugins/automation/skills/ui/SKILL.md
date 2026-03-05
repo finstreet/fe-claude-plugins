@@ -1,5 +1,5 @@
 ---
-name: ui-skill
+name: ui
 description: "Expert guide to building UI components with PandaCSS layout primitives and the @finstreet/ui component library. Covers layout patterns, responsive design, styling utilities, and component composition. MUST BE USED to build any form of UI component."
 ---
 

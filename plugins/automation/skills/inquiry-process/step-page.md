@@ -12,7 +12,7 @@ features/{purpose}InquiryProcess/
   │   └── {StepName}Page.tsx            ← Feature page component
   └── forms/
       └── {stepName}/
-          └── get{StepName}DefaultValues.ts  ← Default values (see form-skill)
+          └── get{StepName}DefaultValues.ts  ← Default values (see form skill)
 ```
 
 ## Next.js page.tsx (Thin Wrapper)
@@ -129,7 +129,7 @@ export const {StepName}Page = async ({
 
 The `get{StepName}DefaultValues` function transforms backend response data into the shape the form expects. It lives alongside the form files (`forms/{stepName}/get{StepName}DefaultValues.ts`).
 
-For implementation patterns (base defaults, backend prefill, transformation patterns, nested objects), see the form-skill's [default-values.md](../form-skill/default-values.md).
+For implementation patterns (base defaults, backend prefill, transformation patterns, nested objects), see the form skill's [default-values.md](../form/default-values.md).
 
 ## Data Flow
 
@@ -159,5 +159,5 @@ Backend request
 1. Always extract into a feature page component — even for single-use steps
 2. The `page.tsx` is a thin wrapper: metadata + param extraction only
 3. The feature page component fetches its own data via `fetchWithErrorHandling`
-4. Use `get{StepName}DefaultValues` to transform backend data into form defaults (see [form-skill default-values.md](../form-skill/default-values.md))
+4. Use `get{StepName}DefaultValues` to transform backend data into form defaults (see [form default-values.md](../form/default-values.md))
 5. Each step page uses `InquiryHeader` and `InquiryContent` from `@finstreet/ui` for consistent layout

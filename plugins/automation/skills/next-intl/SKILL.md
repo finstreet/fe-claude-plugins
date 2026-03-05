@@ -1,5 +1,5 @@
 ---
-name: next-intl-skill
+name: next-intl
 description: ALWAYS use this skill if the user asks anything about next-intl or translations
 allowed-tools: Bash, Glob, Grep, LS, Read, Edit, MultiEdit, Write, TodoWrite, mcp__plugin_automation_context-forge-mcp__update_subtask_content
 ---

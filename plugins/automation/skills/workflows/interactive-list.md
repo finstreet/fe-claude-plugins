@@ -30,7 +30,7 @@ The skill will add the correct translations for the interactive list and update 
 
 ### Step 3: Implement the InteractiveList
 
-Invoke the `automation:ui-skill` skill to build the InteractiveList. ALWAYS pass the following information:
+Invoke the `automation:ui` skill to build the InteractiveList. ALWAYS pass the following information:
 
 - subtask_id
 - featureName
