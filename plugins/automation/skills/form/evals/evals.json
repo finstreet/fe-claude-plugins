@@ -1,0 +1,53 @@
+{
+  "skill_name": "form",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "# Reference Account Form\n\nI want you to build a reference account form. The featureName is `referenceAccount` and the file path is `src/features/referenceAccount`. The form should include the following fields:\n\n- financingCaseId (hidden, string)\n- bankAccountOwner (string, min length of 1, Kontoinhaber)\n- iban: (string, Iban validation, IBAN)\n\nIn the form action I want you to log the formState and return the object with error null and message null. For the form actions I want you to use a back button that goes to the previous page and a submit button. This button does not have an icon and uses the actions.submit translation.",
+      "expected_output": "A complete set of 7 form files that structurally match the golden reference files in evals/files/eval-1/. Each generated file should follow the same patterns: imports, function signatures, type exports, component structure, and integration approach as its corresponding reference file, adapted to the form's specific field names and domain.",
+      "files": [
+        "evals/files/eval-1/updateReferenceAccountFormSchema.ts",
+        "evals/files/eval-1/useUpdateReferenceAccountFormFields.ts",
+        "evals/files/eval-1/updateReferenceAccountFormAction.ts",
+        "evals/files/eval-1/getUpdateReferenceAccountDefaultValues.ts",
+        "evals/files/eval-1/useUpdateReferenceAccountFormConfig.tsx",
+        "evals/files/eval-1/UpdateReferenceAccountFormFields.tsx",
+        "evals/files/eval-1/UpdateReferenceAccountForm.tsx"
+      ],
+      "expectations": [
+        "Schema file follows the same pattern as evals/files/eval-1/updateReferenceAccountFormSchema.ts: imports z from @/lib/zod, defines a z.object schema, and exports all 5 type aliases (Type, OutputType, FormState, FormConfig, DefaultValues)",
+        "useFormFields file follows the same pattern as evals/files/eval-1/useUpdateReferenceAccountFormFields.ts: returns FormFieldsType<T>, uses useTranslations, defines hidden field for ID and typed fields with t() labels",
+        "FormAction file follows the same pattern as evals/files/eval-1/updateReferenceAccountFormAction.ts: has 'use server' directive, correct (state, formData, portal) signature, calls backend function with pathVariables/payload, uses handleFormRequestError for errors, revalidatePath + redirect on success",
+        "DefaultValues file follows the same pattern as evals/files/eval-1/getUpdateReferenceAccountDefaultValues.ts: defines base defaults with 'as const satisfies', spreads defaults and merges backend values with ?? fallback",
+        "FormConfig file follows the same pattern as evals/files/eval-1/useUpdateReferenceAccountFormConfig.tsx: uses createFormFieldNames(fields), wraps serverAction in closure passing portal, includes useErrorAction, renderFormActions with cancel and submit buttons",
+        "FormFields component follows the same pattern as evals/files/eval-1/UpdateReferenceAccountFormFields.tsx: uses DynamicFormField with fieldNames.X, wraps in Fields, does NOT render hidden fields",
+        "Form component follows the same pattern as evals/files/eval-1/UpdateReferenceAccountForm.tsx: has 'use client' directive, calls formConfig hook, renders Form wrapper with FormFields passing config.fieldNames"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "# Additional Information Form\n\nI want you to build a additional information form. The featureName is `additionalInformation` and the filePath is `src/features/additionalInformation`. The form should include the following fields:\n\n- `propertyManagementExistingLiabilityInsurance` (Yes/No radio group, required, \"Besteht eine Haftpflichtversicherung für Ihre Hausverwaltung?\")\n- `propertyManagementTaxId` (string, TaxIdValidationSchema, \"Steuernummer\")\n- `recentForcedAuctions` (number, min 0, 0 decimals, \"Anzahl der Zwangsversteigerungen in den letzten 24 Monaten in der WEG\")\n- `buildingInsurance` (Yes/No radio group, required, \"Besteht eine Gebäudeversicherung für die WEG?\")\n- `naturalHazardsInsurance` (Yes/No radio group, required, \"Besteht eine Elementarschadenversicherung für alle Objekte in der WEG?\")\n- `legalNotificationBghConfirmed` (checkbox, required, \"Hiermit wird bestätigt, dass die Eigentümer über die Haftung in Bezug auf das BGH Urteil vom Sep. 2015 aufgeklärt wurden.\")\n- `durationOptions` (select, optional, options: \"up_to_2_years\", \"up_to_3_years\", \"Dauer\")\n- `financingCaseId` (hidden, string)\n- `maintenanceFeesArrears` (Yes/No radio group, required, \"Gibt es Hausgeldrückstände in der WEG?\")\n- `maintenanceFeesArrearsUnitCount` (number, min 1, 0 decimals, renderCondition: maintenanceFeesArrears === \"yes\", \"Wenn ja, wie viele Einheiten sind betroffen?\")\n\nIn the form action I want you to log the formState and return the object with error null and message null. For the form actions I want you to use a back button that goes to the previous page and a submit button. This button does not have an icon and uses the actions.submit translation.\",",
+      "expected_output": "A complete set of 98form files (including options file) that structurally match the golden reference files in evals/files/eval-2/. This form tests advanced patterns: Yes/No radio groups, checkbox, select with options hook, dependent field validation via superRefine, renderCondition, nested schema objects, and number fields.",
+      "files": [
+        "evals/files/eval-2/options/durationOptions.ts",
+        "evals/files/eval-2/additionalInformationSchema.ts",
+        "evals/files/eval-2/useAdditionalInformationFormFields.ts",
+        "evals/files/eval-2/additionalInformationFormAction.ts",
+        "evals/files/eval-2/getAdditionalInformationDefaultValues.ts",
+        "evals/files/eval-2/useAdditionalInformationFormConfig.tsx",
+        "evals/files/eval-2/AdditionalInformationFormFields.tsx",
+        "evals/files/eval-2/AdditionalInformationForm.tsx"
+      ],
+      "expectations": [
+        "Options file: exports DurationOptions enum with UP_TO_2_YEARS and UP_TO_3_YEARS values, and a useDurationOptions hook that maps enum values to {label: t(value), value} using useTranslations",
+        "Schema file: uses YesNoValidationSchema for radio groups, TaxIDValidationSchema for taxId, RequiredCheckboxValidationSchema for checkbox, z.enum(DurationOptions).optional() for select, z.coerce.number() for number fields. Dependent fields (maintenanceFeesArrears + maintenanceFeesArrearsUnitCount) are grouped in a nested object with superRefine for conditional validation. Exports all 5 type aliases.",
+        "useFormFields file: returns FormFieldsType<AdditionalInformationType>, uses correct field types (yes-no-radio-group, input, number with decimal:0, checkbox, select with items from useDurationOptions, hidden). Dependent fields are nested under maintenanceFeesArrearsInfo with renderCondition checking maintenanceFeesArrears === YesNoOptions.YES",
+        "FormAction file: has 'use server' directive, (state, formData) signature, logs state and formData, returns { error: null, message: null }",
+        "DefaultValues file: accepts financingCaseId param, uses 'as const satisfies' pattern, Yes/No and checkbox fields default to undefined, string fields to empty string, number fields to undefined, nested maintenanceFeesArrearsInfo object with undefined defaults",
+        "FormConfig file: uses createFormFieldNames(fields), passes additionalInformationFormAction directly as serverAction, includes useErrorAction, renderFormActions with back button (router.back) and submit button",
+        "FormFields component: renders DynamicFormField for all visible fields using fieldNames.X, nested fields use fieldNames.maintenanceFeesArrearsInfo.X, wraps in Fields, does NOT render hidden financingCaseId or durationOptions select field",
+        "Form component: has 'use client' directive, calls useAdditionalInformationFormConfig(defaultValues), renders Form wrapper with AdditionalInformationFormFields passing config.fieldNames"
+      ]
+    }
+  ]
+}
