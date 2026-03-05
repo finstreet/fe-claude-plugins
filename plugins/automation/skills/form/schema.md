@@ -31,10 +31,51 @@ export const legalRepresentativeFormSchema = z.object({
 
 ## Dependent Field Validations
 
-When fields should only be validated based on another field's value, use `superRefine`:
+When fields should only be validated based on another field's value, use `superRefine`. The key pattern is to **group the trigger field and its dependent fields into a separate named sub-schema**, then compose that sub-schema as a nested property in the main schema. This nesting is important because it scopes the superRefine validation to only the related fields and creates the nested type structure that useFormFields, defaultValues, and FormFields all depend on.
 
-1. Make dependent fields `.optional()` in the base object
-2. Use `.superRefine()` to apply real validation when the condition is met
+1. Create a **separate sub-schema** containing the trigger field and all its dependent fields
+2. Make dependent fields `.optional()` in the sub-schema's base object
+3. Use `.superRefine()` on the sub-schema to apply real validation when the condition is met
+4. Compose the sub-schema into the main schema as a **nested property**
+
+**Example — conditional number field based on Yes/No trigger:**
+
+```typescript
+// 1. Group trigger + dependent fields in a named sub-schema
+const MaintenanceArrearsInfoSchema = z
+  .object({
+    maintenanceFeesArrears: YesNoValidationSchema,           // trigger field
+    maintenanceFeesArrearsUnitCount: z.coerce.number().optional(), // dependent, optional in base
+  })
+  .superRefine((data, ctx) => {
+    // 3. Apply real validation when trigger condition is met
+    if (data.maintenanceFeesArrears) {
+      const result = z.coerce.number().min(1).safeParse(data.maintenanceFeesArrearsUnitCount);
+      if (!result.success && result.error.issues[0]) {
+        ctx.addIssue({
+          ...result.error.issues[0],
+          message: undefined,
+          path: ["maintenanceFeesArrearsUnitCount"],
+        });
+      }
+    }
+  });
+
+// 4. Compose into the main schema as a nested property
+export const additionalInformationSchema = z.object({
+  propertyManagementExistingLiabilityInsurance: YesNoValidationSchema,
+  maintenanceFeesArrearsInfo: MaintenanceArrearsInfoSchema, // nested!
+  buildingInsurance: YesNoValidationSchema,
+  financingCaseId: z.string(),
+});
+```
+
+This nesting cascades through the rest of the form:
+- **useFormFields**: dependent fields are nested under the sub-schema key (e.g., `maintenanceFeesArrearsInfo: { maintenanceFeesArrears: {...}, maintenanceFeesArrearsUnitCount: {...} }`)
+- **defaultValues**: defaults mirror the nested structure
+- **FormFields**: uses nested fieldNames (e.g., `fieldNames.maintenanceFeesArrearsInfo.maintenanceFeesArrears`)
+
+**Larger example with multiple dependent fields:**
 
 ```typescript
 const accountSchema = z
@@ -71,7 +112,7 @@ const accountSchema = z
     }
   });
 
-// Compose into final schema
+// Compose into final schema as a nested property
 const hoaAccountDetailsSchema = z.object({
   account: accountSchema,
   statementViaEmail: YesNoValidationSchema,
