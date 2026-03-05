@@ -1,26 +1,64 @@
 {
-    "hooks": {
-      "Notification": [
-        {
-          "matcher": "",
-          "hooks": [
-            {
-              "type": "command",
-              "command": "terminal-notifier -group 'eco.scale-bfw' -title 'Claude Code needs your input'"
-            }
-          ]
-        }
-      ],
-      "Stop": [
-        {
-          "matcher": "",
-          "hooks": [
-            {
-              "type": "command",
-              "command": "terminal-notifier -group 'eco.scale-bfw' -title 'Claude Code Finished' -sound Sonumi"
-            }
-          ]
-        }
-      ]
-    }
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh\" \"Claude Code needs your input\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh\" \"Claude Code Finished\" Sosumi",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh\" \"Task Completed\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh\" \"Tool Failed\" Basso",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh\" \"Subagent Finished\" Glass",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
   }
+}
