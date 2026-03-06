@@ -63,7 +63,7 @@ parentDirectory/
 
 ## File Creation Order
 
-ALWAYS create files in this exact sequence:
+Plan files in this logical sequence to ensure consistent types and imports:
 
 1. **Options** - `options/use{OptionName}Options.ts` (only for select, radio-group, selectable-cards fields)
 2. **Combobox Hooks** - `hooks/use{HookName}Search.ts` (only for combobox fields), then `hooks/use{HookName}FieldsState.ts` (only if search hook has a "not found" item)
@@ -74,6 +74,19 @@ ALWAYS create files in this exact sequence:
 7. **useFormConfig** - `use{FormName}FormConfig.tsx`
 8. **FormFields** - `{FormName}FormFields.tsx` (skip if only hidden fields)
 9. **Form** - `{FormName}Form.tsx`
+
+### Parallel Execution
+
+All file names, types, and imports are deterministic from the `featureName`. After planning the content of all files, write them in parallel:
+
+- **Batch 1**: Options + Combobox Hooks + Schema
+- **Batch 2**: All remaining files (useFormFields, FormAction, DefaultValues, useFormConfig, FormFields, Form)
+
+Issue multiple Write tool calls in a single message for each batch. Do NOT create files one at a time.
+
+### Diagnostics
+
+Do NOT run or check diagnostics until ALL files have been written. Files import from each other, so diagnostics will show false errors until the full set exists.
 
 ## Key Imports
 
