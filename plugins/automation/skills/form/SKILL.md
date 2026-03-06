@@ -19,6 +19,10 @@ Form Component ("use client")
        └── FormConfig drives everything: schema, fields, actions, UI
 ```
 
+## Path Resolution
+
+Before creating any files, invoke the `automation:path-resolver` skill with your input parameters (featureName, subFeatureName, featureType, product, role) to resolve the correct paths. Use the returned **Feature Path** as `parentDirectory` below. The `backend/` directory sits as a sibling at the feature/product/role level.
+
 ## Directory Structure
 
 ### Standard Form

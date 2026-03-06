@@ -10,17 +10,7 @@ You will receive one of:
 
 ## Steps
 
-### Step 1: Get parent paths
-
-Invoke the `automation:parent-directory` skill to resolve the correct paths for this feature. It will update the subtask content with its findings after it is done. ALWAYS pass the following information:
-
-- featureName
-- subFeatureName (which is the name of the subtask)
-- featureType
-- product (optional)
-- role (optional)
-
-### Step 2: Add translations
+### Step 1: Add translations
 
 Invoke the `automation:next-intl` skill. ALWAYS pass the following information:
 
@@ -28,12 +18,13 @@ Invoke the `automation:next-intl` skill. ALWAYS pass the following information:
 
 The skill will add the correct translations for the form and update the subtask content with its findings after it is done. Your ONLY task in this step is to add the translations. DO NOT make any other changes! You are DONE with this step after the translations have been added and the subtask content has been updated.
 
-### Step 3: Implement the form
+### Step 2: Implement the form
 
 Invoke the `automation:form` skill. It contains the complete guide for implementing forms using `@finstreet/forms`. Follow the file creation order from the skill exactly and create ALL necessary files. ALWAYS pass the following information:
 
 - subtask_id
 - featureName
+- subFeatureName
 - featureType
 - product (optional)
 - role (optional)
@@ -42,7 +33,7 @@ Invoke the `automation:form` skill. It contains the complete guide for implement
 ALWAYS tell the skill to follow these rules:
 - you can create all files in parallel
 
-### Step 4: Update task context with usage documentation
+### Step 3: Update task context with usage documentation
 
 After ALL other steps are done, use the `mcp__plugin_automation_context-forge-mcp__update_task_context` tool to update the task context so that further subtasks have access to the context.
 

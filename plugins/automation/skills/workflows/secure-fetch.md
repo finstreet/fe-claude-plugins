@@ -10,25 +10,15 @@ You will receive one of:
 
 ## Steps
 
-### Step 1: Get parent paths
-
-Invoke the `automation:parent-directory` skill to resolve the correct paths for this feature. It will update the subtask content with its findings after it is done. ALWAYS pass the following information:
-
-- featureName
-- featureType
-- product (optional)
-- role (optional)
-
-### Step 2: Create all request schemas and endpoint configs
+### Step 1: Create all request schemas and endpoint configs
 
 Follow the order of the `Request Paths` from the metadata to create ALL necessary schemas and requests. For each request path, invoke the `automation:secure-fetch` skill with the following information:
 
 - ALL metadata fields from this request (this contains the endpoint)
-- RequestPath for this feature from the previous `automation:parent-directory` skill (this is not the endpoint)
 
 ONLY pass the information above and do not add anything else. Invoke the skill for each request in sequence — NEVER in parallel.
 
-### Step 3: Update task context with usage documentation
+### Step 2: Update task context with usage documentation
 
 After ALL other steps are done, use the `mcp__plugin_automation_context-forge-mcp__update_task_context` tool to update the task context so that further subtasks have access to the context.
 

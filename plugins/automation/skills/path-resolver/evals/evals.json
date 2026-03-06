@@ -1,0 +1,119 @@
+{
+  "skill_name": "path-resolver",
+  "evals": [
+    {
+      "id": 1,
+      "name": "form-with-product-and-role",
+      "prompt": "Resolve paths for: featureName=legalRepresentatives, subFeatureName=createLegalRepresentative, featureType=form, product=hoaLoan, role=pm",
+      "expected_output": {
+        "feature_path": "src/features/legalRepresentatives/hoaLoan/pm/forms/createLegalRepresentative"
+      },
+      "assertions": [
+        {
+          "name": "FeaturePath appends forms/subFeatureName",
+          "check": "output contains 'src/features/legalRepresentatives/hoaLoan/pm/forms/createLegalRepresentative'"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "interactive-list-no-product-no-role",
+      "prompt": "Resolve paths for: featureName=userManagement, subFeatureName=pendingUsers, featureType=interactiveList",
+      "expected_output": {
+        "feature_path": "src/features/userManagement/interactiveLists/pendingUsers/"
+      },
+      "assertions": [
+        {
+          "name": "FeaturePath appends interactiveLists/subFeatureName",
+          "check": "output contains 'src/features/userManagement/interactiveLists/pendingUsers'"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "inquiry-process-no-append",
+      "prompt": "Resolve paths for: featureName=propertyManagement, subFeatureName=details, featureType=inquiryProcess, product=hoaAccount, role=fsp",
+      "expected_output": {
+        "feature_path": "src/features/propertyManagement/hoaAccount/fsp/"
+      },
+      "assertions": [
+        {
+          "name": "FeaturePath does NOT append featureType",
+          "check": "Feature Path does not contain 'inquiryProcesss' or 'inquiryProcess/' after role"
+        },
+        {
+          "name": "FeaturePath ends at role level",
+          "check": "output contains 'src/features/propertyManagement/hoaAccount/fsp'"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "kebab-case-to-camelCase",
+      "prompt": "Resolve paths for: featureName=hoa-loan-signature, subFeatureName=sign-documents, featureType=form, product=hoa-loan, role=pm",
+      "expected_output": {
+        "feature_path": "src/features/hoaLoanSignature/hoaLoan/pm/forms/signDocuments"
+      },
+      "assertions": [
+        {
+          "name": "featureName converted to camelCase",
+          "check": "output contains 'hoaLoanSignature' (not 'hoa-loan-signature')"
+        },
+        {
+          "name": "product converted to camelCase",
+          "check": "output contains 'hoaLoan' (not 'hoa-loan')"
+        },
+        {
+          "name": "subFeatureName converted to camelCase",
+          "check": "output contains 'signDocuments' (not 'sign-documents')"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "modal-product-only-no-role",
+      "prompt": "Resolve paths for: featureName=referenceAccount, subFeatureName=confirmDelete, featureType=modal, product=hoaLoan",
+      "expected_output": {
+        "feature_path": "src/features/referenceAccount/hoaLoan/modals/confirmDelete"
+      },
+      "assertions": [
+        {
+          "name": "FeaturePath appends modals/subFeatureName",
+          "check": "output contains 'src/features/referenceAccount/hoaLoan/modals/confirmDelete'"
+        },
+        {
+          "name": "FeaturePath has no role segment",
+          "check": "path goes directly from hoaLoan to modals with no role in between"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "form-product-only",
+      "prompt": "Resolve paths for: featureName=members, subFeatureName=editProfile, featureType=form, product=hoaAccount",
+      "expected_output": {
+        "feature_path": "src/features/members/hoaAccount/forms/editProfile"
+      },
+      "assertions": [
+        {
+          "name": "FeaturePath has product but no role before forms/",
+          "check": "output contains 'src/features/members/hoaAccount/forms/editProfile'"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "minimal-inputs-request-type",
+      "prompt": "Resolve paths for: featureName=documentExchange, subFeatureName=upload, featureType=request",
+      "expected_output": {
+        "feature_path": "src/features/documentExchange/"
+      },
+      "assertions": [
+        {
+          "name": "FeaturePath is just the featureName base",
+          "check": "output contains 'src/features/documentExchange' without product/role/featureType appended"
+        }
+      ]
+    }
+  ]
+}

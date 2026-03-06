@@ -11,6 +11,10 @@ Every modal consists of up to three files:
 2. **Modal** — The modal UI component
 3. **Open Button** — *(optional)* Only create this when explicitly requested
 
+## Path Resolution
+
+Before creating any files, invoke the `automation:path-resolver` skill with your input parameters (featureName, subFeatureName, featureType, product, role) to resolve the correct paths. Use the returned **Feature Path** as `{parentDirectory}` in the directory structure below.
+
 ## Directory Structure
 
 ```

@@ -7,6 +7,10 @@ description: "Complete guide to creating or updating type-safe server/client HTT
 
 The `@finstreet/secure-fetch` library provides a fully type-safe approach to backend requests using Zod for schema validation of payloads, path variables, and responses.
 
+## Path Resolution
+
+Before creating any files, invoke the `automation:path-resolver` skill with your input parameters (featureName, featureType, product, role) to resolve the correct paths. Use the returned **Feature Path** with `/backend` appended as `{featurePath}` in the file structure below.
+
 ## File Structure
 
 Every feature's backend integration lives in exactly three files:
