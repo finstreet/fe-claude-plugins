@@ -12,7 +12,7 @@ import {
   ActionPanelContent,
   ActionPanelAction,
 } from '@finstreet/ui/components/patterns/ActionPanel';
-import { useTranslations } from 'next-intl';
+import { useExtracted } from 'next-intl';
 
 type {TaskGroupName}ActionProps = {
   financingCaseId: string;
@@ -23,7 +23,7 @@ export function {TaskGroupName}Action({
   financingCaseId,
   {actionName}Disabled,
 }: {TaskGroupName}ActionProps) {
-  const t = useTranslations('{translationNamespace}');
+  const t = useExtracted();
 
   return (
     <ActionPanel>
@@ -47,10 +47,10 @@ const handle{ActionName} = () => {
 
 <ActionPanelAction
   disabled={!{actionName}Enabled}
-  disabledHint={t('{action}.disabledHint')}
+  disabledHint={t("{German disabled hint}")}
   onClick={handle{ActionName}}
 >
-  {t('{action}.title')}
+  {t("{German action title}")}
 </ActionPanelAction>
 ```
 
@@ -59,13 +59,13 @@ const handle{ActionName} = () => {
 ```tsx
 <ActionPanelAction
   href={routes.{role}.{resource}.{action}(financingCaseId)}
-  name={t('{action}.title')}
+  name={t("{German action title}")}
   prefetch={true}
   scroll={true}
   disabled={!{actionName}Enabled}
-  disabledHint={t('{action}.disabledHint')}
+  disabledHint={t("{German disabled hint}")}
 >
-  {t('{action}.title')}
+  {t("{German action title}")}
 </ActionPanelAction>
 ```
 
@@ -77,7 +77,7 @@ import {
   ActionPanelContent,
   ActionPanelAction,
 } from '@finstreet/ui/components/patterns/ActionPanel';
-import { useTranslations } from 'next-intl';
+import { useExtracted } from 'next-intl';
 
 type HoaLoanFspActionsProps = {
   financingCaseId: string;
@@ -92,7 +92,7 @@ export function HoaLoanFspActions({
   provideDocumentDisabled,
   placeOfferDisabled,
 }: HoaLoanFspActionsProps) {
-  const t = useTranslations('hoaLoan.fsp.actions');
+  const t = useExtracted();
 
   const handleStartValueIndication = () => {
     // TODO: Implement start value indication functionality
@@ -109,25 +109,25 @@ export function HoaLoanFspActions({
       <ActionPanelContent>
         <ActionPanelAction
           disabled={startValueIndicationDisabled}
-          disabledHint={t('startValueIndication.disabledHint')}
+          disabledHint={t("Wertermittlung kann erst gestartet werden, wenn alle Aufgaben erledigt sind")}
           onClick={handleStartValueIndication}
         >
-          {t('startValueIndication.title')}
+          {t("Wertermittlung starten")}
         </ActionPanelAction>
         <ActionPanelAction
           disabled={provideDocumentDisabled}
-          disabledHint={t('provideDocument.disabledHint')}
+          disabledHint={t("Dokument kann erst bereitgestellt werden, wenn alle Aufgaben erledigt sind")}
           onClick={handleProvideDocument}
         >
-          {t('provideDocument.title')}
+          {t("Dokument bereitstellen")}
         </ActionPanelAction>
         <ActionPanelAction
           href={routes.fsp.hoaLoan.placeOffer(financingCaseId)}
-          name={t('placeOffer.title')}
+          name={t("Angebot erstellen")}
           disabled={placeOfferDisabled}
-          disabledHint={t('placeOffer.disabledHint')}
+          disabledHint={t("Angebot kann erst erstellt werden, wenn alle Aufgaben erledigt sind")}
         >
-          {t('placeOffer.title')}
+          {t("Angebot erstellen")}
         </ActionPanelAction>
       </ActionPanelContent>
     </ActionPanel>

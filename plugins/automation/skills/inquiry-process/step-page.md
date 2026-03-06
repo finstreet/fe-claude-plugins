@@ -46,7 +46,7 @@ export default async function FSP{StepName}Page({
 The feature page component is a server component that owns all domain logic: data fetching, default values transformation, and layout. It receives only the `inquiryId` and is self-contained.
 
 ```tsx
-import { getTranslations } from "next-intl/server";
+import { getExtracted } from "next-intl/server";
 import { get{StepName}DefaultValues } from "@/features/{purpose}InquiryProcess/forms/{stepName}/get{StepName}DefaultValues";
 import { {StepName}Form } from "@/features/{purpose}InquiryProcess/forms/{stepName}/{StepName}Form";
 import { fetchWithErrorHandling } from "@/shared/backend/fetchWithErrorHandling";
@@ -61,7 +61,7 @@ type {StepName}PageProps = {
 export const {StepName}Page = async ({
   inquiryId,
 }: {StepName}PageProps) => {
-  const t = await getTranslations("{translationKey}");
+  const t = await getExtracted();
 
   const inquiryValues = await fetchWithErrorHandling(() =>
     get{Purpose}Inquiry({
@@ -78,7 +78,7 @@ export const {StepName}Page = async ({
 
   return (
     <>
-      <InquiryHeader title={t("title")} description={t("description")} />
+      <InquiryHeader title={t("{German title}")} description={t("{German description}")} />
       <InquiryContent>
         <{StepName}Form defaultValues={defaultValues} />
       </InquiryContent>
@@ -95,7 +95,7 @@ When the step also needs options data, fetch both in the feature page:
 export const {StepName}Page = async ({
   inquiryId,
 }: {StepName}PageProps) => {
-  const t = await getTranslations("{translationKey}");
+  const t = await getExtracted();
 
   const options = await fetchWithErrorHandling(() =>
     get{Purpose}InquiryOptions({}),
@@ -116,7 +116,7 @@ export const {StepName}Page = async ({
 
   return (
     <>
-      <InquiryHeader title={t("title")} description={t("description")} />
+      <InquiryHeader title={t("{German title}")} description={t("{German description}")} />
       <InquiryContent>
         <{StepName}Form defaultValues={defaultValues} options={options} />
       </InquiryContent>

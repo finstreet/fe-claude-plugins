@@ -106,7 +106,7 @@ import { Typography } from "@finstreet/ui/components/base/Typography";
 import { Fieldset, FieldsetLegend } from "@finstreet/ui/components/base/Form/Fieldset";
 
 // Translations
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 // Date parsing for datepicker constraints (minDate/maxDate)
 import { parseDate } from "@ark-ui/react";

@@ -12,13 +12,13 @@ import { buildApiUrl } from '@/shared/backend/models/common/buildApiUrl';
 import { collectPaginatedData } from '@/shared/backend/models/common/collectPaginatedData';
 import { get{ListName} } from '@/shared/backend/models/{model}/server';
 import { Constants } from '@/shared/utils/constants';
-import { getTranslations } from 'next-intl/server';
+import { getExtracted } from 'next-intl/server';
 
 export async function get{ListName}List(
   searchParams: Parsed{ListName}SearchParams,
 ) {
   const { pagination } = searchParams;
-  const t = await getTranslations('{listName}.list');
+  const t = await getExtracted();
   const currentPage = pagination['{groupKey}'] || '1';
 
   const apiUrl = buildApiUrl({
@@ -32,7 +32,7 @@ export async function get{ListName}List(
 
   return collectPaginatedData({
     apiUrl,
-    title: t('sectionTitle'),
+    title: t('{German section title}'),
     groupKey: '{groupKey}',
     apiCall: () => get{ListName}(apiUrl)({}),
   });
@@ -47,7 +47,7 @@ export async function get{ListName}List(
 ) {
   const { pagination } = searchParams;
   const currentPage = pagination['default'] || '1';
-  const t = await getTranslations('{listName}.list');
+  const t = await getExtracted();
 
   const apiUrl = buildApiUrl({
     baseUrl: '/path/to/resource',
@@ -60,7 +60,7 @@ export async function get{ListName}List(
 
   return collectPaginatedData({
     apiUrl,
-    title: t('title'),
+    title: t('{German title}'),
     groupKey: 'default',
     apiCall: () => get{ListName}(apiUrl)({}),
   });

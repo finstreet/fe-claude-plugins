@@ -1,5 +1,5 @@
 import { createFormFieldNames } from "@finstreet/forms/lib";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { Button } from "@finstreet/ui/components/base/Button";
 import { HStack } from "@styled-system/jsx";
 import { FaArrowLeft } from "react-icons/fa6";
@@ -20,7 +20,7 @@ import { usePortalSpecificHoaLoanOverviewRoute } from "@/shared/hooks/usePortalS
 export function useAdditionalInformationFormConfig(
     defaultValues: AdditionalInformationDefaultValues,
 ): AdditionalInformationFormConfig {
-    const t = useTranslations("additionalInformation.form");
+    const t = useExtracted();
     const router = useRouter();
     const fields = useAdditionalInformationFormFields();
 
@@ -45,13 +45,13 @@ export function useAdditionalInformationFormConfig(
                         icon={<FaArrowLeft />}
                         onClick={() => router.back()}
                     >
-                        {t("actions.back")}
+                        {t("Zurück")}
                     </Button>
                     <Button
                         loading={isPending}
                         type="submit"
                     >
-                        {t("actions.submit")}
+                        {t("Speichern")}
                     </Button>
                 </HStack>
             );

@@ -13,7 +13,7 @@ import {
 } from '@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout';
 import { TaskGroup } from '@finstreet/ui/components/patterns/TaskGroup';
 import { VStack } from '@styled-system/jsx';
-import { useTranslations } from 'next-intl';
+import { useExtracted } from 'next-intl';
 import { {Product}{Role}{TaskPanelName}TaskPanel } from './taskPanels/{Product}{Role}{TaskPanelName}TaskPanel';
 import { {Product}{Role}{TaskGroupName}Action } from './{Product}{Role}{TaskGroupName}Action';
 
@@ -36,10 +36,10 @@ export function {TaskGroupName}TaskGroup({
   sections,
   flags,
 }: {TaskGroupName}TaskGroupProps) {
-  const t = useTranslations('{translationNamespace}');
+  const t = useExtracted();
 
   return (
-    <TaskGroup label={t('label')}>
+    <TaskGroup label={t("{German task group label}")}>
       <TasksAndActionsLayout>
         <Area gridArea="tasks">
           <VStack gap={4} alignItems="stretch">
@@ -92,7 +92,7 @@ import {
 } from '@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout';
 import { TaskGroup } from '@finstreet/ui/components/patterns/TaskGroup';
 import { VStack } from '@styled-system/jsx';
-import { useTranslations } from 'next-intl';
+import { useExtracted } from 'next-intl';
 import { HoaLoanFspInquiryTaskPanel } from './taskPanels/HoaLoanFspInquiryTaskPanel';
 import { HoaLoanFspApplicationInformationTaskPanel } from './taskPanels/HoaLoanFspApplicationInformationTaskPanel';
 import { HoaLoanFspActions } from './HoaLoanFspActions';
@@ -117,10 +117,10 @@ export function HoaLoanFspTaskGroup({
   sections,
   flags,
 }: HoaLoanFspTaskGroupProps) {
-  const t = useTranslations('hoaLoan.fsp');
+  const t = useExtracted();
 
   return (
-    <TaskGroup label={t('taskGroup.label')}>
+    <TaskGroup label={t("Kreditantrag")}>
       <TasksAndActionsLayout>
         <Area gridArea="tasks">
           <VStack gap={4} alignItems="stretch">

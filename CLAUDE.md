@@ -15,3 +15,7 @@ This ensures the skill's directory-handling behavior is tested while keeping out
 ### No Baseline Runs
 
 Skills in this project use custom libraries (e.g. `@finstreet/forms`, `@finstreet/ui`) that Claude doesn't know about without the skill. Running without-skill baselines is not meaningful — skip them.
+
+### No Eval Viewer
+
+DO NOT run the eval viewer after you are done with your evaluations. I just want you to show me a table in the console with the results of the evaluation. That's enough for me.

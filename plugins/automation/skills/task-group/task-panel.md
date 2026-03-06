@@ -14,7 +14,7 @@ import {
   TaskPanelStatus,
   TaskPanelTitle,
 } from '@finstreet/ui/components/patterns/TaskPanel';
-import { useTranslations } from 'next-intl';
+import { useExtracted } from 'next-intl';
 
 type {TaskPanelName}TaskPanelProps = {
   financingCaseId: string;    // ← or whatever ID is needed for route building
@@ -26,18 +26,18 @@ export function {TaskPanelName}TaskPanel({
   financingCaseId,
   completed,
 }: {TaskPanelName}TaskPanelProps) {
-  const t = useTranslations('{translationNamespace}');
+  const t = useExtracted();
 
   return (
     <TaskPanel
       href={routes.{role}.{resource}.{action}(financingCaseId)}
       prefetch={true}
       scroll={true}
-      name={t('{task}.title')}
+      name={t("{German task title}")}
     >
       <TaskPanelHeader>
         <TaskPanelStatus status={completed ? 'done' : 'active'} />
-        <TaskPanelTitle>{t('{task}.title')}</TaskPanelTitle>
+        <TaskPanelTitle>{t("{German task title}")}</TaskPanelTitle>
       </TaskPanelHeader>
     </TaskPanel>
   );
@@ -97,39 +97,39 @@ export function {TaskPanelName}TaskPanel({
   subtaskOneCompleted,
   subtaskTwoCompleted,
 }: {TaskPanelName}TaskPanelProps) {
-  const t = useTranslations('{translationNamespace}');
+  const t = useExtracted();
 
   return (
     <TaskPanel
       href={routes.{role}.{resource}.overview(financingCaseId)}
       prefetch={true}
       scroll={true}
-      name={t('{task}.title')}
+      name={t("{German task title}")}
     >
       <TaskPanelHeader>
         <TaskPanelStatus status={completed ? 'done' : 'active'} />
-        <TaskPanelTitle>{t('{task}.title')}</TaskPanelTitle>
+        <TaskPanelTitle>{t("{German task title}")}</TaskPanelTitle>
       </TaskPanelHeader>
       <TaskPanelContent>
         <SubTask
           status={subtaskOneCompleted ? 'done' : 'active'}
-          actionLabel={t('{task}.subtasks.one.actionLabel')}
-          name={t('{task}.subtasks.one.title')}
+          actionLabel={t("{German action label for subtask one}")}
+          name={t("{German subtask one title}")}
           href={routes.{role}.{resource}.subtaskOne(financingCaseId)}
           prefetch={true}
           scroll={true}
         >
-          {t('{task}.subtasks.one.title')}
+          {t("{German subtask one title}")}
         </SubTask>
         <SubTask
           status={subtaskTwoCompleted ? 'done' : 'active'}
-          actionLabel={t('{task}.subtasks.two.actionLabel')}
-          name={t('{task}.subtasks.two.title')}
+          actionLabel={t("{German action label for subtask two}")}
+          name={t("{German subtask two title}")}
           href={routes.{role}.{resource}.subtaskTwo(financingCaseId)}
           prefetch={true}
           scroll={true}
         >
-          {t('{task}.subtasks.two.title')}
+          {t("{German subtask two title}")}
         </SubTask>
       </TaskPanelContent>
     </TaskPanel>

@@ -85,12 +85,12 @@ function mapSearchItems(data: {ResourceName}ResponseType): {ResourceName}Suggest
 When the search should offer a fallback "not found" option that clears related fields:
 
 ```typescript
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 export const MANUAL_ENTRY_VALUE = "notFound";
 
 export function use{ResourceName}Search() {
-  const t = useTranslations("{translationNamespace}.search");
+  const t = useExtracted();
 
   const onSelect = (
     { data, value }: ComboboxItem,
@@ -120,7 +120,7 @@ export function use{ResourceName}Search() {
     });
 
     const notFoundItem: {ResourceName}SuggestionItem = {
-      label: t("notFoundLabel"),
+      label: t("Nicht gefunden"),
       value: MANUAL_ENTRY_VALUE,
       data: {
         // ... empty/default values for all data fields
@@ -222,13 +222,13 @@ Import `FieldValues` from `react-hook-form` when using parameterized field names
 import { use{ResourceName}Search } from "./hooks/use{ResourceName}Search";
 
 export function use{FormName}FormFields(): FormFieldsType<{FormName}Type> {
-  const t = useTranslations("{translationNamespace}");
+  const t = useExtracted();
   const { onSelect, onClear, getItems } = use{ResourceName}Search();
 
   return {
     {comboboxFieldName}: {
       type: "combobox",
-      label: t("fields.{comboboxFieldName}.label"),
+      label: t("{German label for comboboxFieldName}"),
       onSelect,
       onClear,
       getItems,
@@ -244,13 +244,13 @@ File: `use{FormName}FormFields.ts`
 
 ```typescript
 import { FormFieldsType } from "@finstreet/forms";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { {FormName}Type } from "./{formName}Schema";
 // Import options hooks if needed
 // import { use{OptionName}Options } from "./options/use{OptionName}Options";
 
 export function use{FormName}FormFields(): FormFieldsType<{FormName}Type> {
-  const t = useTranslations("{translationNamespace}");
+  const t = useExtracted();
   // const someOptions = useSomeOptions();
 
   return {
@@ -259,7 +259,7 @@ export function use{FormName}FormFields(): FormFieldsType<{FormName}Type> {
     },
     fieldName: {
       type: "input",
-      label: t("fields.fieldName.label"),
+      label: t("{German label for fieldName}"),
     },
     // ... more fields
   };
@@ -272,11 +272,11 @@ ALWAYS use `renderCondition` for fields that depend on other field values:
 return {
   interimFinancingRequested: {
     type: "yes-no-radio-group",
-    label: t("fields.interimFinancingRequested.label"),
+    label: t("{German label for interimFinancingRequested}"),
   },
   interimFinancingAmount: {
     type: "number",
-    label: t("fields.interimFinancingAmount.label"),
+    label: t("{German label for interimFinancingAmount}"),
     renderCondition: (formValues) => {
       return formValues.interimFinancingRequested === YesNoOptions.YES;
     },
@@ -471,7 +471,7 @@ File: `use{FormName}FormConfig.tsx`
 ```tsx
 import { FormConfig } from "@finstreet/forms";
 import { createFormFieldNames } from "@finstreet/forms/lib";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { Button } from "@finstreet/ui/components/base/Button";
 import { HStack } from "@styled-system/jsx";
 import { FaArrowRight } from "react-icons/fa6";
@@ -488,7 +488,7 @@ import { use{FormName}FormFields } from "./use{FormName}FormFields";
 export function use{FormName}FormConfig(
   defaultValues: {FormName}DefaultValues,
 ): FormConfig<{FormName}FormState, {FormName}Type, {FormName}OutputType> {
-  const t = useTranslations("buttons");
+  const t = useExtracted();
   const fields = use{FormName}FormFields();
 
   return {
@@ -506,7 +506,7 @@ export function use{FormName}FormConfig(
       return (
         <HStack mt={12} justifyContent={"space-between"}>
           <Button loading={isPending} type="submit" icon={<FaArrowRight />}>
-            {t("next")}
+            {t("Weiter")}
           </Button>
         </HStack>
       );
@@ -525,7 +525,7 @@ export function use{FormName}FormConfig(): FormConfig<
   {FormName}Type,
   {FormName}OutputType
 > {
-  const t = useTranslations("buttons");
+  const t = useExtracted();
   const fields = use{FormName}FormFields();
 
   return {
@@ -546,7 +546,7 @@ export function use{FormName}FormConfig(): FormConfig<
       return (
         <HStack mt={12} justifyContent={"space-between"}>
           <Button loading={isPending} type="submit" icon={<FaArrowRight />}>
-            {t("submit")}
+            {t("Speichern")}
           </Button>
         </HStack>
       );
@@ -570,7 +570,7 @@ export function use{FormName}FormConfig(
   defaultValues: {FormName}DefaultValues,
   setIsOpen: (open: boolean) => void,
 ): FormConfig<{FormName}FormState, {FormName}Type, {FormName}OutputType> {
-  const t = useTranslations("buttons");
+  const t = useExtracted();
   const { portal } = usePortal();
   const fields = use{FormName}FormFields();
 
@@ -599,10 +599,10 @@ export function use{FormName}FormConfig(
             variant="text"
             onClick={() => { setIsOpen(false); }}
           >
-            {t("cancel")}
+            {t("Abbrechen")}
           </Button>
           <Button loading={isPending} type="submit" icon={<FaArrowRight />}>
-            {t("submit")}
+            {t("Speichern")}
           </Button>
         </HStack>
       );
@@ -630,10 +630,10 @@ renderFormActions: (isPending: boolean) => {
         icon={<FaArrowLeft />}
         onClick={() => router.back()}
       >
-        {t("back")}
+        {t("Zurück")}
       </Button>
       <Button loading={isPending} type="submit" icon={<FaArrowRight />}>
-        {t("next")}
+        {t("Weiter")}
       </Button>
     </HStack>
   );
@@ -709,7 +709,7 @@ import {
 
 <Fieldset disabled={!editable}>
   <Fields>
-    <FieldsetLegend>{t("fieldSets.person.title")}</FieldsetLegend>
+    <FieldsetLegend>{t("{German legend for person fieldset}")}</FieldsetLegend>
     <DynamicFormField fieldName={fieldNames.firstName} />
     <DynamicFormField fieldName={fieldNames.lastName} />
   </Fields>
@@ -722,14 +722,14 @@ Multiple `Fieldset` blocks can be stacked with `VStack`:
 <VStack gap={8} alignItems="stretch">
   <Fieldset>
     <Fields>
-      <FieldsetLegend>{t("fieldSets.address.title")}</FieldsetLegend>
+      <FieldsetLegend>{t("{German legend for address fieldset}")}</FieldsetLegend>
       <DynamicFormField fieldName={fieldNames.street} />
       <DynamicFormField fieldName={fieldNames.city} />
     </Fields>
   </Fieldset>
   <Fieldset>
     <Fields>
-      <FieldsetLegend>{t("fieldSets.contact.title")}</FieldsetLegend>
+      <FieldsetLegend>{t("{German legend for contact fieldset}")}</FieldsetLegend>
       <DynamicFormField fieldName={fieldNames.email} />
       <DynamicFormField fieldName={fieldNames.phone} />
     </Fields>
@@ -825,7 +825,7 @@ import { IconButton } from "@finstreet/ui/components/base/IconButton";
 import { VStack, HStack, Box } from "@styled-system/jsx";
 import { Fields } from "@finstreet/ui/components/pageLayout/Fields";
 import { FaPlus, FaTimes } from "react-icons/fa6";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { FieldNamesType, FormFieldsType } from "@finstreet/forms";
 import { {FormName}Type } from "./{formName}Schema";
 
@@ -835,7 +835,7 @@ type IdentifiersFieldProps = {
 };
 
 const IdentifiersField = ({ fieldNames, fields }: IdentifiersFieldProps) => {
-  const t = useTranslations("{namespace}.fields.identifiers");
+  const t = useExtracted();
 
   const {
     fields: fieldsArray,
@@ -898,7 +898,7 @@ const IdentifiersField = ({ fieldNames, fields }: IdentifiersFieldProps) => {
           }}
         >
           <FaPlus />
-          {t("add")}
+          {t("Hinzufügen")}
         </Button>
       </HStack>
     </Fields>

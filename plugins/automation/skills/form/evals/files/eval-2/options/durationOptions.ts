@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 export enum DurationOptions {
     UP_TO_2_YEARS = "up_to_2_years",
@@ -6,12 +6,10 @@ export enum DurationOptions {
 }
 
 export function useDurationOptions() {
-    const t = useTranslations(
-        "durations",
-    );
+    const t = useExtracted();
 
-    return Object.values(DurationOptions).map((duration) => ({
-        label: t(duration),
-        value: duration,
-    }));
+    return [
+        { label: t("Bis zu 2 Jahre"), value: DurationOptions.UP_TO_2_YEARS },
+        { label: t("Bis zu 3 Jahre"), value: DurationOptions.UP_TO_3_YEARS },
+    ];
 }

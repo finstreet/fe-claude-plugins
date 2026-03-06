@@ -85,7 +85,7 @@ import { usePortal } from "@/shared/context/portal/portalContext";
 import { routes } from "@/routes";
 
 // Translations
-import { useTranslations } from 'next-intl'
+import { useExtracted } from 'next-intl'
 
 // Backend (only when layout fetches data)
 import { fetchWithErrorHandling } from "@/shared/backend/fetchWithErrorHandling";

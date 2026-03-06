@@ -15,7 +15,7 @@ Options for `select` and `radio-group` return `{ label: string; value: string }[
 
 ```typescript
 // path: {parent}/options/useSalutationOptions.ts
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 export enum SalutationOptions {
   MALE = "mr",
@@ -23,14 +23,12 @@ export enum SalutationOptions {
 }
 
 export function useSalutationOptions() {
-  const t = useTranslations(
-    "inquiryProcess.contactData.fields.salutation.items",
-  );
+  const t = useExtracted();
 
-  return Object.values(SalutationOptions).map((salutation) => ({
-    label: t(salutation),
-    value: salutation,
-  }));
+  return [
+    { label: t("Herr"), value: SalutationOptions.MALE },
+    { label: t("Frau"), value: SalutationOptions.FEMALE },
+  ];
 }
 ```
 
@@ -51,9 +49,8 @@ If no icons are provided, ALWAYS use `FaHouse` as a placeholder.
 
 ```typescript
 // path: {parent}/options/useUsagePurposeOptions.ts
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { FaHouse } from "react-icons/fa6";
-import { IconType } from "react-icons";
 
 export enum UsagePurposes {
   FACADE = "facade",
@@ -62,21 +59,15 @@ export enum UsagePurposes {
   OTHER = "other",
 }
 
-const usagePurposeIcons: Record<UsagePurposes, IconType> = {
-  facade: FaHouse,
-  roof: FaHouse,
-  heating: FaHouse,
-  other: FaHouse,
-};
-
 export function useUsagePurposeOptions() {
-  const t = useTranslations("financingDetails.fields.usagePurpose.items");
+  const t = useExtracted();
 
-  return Object.values(UsagePurposes).map((usagePurpose) => ({
-    label: t(usagePurpose),
-    id: usagePurpose,
-    icon: usagePurposeIcons[usagePurpose],
-  }));
+  return [
+    { label: t("Fassade"), id: UsagePurposes.FACADE, icon: FaHouse },
+    { label: t("Dach"), id: UsagePurposes.ROOF, icon: FaHouse },
+    { label: t("Heizung"), id: UsagePurposes.HEATING, icon: FaHouse },
+    { label: t("Sonstiges"), id: UsagePurposes.OTHER, icon: FaHouse },
+  ];
 }
 ```
 
@@ -91,7 +82,7 @@ When options depend on backend data (dynamic labels, dynamic sublabels, API-prov
 
 ```typescript
 // path: {parent}/options/useAccountKindOptions.ts
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { FaHouse } from "react-icons/fa6";
 import { GetOptionsResponseType } from "@/shared/backend/models/someResource";
 
@@ -103,17 +94,17 @@ export enum AccountKindOptions {
 export function useAccountKindOptions(
   options: GetOptionsResponseType,
 ) {
-  const t = useTranslations("accountKinds.items");
+  const t = useExtracted();
 
   return [
     {
-      label: t("checkingAccount.label"),
+      label: t("Girokonto"),
       subLabel: `${options.overnightDepositInterestRate}%`, // Dynamic from backend
       id: AccountKindOptions.CHECKING_ACCOUNT,
       icon: FaHouse,
     },
     {
-      label: t("fixedDeposit.label"),
+      label: t("Festgeld"),
       subLabel: `${options.fixedDepositRate}%`, // Dynamic from backend
       id: AccountKindOptions.FIXED_DEPOSIT,
       icon: FaHouse,
@@ -141,12 +132,12 @@ For simple cases where a separate options hook would be overkill, map API data d
 export function use{FormName}FormFields(
   options: GetOptionsResponseType,
 ): FormFieldsType<{FormName}Type> {
-  const t = useTranslations("{namespace}.fields");
+  const t = useExtracted();
 
   return {
     investmentDurations: {
       type: "select",
-      label: t("investmentDurations.label"),
+      label: t("{German label for investmentDurations}"),
       items: options.durations.map((d) => ({
         label: `${d.amount} ${d.displayUnit}`,
         value: d.amount.toString(),
@@ -154,7 +145,7 @@ export function use{FormName}FormFields(
     },
     department: {
       type: "select",
-      label: t("department.label"),
+      label: t("{German label for department}"),
       items: options.departments.map((dept) => ({
         label: dept.label,
         value: dept.value,

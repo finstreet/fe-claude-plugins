@@ -1,9 +1,9 @@
 import { FormFieldsType } from "@finstreet/forms";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { UpdateReferenceAccountType } from "./referenceAccountFormSchema";
 
 export function useReferenceAccountFormFields(): FormFieldsType<UpdateReferenceAccountType> {
-  const t = useTranslations("referenceAccount.updateReferenceAccountForm");
+  const t = useExtracted();
 
   return {
     financingCaseId: {
@@ -11,11 +11,11 @@ export function useReferenceAccountFormFields(): FormFieldsType<UpdateReferenceA
     },
     bankAccountOwner: {
       type: "input",
-      label: t("fields.bankAccountOwner.label"),
+      label: t("Kontoinhaber"),
     },
     iban: {
       type: "input",
-      label: t("fields.iban.label"),
+      label: t("IBAN"),
     },
   };
 }

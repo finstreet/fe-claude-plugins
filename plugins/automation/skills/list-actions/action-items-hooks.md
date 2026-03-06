@@ -14,17 +14,17 @@ Import the `SortByEnum` from the SearchParams file. Always include an empty stri
 
 ```typescript
 import { {ListName}SortByEnum } from './{listName}SearchParams';
-import { useTranslations } from 'next-intl';
+import { useExtracted } from 'next-intl';
 
 export function use{ListName}SortByItems() {
-  const t = useTranslations('{listName}.actions.sortBy.options');
+  const t = useExtracted();
 
   return [
-    { value: '', label: t('none') },
-    { value: {ListName}SortByEnum.CREATED_AT_ASC, label: t('createdAtAsc') },
-    { value: {ListName}SortByEnum.CREATED_AT_DESC, label: t('createdAtDesc') },
-    { value: {ListName}SortByEnum.STATUS_ASC, label: t('statusAsc') },
-    { value: {ListName}SortByEnum.STATUS_DESC, label: t('statusDesc') },
+    { value: '', label: t('Keine Sortierung') },
+    { value: {ListName}SortByEnum.CREATED_AT_ASC, label: t('Erstelldatum aufsteigend') },
+    { value: {ListName}SortByEnum.CREATED_AT_DESC, label: t('Erstelldatum absteigend') },
+    { value: {ListName}SortByEnum.STATUS_ASC, label: t('Status aufsteigend') },
+    { value: {ListName}SortByEnum.STATUS_DESC, label: t('Status absteigend') },
     // all other enum values
   ];
 }
@@ -38,14 +38,14 @@ Import the `GroupByEnum` from the SearchParams file. Always include an empty str
 
 ```typescript
 import { {ListName}GroupByEnum } from './{listName}SearchParams';
-import { useTranslations } from 'next-intl';
+import { useExtracted } from 'next-intl';
 
 export function use{ListName}GroupByItems() {
-  const t = useTranslations('{listName}.actions.groupBy.options');
+  const t = useExtracted();
 
   return [
-    { value: '', label: t('none') },
-    { value: {ListName}GroupByEnum.STATUS, label: t('status.label') },
+    { value: '', label: t('Keine Gruppierung') },
+    { value: {ListName}GroupByEnum.STATUS, label: t('Status') },
     // all other enum values
   ];
 }
@@ -62,29 +62,29 @@ import { useRenderActions } from '@/shared/hooks/useRenderActions';
 import { use{ListName}SortByItems } from './use{ListName}SortByItems';
 import { use{ListName}GroupByItems } from './use{ListName}GroupByItems';
 import { {listName}SearchParams } from './{listName}SearchParams';
-import { useTranslations } from 'next-intl';
+import { useExtracted } from 'next-intl';
 
 export function use{ListName}RenderActions() {
   const sortByItems = use{ListName}SortByItems();
   const groupByItems = use{ListName}GroupByItems();
-  const t = useTranslations('{listName}');
+  const t = useExtracted();
 
   return useRenderActions({
     searchParams: {listName}SearchParams,
     groupByItems,
     sortByItems,
     translations: {
-      label: t('actions.label'),
-      reset: t('actions.reset'),
+      label: t('Aktionen'),
+      reset: t('Zurücksetzen'),
       search: {
-        label: t('actions.search.label'),
-        placeholder: t('actions.search.placeholder'),
+        label: t('Suche'),
+        placeholder: t('{German search placeholder}'),
       },
       groupBy: {
-        label: t('actions.groupBy.label'),
+        label: t('Gruppieren nach'),
       },
       sortBy: {
-        label: t('actions.sortBy.label'),
+        label: t('Sortieren nach'),
       },
     },
   });

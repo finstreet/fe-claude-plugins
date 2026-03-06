@@ -69,10 +69,10 @@ import { CardsGridLayout } from "@finstreet/ui/components/pageLayout/Layout/Card
 
 ```typescript
 // Client components
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 // Server components
-import { getTranslations } from "next-intl/server";
+import { getExtracted } from "next-intl/server";
 ```
 
 ## PandaCSS Reference

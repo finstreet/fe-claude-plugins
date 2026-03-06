@@ -20,15 +20,7 @@ Invoke the `automation:routes` skill to determine the route of the page and add 
 - role (optional)
 - metadata
 
-### Step 2: Add translations
-
-Invoke the `automation:next-intl` skill. ALWAYS pass the following information:
-
-- metadata
-
-The skill will add the correct translations for the page and update the subtask content with its findings after it is done. Your ONLY task in this step is to add the translations. DO NOT make any other changes! You are DONE with this step after the translations have been added and the subtask content has been updated.
-
-### Step 3: Implement the page
+### Step 2: Implement the page
 
 Invoke the `automation:page` skill to implement the page for this task based on the context. ALWAYS pass the following information:
 

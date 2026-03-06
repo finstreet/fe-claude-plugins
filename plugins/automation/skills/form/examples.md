@@ -8,9 +8,8 @@ A form with hidden ID, number inputs with currency suffix, selectable cards, and
 
 ```typescript
 // options/useUsagePurposeOptions.ts
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { FaHouse } from "react-icons/fa6";
-import { IconType } from "react-icons";
 
 export enum UsagePurposes {
   FACADE = "facade",
@@ -20,22 +19,16 @@ export enum UsagePurposes {
   OTHER = "other",
 }
 
-const usagePurposeIcons: Record<UsagePurposes, IconType> = {
-  facade: FaHouse,
-  roof: FaHouse,
-  heating: FaHouse,
-  windows: FaHouse,
-  other: FaHouse,
-};
-
 export function useUsagePurposeOptions() {
-  const t = useTranslations("financingDetails.fields.usagePurpose.items");
+  const t = useExtracted();
 
-  return Object.values(UsagePurposes).map((purpose) => ({
-    label: t(purpose),
-    id: purpose,
-    icon: usagePurposeIcons[purpose],
-  }));
+  return [
+    { label: t("Fassade"), id: UsagePurposes.FACADE, icon: FaHouse },
+    { label: t("Dach"), id: UsagePurposes.ROOF, icon: FaHouse },
+    { label: t("Heizung"), id: UsagePurposes.HEATING, icon: FaHouse },
+    { label: t("Fenster"), id: UsagePurposes.WINDOWS, icon: FaHouse },
+    { label: t("Sonstiges"), id: UsagePurposes.OTHER, icon: FaHouse },
+  ];
 }
 ```
 
@@ -73,12 +66,12 @@ export type FinancingDetailsDefaultValues = DeepPartial<FinancingDetailsType>;
 // useFinancingDetailsFormFields.ts
 import { FormFieldsType } from "@finstreet/forms";
 import { YesNoOptions } from "@finstreet/forms/customValidations";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { FinancingDetailsType } from "./financingDetailsSchema";
 import { useUsagePurposeOptions } from "./options/useUsagePurposeOptions";
 
 export function useFinancingDetailsFormFields(): FormFieldsType<FinancingDetailsType> {
-  const t = useTranslations("financingDetails.fields");
+  const t = useExtracted();
   const usagePurposeOptions = useUsagePurposeOptions();
 
   return {
@@ -87,33 +80,33 @@ export function useFinancingDetailsFormFields(): FormFieldsType<FinancingDetails
     },
     investmentAmount: {
       type: "number",
-      label: t("investmentAmount.label"),
+      label: t("Investitionssumme"),
       suffix: "€",
     },
     maintenanceReserve: {
       type: "number",
-      label: t("maintenanceReserve.label"),
+      label: t("Instandhaltungsrücklage"),
       suffix: "€",
     },
     plannedSpecialContribution: {
       type: "number",
-      label: t("plannedSpecialContribution.label"),
+      label: t("Geplante Sonderumlage"),
       suffix: "€",
     },
     usagePurposes: {
       type: "selectable-cards",
-      label: t("usagePurposes.label"),
+      label: t("Verwendungszweck"),
       selectType: "multiple",
       options: usagePurposeOptions,
     },
     subCommunity: {
       isSubCommunity: {
         type: "yes-no-radio-group",
-        label: t("subCommunity.isSubCommunity.label"),
+        label: t("Ist eine Untergemeinschaft?"),
       },
       subCommunitySelfAuthorized: {
         type: "yes-no-radio-group",
-        label: t("subCommunity.subCommunitySelfAuthorized.label"),
+        label: t("Untergemeinschaft selbst bevollmächtigt?"),
         renderCondition: (formValues) => {
           return formValues.subCommunity.isSubCommunity === YesNoOptions.YES;
         },
@@ -215,7 +208,7 @@ export function getFinancingDetailsDefaultValues({
 // useFinancingDetailsFormConfig.tsx
 import { FormConfig } from "@finstreet/forms";
 import { createFormFieldNames } from "@finstreet/forms/lib";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { Button } from "@finstreet/ui/components/base/Button";
 import { HStack } from "@styled-system/jsx";
 import { FaArrowRight } from "react-icons/fa6";
@@ -232,7 +225,7 @@ import { useFinancingDetailsFormFields } from "./useFinancingDetailsFormFields";
 export function useFinancingDetailsFormConfig(
   defaultValues: FinancingDetailsDefaultValues,
 ): FormConfig<FinancingDetailsFormState, FinancingDetailsType, FinancingDetailsOutputType> {
-  const t = useTranslations("buttons");
+  const t = useExtracted();
   const fields = useFinancingDetailsFormFields();
 
   return {
@@ -250,7 +243,7 @@ export function useFinancingDetailsFormConfig(
       return (
         <HStack mt={12} justifyContent={"space-between"}>
           <Button loading={isPending} type="submit" icon={<FaArrowRight />}>
-            {t("next")}
+            {t("Weiter")}
           </Button>
         </HStack>
       );
@@ -456,7 +449,7 @@ Key differences from a page form action:
 // forms/create/useCreateLegalRepresentativeFormConfig.tsx
 import { FormConfig } from "@finstreet/forms";
 import { createFormFieldNames } from "@finstreet/forms/lib";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { Button } from "@finstreet/ui/components/base/Button";
 import { HStack } from "@styled-system/jsx";
 import { createLegalRepresentativeAction } from "../legalRepresentativeFormAction";
@@ -482,7 +475,7 @@ export function useCreateLegalRepresentativeFormConfig({
   CreateLegalRepresentativeType,
   CreateLegalRepresentativeOutputType
 > {
-  const t = useTranslations("legalRepresentatives.form");
+  const t = useExtracted();
   const fields = useLegalRepresentativeFormFields();
   const { setIsOpen } = useCreateLegalRepresentativeModal();
   const { portal } = usePortal();
@@ -520,10 +513,10 @@ export function useCreateLegalRepresentativeFormConfig({
             onClick={() => setIsOpen(false)}
             variant="text"
           >
-            {t("actions.cancel")}
+            {t("Abbrechen")}
           </Button>
           <Button loading={isPending} type="submit">
-            {t("actions.submit")}
+            {t("Speichern")}
           </Button>
         </HStack>
       );
@@ -579,11 +572,11 @@ import {
 } from "@finstreet/ui/components/patterns/Modal";
 import { useCreateLegalRepresentativeModal } from "./store";
 import { CreateLegalRepresentativeForm } from "@/features/legalRepresentatives/forms/create/CreateLegalRepresentativeForm";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 export const CreateLegalRepresentativeModal = () => {
   const { isOpen, data, setIsOpen } = useCreateLegalRepresentativeModal();
-  const t = useTranslations("legalRepresentatives.modals.create");
+  const t = useExtracted();
 
   if (!data) {
     return null;
@@ -591,7 +584,7 @@ export const CreateLegalRepresentativeModal = () => {
 
   return (
     <Modal open={isOpen} onClose={() => setIsOpen(false)}>
-      <ModalTitle>{t("title")}</ModalTitle>
+      <ModalTitle>{t("Gesetzlichen Vertreter anlegen")}</ModalTitle>
       <ModalContent>
         <CreateLegalRepresentativeForm financingCaseId={data.financingCaseId} />
       </ModalContent>
@@ -608,7 +601,7 @@ export const CreateLegalRepresentativeModal = () => {
 
 import { useCreateLegalRepresentativeModal } from "./store";
 import { Button } from "@finstreet/ui/components/base/Button";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 type Props = {
   financingCaseId: string;
@@ -618,11 +611,11 @@ export const OpenCreateLegalRepresentativeModalButton = ({
   financingCaseId,
 }: Props) => {
   const { setData } = useCreateLegalRepresentativeModal();
-  const t = useTranslations("legalRepresentatives.buttons");
+  const t = useExtracted();
 
   return (
     <Button onClick={() => setData({ financingCaseId })}>
-      {t("createLegalRepresentative")}
+      {t("Gesetzlichen Vertreter anlegen")}
     </Button>
   );
 };

@@ -14,7 +14,7 @@ import {
   ProgressBarGroup,
 } from "@finstreet/ui/components/patterns/ProgressBar";
 import { ProgressStep } from "@/shared/components/ProgressStep";
-import { useTranslations } from 'next-intl'
+import { useExtracted } from 'next-intl'
 import { usePathname, useParams } from 'next/navigation'
 import { {Purpose}InquiryProcessSteps } from '@/features/{purpose}InquiryProcess/{Purpose}InquiryProcess.types'
 import { usePortal } from "@/shared/context/portal/portalContext";
@@ -25,7 +25,7 @@ const useProgressBarSteps = (): Record<
   {Purpose}InquiryProcessSteps,
   ProgressBarStep<{Purpose}InquiryProcessSteps>
 > => {
-  const t = useTranslations('{purpose}InquiryProcess.progressBar.steps')
+  const t = useExtracted()
   const path = usePathname()
   const { inquiryId } = useParams()
   const { portal } = usePortal()
@@ -33,12 +33,12 @@ const useProgressBarSteps = (): Record<
   return {
     [{Purpose}InquiryProcessSteps.STEP_ONE]: {
       id: {Purpose}InquiryProcessSteps.STEP_ONE,
-      label: t('stepOne'),
+      label: t("{German label for step one}"),
       current: path === routes[portal].{purpose}.stepOne(inquiryId as string),
     },
     [{Purpose}InquiryProcessSteps.STEP_TWO]: {
       id: {Purpose}InquiryProcessSteps.STEP_TWO,
-      label: t('stepTwo'),
+      label: t('{German label for step two}'),
       current: path === routes[portal].{purpose}.stepTwo(inquiryId as string),
     },
   }
@@ -46,11 +46,11 @@ const useProgressBarSteps = (): Record<
 
 export function {Purpose}ProgressBar() {
   const progressBarSteps = useProgressBarSteps()
-  const t = useTranslations('{purpose}InquiryProcess.progressBar')
+  const t = useExtracted()
 
   return (
     <ProgressBar>
-      <ProgressBarGroup label={t("title")}>
+      <ProgressBarGroup label={t("{German progress bar title}")}>
         <ProgressStep step={progressBarSteps[{Purpose}InquiryProcessSteps.STEP_ONE]} />
         <ProgressStep step={progressBarSteps[{Purpose}InquiryProcessSteps.STEP_TWO]} />
       </ProgressBarGroup>
@@ -70,16 +70,16 @@ type {Purpose}ProgressBarProps = {
 
 export function {Purpose}ProgressBar({ isAuthenticated }: {Purpose}ProgressBarProps) {
   const progressBarSteps = useProgressBarSteps()
-  const t = useTranslations('{purpose}InquiryProcess.progressBar')
+  const t = useExtracted()
 
   return (
     <ProgressBar>
-      <ProgressBarGroup label={t("title")}>
+      <ProgressBarGroup label={t("{German progress bar title}")}>
         <ProgressStep step={progressBarSteps[{Purpose}InquiryProcessSteps.STEP_ONE]} />
         <ProgressStep step={progressBarSteps[{Purpose}InquiryProcessSteps.STEP_TWO]} />
       </ProgressBarGroup>
       {!isAuthenticated ? (
-        <ProgressBarGroup label={t("subtitle")}>
+        <ProgressBarGroup label={t("{German progress bar subtitle}")}>
           <ProgressStep step={progressBarSteps[{Purpose}InquiryProcessSteps.STEP_THREE]} />
         </ProgressBarGroup>
       ) : null}
@@ -101,7 +101,7 @@ import {
   ProgressBarStep,
 } from "@finstreet/ui/components/patterns/ProgressBar";
 import { ProgressStep } from "@/shared/components/ProgressStep";
-import { useTranslations } from 'next-intl'
+import { useExtracted } from 'next-intl'
 import { usePathname, useParams } from 'next/navigation'
 import { FactoringInquiryProcessSteps } from '@/features/factoringInquiryProcess/FactoringInquiryProcess.types'
 import { usePortal } from "@/shared/context/portal/portalContext";
@@ -111,7 +111,7 @@ const useProgressBarSteps = (): Record<
   FactoringInquiryProcessSteps,
   ProgressBarStep<FactoringInquiryProcessSteps>
 > => {
-  const t = useTranslations('factoringInquiryProcess.progressBar.steps')
+  const t = useExtracted()
   const path = usePathname()
   const { inquiryId } = useParams()
   const { portal } = usePortal()
@@ -119,22 +119,22 @@ const useProgressBarSteps = (): Record<
   return {
     [FactoringInquiryProcessSteps.FACTORING_NEED]: {
       id: FactoringInquiryProcessSteps.FACTORING_NEED,
-      label: t('factoringNeed'),
+      label: t("Factoring-Bedarf"),
       current: path === routes[portal].factoring.factoringNeed(inquiryId as string),
     },
     [FactoringInquiryProcessSteps.CONTACT_DATA]: {
       id: FactoringInquiryProcessSteps.CONTACT_DATA,
-      label: t('contactData'),
+      label: t("Kontaktdaten"),
       current: path === routes[portal].factoring.contactData(inquiryId as string),
     },
     [FactoringInquiryProcessSteps.COMPANY_DATA]: {
       id: FactoringInquiryProcessSteps.COMPANY_DATA,
-      label: t('companyData'),
+      label: t("Unternehmensdaten"),
       current: path === routes[portal].factoring.companyData(inquiryId as string),
     },
     [FactoringInquiryProcessSteps.FACTORING_CONDITIONS]: {
       id: FactoringInquiryProcessSteps.FACTORING_CONDITIONS,
-      label: t('factoringConditions'),
+      label: t("Factoring-Konditionen"),
       current: path === routes[portal].factoring.factoringConditions(inquiryId as string),
     },
   }
@@ -142,11 +142,11 @@ const useProgressBarSteps = (): Record<
 
 export function FactoringProgressBar() {
   const progressBarSteps = useProgressBarSteps()
-  const t = useTranslations('factoringInquiryProcess.progressBar')
+  const t = useExtracted()
 
   return (
     <ProgressBar>
-      <ProgressBarGroup label={t("title")}>
+      <ProgressBarGroup label={t("{German progress bar title}")}>
         <ProgressStep step={progressBarSteps[FactoringInquiryProcessSteps.FACTORING_NEED]} />
         <ProgressStep step={progressBarSteps[FactoringInquiryProcessSteps.CONTACT_DATA]} />
         <ProgressStep step={progressBarSteps[FactoringInquiryProcessSteps.COMPANY_DATA]} />

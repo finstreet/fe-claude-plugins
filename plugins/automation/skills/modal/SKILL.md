@@ -68,14 +68,14 @@ import {
 } from "@finstreet/ui/components/patterns/Modal";
 import { use{ModalName}Modal } from "./store";
 import { Suspense } from "react";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { Headline } from "@finstreet/ui/components/base/Headline";
 import { Typography } from "@finstreet/ui/components/base/Typography";
 import { VStack } from "@styled-system/jsx";
 
 export const {ModalName}Modal = () => {
   const { isOpen, data, setIsOpen } = use{ModalName}Modal();
-  const t = useTranslations("{translation.namespace}");
+  const t = useExtracted();
 
   if (!data) {
     return null;
@@ -104,8 +104,8 @@ Use exactly one of these based on whether a subheading is present in the context
 ```tsx
 <ModalTitle>
   <VStack gap={1} alignItems={"flex-start"}>
-    <Headline>{t("title")}</Headline>
-    <Typography color={"text.dark"}>{t("subheading")}</Typography>
+    <Headline>{t("{German title}")}</Headline>
+    <Typography color={"text.dark"}>{t("{German subheading}")}</Typography>
   </VStack>
 </ModalTitle>
 ```
@@ -113,7 +113,7 @@ Use exactly one of these based on whether a subheading is present in the context
 **Title only (no subheading):**
 ```tsx
 <ModalTitle>
-  {t("title")}
+  {t("{German title}")}
 </ModalTitle>
 ```
 
@@ -134,7 +134,7 @@ File: `Open{ModalName}ModalButton.tsx`
 
 import { use{ModalName}Modal } from "./store";
 import { Button } from "@finstreet/ui/components/base/Button";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 type Open{ModalName}ModalButtonProps = {
   financingCaseId: string;
@@ -144,11 +144,11 @@ export const Open{ModalName}ModalButton = ({
   financingCaseId,
 }: Open{ModalName}ModalButtonProps) => {
   const { setData } = use{ModalName}Modal();
-  const t = useTranslations("{translation.namespace}");
+  const t = useExtracted();
 
   return (
     <Button onClick={() => setData({ financingCaseId })}>
-      {t("button")}
+      {t("{German button label}")}
     </Button>
   );
 };

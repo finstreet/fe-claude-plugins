@@ -1,6 +1,6 @@
 import { FormConfig } from "@finstreet/forms";
 import { createFormFieldNames } from "@finstreet/forms/lib";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { Button } from "@finstreet/ui/components/base/Button";
 import { HStack } from "@styled-system/jsx";
 import { referenceAccountFormAction } from "./referenceAccountFormAction";
@@ -23,7 +23,7 @@ export function useReferenceAccountFormConfig(
   UpdateReferenceAccountType,
   UpdateReferenceAccountOutputType
 > {
-  const t = useTranslations("referenceAccount.updateReferenceAccountForm");
+  const t = useExtracted();
   const router = useRouter();
   const fields = useReferenceAccountFormFields();
 
@@ -47,13 +47,13 @@ export function useReferenceAccountFormConfig(
               router.back();
             }}
           >
-            {t("actions.cancel")}
+            {t("Abbrechen")}
           </Button>
           <Button
             loading={isPending}
             type="submit"
           >
-            {t("actions.submit")}
+            {t("Speichern")}
           </Button>
         </HStack>
       );

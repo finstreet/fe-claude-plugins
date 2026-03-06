@@ -47,7 +47,7 @@ import { Metadata } from "next";
 import { Constants } from "@/shared/utils/constants";
 import { InquiryHeader } from "@finstreet/ui/components/pageLayout/InquiryHeader";
 import { InquiryContent } from "@finstreet/ui/components/pageLayout/InquiryContent";
-import { getTranslations } from "next-intl/server";
+import { getExtracted } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: `Page Title | ${Constants.companyName}`,
@@ -59,11 +59,11 @@ type Props = {
 
 export default async function {PageName}Page({ params }: Props) {
   const { inquiryId } = await params;
-  const t = await getTranslations("{translationNamespace}");
+  const t = await getExtracted();
 
   return (
     <>
-      <InquiryHeader title={t("title")} description={t("description")} />
+      <InquiryHeader title={t("{German title}")} description={t("{German description}")} />
       <InquiryContent>
         {/* Form or content component goes here */}
       </InquiryContent>
@@ -85,7 +85,7 @@ import {
 } from "@finstreet/ui/components/pageLayout/PageHeader";
 import { Headline } from "@finstreet/ui/components/base/Headline";
 import { PageContent } from "@finstreet/ui/components/pageLayout/PageContent";
-import { getTranslations } from "next-intl/server";
+import { getExtracted } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: `Page Title | ${Constants.companyName}`,
@@ -97,13 +97,13 @@ type Props = {
 
 export default async function {PageName}Page({ params }: Props) {
   const { financingCaseId } = await params;
-  const t = await getTranslations("{translationNamespace}");
+  const t = await getExtracted();
 
   return (
     <>
       <PageHeader>
         <PageHeaderTitle>
-          <Headline as="h1">{t("title")}</Headline>
+          <Headline as="h1">{t("{German title}")}</Headline>
         </PageHeaderTitle>
       </PageHeader>
       <PageContent>
@@ -119,6 +119,6 @@ export default async function {PageName}Page({ params }: Props) {
 - Always `async` — pages in Next.js App Router are async Server Components
 - Always `await params` before destructuring
 - Metadata title: plain string, no translations
-- Page content: use `getTranslations` for translations
+- Page content: use `getExtracted` for translations
 - If the content component is unknown from context, use `Hello World` as placeholder
 - Do NOT search the project for existing pages or dependencies

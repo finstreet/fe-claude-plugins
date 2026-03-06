@@ -6,7 +6,7 @@ import {
     Fieldset,
     FieldsetLegend,
 } from "@finstreet/ui/components/base/Form/Fieldset";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { useFormContext } from "react-hook-form";
 import { useEffect } from "react";
 import { YesNoOptions } from "@/shared/components/form/YesNoRadioGroup/options";
@@ -45,6 +45,7 @@ export const AdditionalInformationFormFields = ({
                 }
             />
             <DynamicFormField fieldName={fieldNames.buildingInsurance} />
+            <DynamicFormField fieldName={fieldNames.durationOptions} />
             <DynamicFormField fieldName={fieldNames.naturalHazardsInsurance} />
             <DynamicFormField
                 fieldName={fieldNames.legalNotificationBghConfirmed}

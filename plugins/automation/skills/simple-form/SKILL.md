@@ -31,6 +31,7 @@ import { useStopAutoArchivalModal } from "@/features/agree21/fsp/modals/stopAuto
 import { HStack } from "@styled-system/jsx";
 import { Banner } from "@finstreet/ui/components/base/Banner";
 import { Button } from "@finstreet/ui/components/base/Button";
+import { useExtracted } from "next-intl";
 
 // All data that you need for the request should be passed via props to the SimpleForm
 type Props = {
@@ -39,8 +40,7 @@ type Props = {
 
 export const StopAutoArchivalSimpleForm = ({financingCaseId}: Props) => {
     const { setIsOpen } = useStopAutoArchivalModal();
-    const t = useTranslations("agree21.fsp.modals.cancelAutoArchival");
-    const tButtons = useTranslations("buttons"); // you will use this if there is nothing else explicitly mentioned for the button translations --> these are the default ones! If nothing else is mentioned use `save` and `cancel` respectively
+    const t = useExtracted();
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<boolean>(false);
 
@@ -61,13 +61,13 @@ export const StopAutoArchivalSimpleForm = ({financingCaseId}: Props) => {
   };
 
   return (
-       {error ? <Banner type="error">{t("error")}</Banner> : null}
+       {error ? <Banner type="error">{t("Fehler")}</Banner> : null}
         <HStack mt={12} justifyContent={"space-between"}>
           <Button variant="text" onClick={() => setIsOpen(false)}>
-            {tButtons("cancel")}
+            {t("Abbrechen")}
           </Button>
           <Button loading={isPending} onClick={handleSubmit}>
-            {t("actions.stopArchival")}
+            {t("Archivierung stoppen")}
           </Button>
         </HStack>
   )

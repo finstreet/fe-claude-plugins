@@ -59,7 +59,7 @@ import {
 
 // Routes and translations
 import { routes } from '@/routes';
-import { useTranslations } from 'next-intl';
+import { useExtracted } from 'next-intl';
 import { VStack } from '@styled-system/jsx';
 ```
 

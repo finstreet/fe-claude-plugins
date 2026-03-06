@@ -18,26 +18,11 @@ server.ts / client.ts
 
 The `EndpointConfig` is identical for mock and real. Only the import changes.
 
-## Infrastructure Files (one-time setup)
-
-Before generating a mock handler, check if these files exist in the bfw project. If any are missing, create them:
-
-| File | Purpose |
-|------|---------|
-| `src/shared/backend/mocks/registry.ts` | Route registration and path-pattern matching |
-| `src/shared/backend/mocks/handlers/index.ts` | Barrel file that imports all mock handlers |
-| `src/app/api/mock/[...all]/route.ts` | Next.js catch-all route that dispatches to registered mocks |
-| `src/shared/backend/createMockServerFetchFunction.ts` | Server-side mock fetch (bypasses HMAC/JWT) |
-| `src/shared/backend/createMockClientFetchFunction.ts` | Client-side mock fetch |
-
-If these files already exist, do NOT recreate or modify them.
-
 ## Task Approach
 
-1. **Check infrastructure** — verify the files above exist in the bfw project
-2. **Gather input** — route path, HTTP method(s), response field descriptions or Zod schema reference
-3. **Generate mock handler** — see [mock-handler.md](mock-handler.md)
-4. **Update barrel** — add the import to `src/shared/backend/mocks/handlers/index.ts`
+1. **Gather input** — route path, HTTP method(s), response field descriptions or Zod schema reference
+2**Generate mock handler** — see [mock-handler.md](mock-handler.md)
+3**Update barrel** — add the import to `src/shared/backend/mocks/handlers/index.ts`
 
 ## Using in server.ts
 

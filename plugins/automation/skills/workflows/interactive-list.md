@@ -20,15 +20,7 @@ Invoke the `automation:path-resolver` skill to resolve the correct paths for thi
 - product (optional)
 - role (optional)
 
-### Step 2: Add translations
-
-Invoke the `automation:next-intl` skill. ALWAYS pass the following information:
-
-- metadata
-
-The skill will add the correct translations for the interactive list and update the subtask content with its findings after it is done. Your ONLY task in this step is to add the translations. DO NOT make any other changes! You are DONE with this step after the translations have been added and the subtask content has been updated.
-
-### Step 3: Implement the InteractiveList
+### Step 2: Implement the InteractiveList
 
 Invoke the `automation:ui` skill to build the InteractiveList. ALWAYS pass the following information:
 

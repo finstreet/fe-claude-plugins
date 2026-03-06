@@ -1,41 +1,37 @@
 import { AdditionalInformationType } from "@/features/propertyManagement/forms/additionalInformation/additionalInformationSchema";
 import { FormFieldsType } from "@finstreet/forms";
 import { YesNoOptions } from "@/shared/components/form/YesNoRadioGroup/options";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { parseDate } from "@ark-ui/react";
 import {useDurationOptions} from "./options/durationOptions";
 
 export const useAdditionalInformationFormFields = (): FormFieldsType<AdditionalInformationType> => {
-    const t = useTranslations("additionalInformation.form");
+    const t = useExtracted();
     const durationOptions = useDurationOptions()
 
     return {
         propertyManagementExistingLiabilityInsurance: {
             type: "yes-no-radio-group",
-            label: t("fields.propertyManagementExistingLiabilityInsurance.label"),
+            label: t("Besteht eine Haftpflichtversicherung für Ihre Hausverwaltung?"),
         },
         propertyManagementTaxId: {
             type: "input",
-            label: t("fields.propertyManagementTaxId.label"),
+            label: t("Steuernummer"),
         },
         recentForcedAuctions: {
             type: "number",
             decimal: 0,
-            label: t("fields.recentForcedAuctions.label"),
+            label: t("Anzahl der Zwangsversteigerungen in den letzten 24 Monaten in der WEG"),
         },
         maintenanceFeesArrearsInfo: {
             maintenanceFeesArrears: {
                 type: "yes-no-radio-group",
-                label: t(
-                    "fields.maintenanceFeesArrearsInfo.maintenanceFeesArrears.label",
-                ),
+                label: t("Gibt es Hausgeldrückstände in der WEG?"),
             },
             maintenanceFeesArrearsUnitCount: {
                 type: "number",
                 decimal: 0,
-                label: t(
-                    "fields.maintenanceFeesArrearsInfo.maintenanceFeesArrearsUnitCount.label",
-                ),
+                label: t("Wenn ja, wie viele Einheiten sind betroffen?"),
                 renderCondition: (formValues) => {
                     return (
                         formValues.maintenanceFeesArrearsInfo.maintenanceFeesArrears ===
@@ -46,19 +42,19 @@ export const useAdditionalInformationFormFields = (): FormFieldsType<AdditionalI
         },
         buildingInsurance: {
             type: "yes-no-radio-group",
-            label: t("fields.buildingInsurance.label"),
+            label: t("Besteht eine Gebäudeversicherung für die WEG?"),
         },
         naturalHazardsInsurance: {
             type: "yes-no-radio-group",
-            label: t("fields.naturalHazardsInsurance.label"),
+            label: t("Besteht eine Elementarschadenversicherung für alle Objekte in der WEG?"),
         },
         legalNotificationBghConfirmed: {
             type: "checkbox",
-            label: t("fields.legalNotificationBghConfirmed.label"),
+            label: t("Hiermit wird bestätigt, dass die Eigentümer über die Haftung in Bezug auf das BGH Urteil vom Sep. 2015 aufgeklärt wurden."),
         },
         durationOptions: {
             type: "select" ,
-            label: t("fields.durationOptions.label"),
+            label: t("Dauer"),
             items: durationOptions,
         },
         financingCaseId: {
