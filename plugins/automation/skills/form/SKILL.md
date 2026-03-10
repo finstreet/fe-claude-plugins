@@ -157,6 +157,7 @@ Each step has detailed documentation in a supporting file:
 - For **Default values** (field-type defaults, backend prefill, transformation patterns, nested objects), see [default-values.md](default-values.md)
 - For **File templates** (action, config, fields component, form), see [file-templates.md](file-templates.md)
 - For **Editing existing forms** (adding/removing fields, changing types, adding prefill, etc.), see [editing.md](editing.md)
+- For **External form actions** (buttons outside the form using `formId`, zustand store, and `onPendingChange`), see [external-actions.md](external-actions.md)
 
 ## Hidden Fields and IDs
 
