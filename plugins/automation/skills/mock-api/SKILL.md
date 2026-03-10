@@ -81,6 +81,30 @@ When the backend endpoint is ready, change the import in `server.ts` or `client.
 
 Then optionally clean up: remove the mock handler file and its import from the barrel.
 
+## Mock Delay Configuration
+
+All mock requests pass through `src/app/api/mock/[...all]/route.ts`, which applies a configurable random delay to simulate network latency. This is controlled by a single config file:
+
+**`src/shared/backend/mocks/mockConfig.ts`**
+
+```typescript
+export const mockConfig = {
+  delay: {
+    enabled: true,
+    min: 250, // ms
+    max: 750, // ms
+  },
+};
+```
+
+| Scenario              | min  | max  |
+|-----------------------|------|------|
+| Default (realistic)   | 250  | 750  |
+| Slow connection       | 1000 | 3000 |
+| No delay (fast iteration) | — | — (`enabled: false`) |
+
+The delay is applied automatically to **every** registered mock handler — no per-handler changes needed. When creating new mock handlers, you do NOT need to touch the delay config.
+
 ## Step-by-Step Reference
 
 - For **generating mock handlers** (registerMock calls, realistic data, barrel updates), see [mock-handler.md](mock-handler.md)
