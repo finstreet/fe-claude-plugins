@@ -29,7 +29,7 @@ Use the `automation:workflows` skill to dispatch to the correct workflow for eac
 /workflows <type> <subtaskId>
 ```
 
-Available workflow types: `form`, `modal`, `page`, `inquiry-process`, `interactive-list`, `list-actions`, `secure-fetch`, `simple-form`, `task-group`, `generic`.
+Available workflow types: `modal`, `page`, `inquiry-process`, `interactive-list`, `list-actions`, `secure-fetch`, `simple-form`, `task-group`, `generic`.
 
 As a fallback, you can also fetch raw documentation via the `get_task_instructions` tool:
 

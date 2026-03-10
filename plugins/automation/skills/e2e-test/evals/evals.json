@@ -1,0 +1,53 @@
+{
+  "skill_name": "e2e-test",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add e2e tests for a new `referenceAccount` form module on the HOA Account financing case overview page. The form has two fields: `bankAccountOwner` (INPUT) and `iban` (INPUT). After submission, it navigates back to the overview page. The form shows a validation error on both fields when submitted with empty/invalid values.",
+      "expected_output": "A complete set of 3 files: test data, FormModule subclass, and updated overview page. Each should follow the exact patterns from the BFW project's existing e2e modules.",
+      "files": [],
+      "expectations": [
+        "Module extends FormModule<UpdateReferenceAccountType> with correct import from @/features/referenceAccount/forms/updateReferenceAccountForm/updateReferenceAccountFormSchema",
+        "Test data file exports referenceAccountTestData with valid (using satisfies UpdateReferenceAccountType) and invalid variants, with bankAccountOwner and iban fields",
+        "fillAndSubmitForm uses this.form.fillField with BaseField.INPUT for both bankAccountOwner and iban, then calls this.form.submit()",
+        "navigate method uses this.navigation.navigateToSection with dataTestIds.hoaAccount.financingCase.pm.goToReferenceAccountAction and routes.pm.hoaAccount.financingCase.sepaMandate(caseId)",
+        "setupWithValidation wraps in test.step, calls navigate, then executeValidationAndSubmit with expectedErrorFields: ['bankAccountOwner', 'iban'] and expectedUrl pointing to the overview page",
+        "Module is registered as readonly property on PMHoaAccountFinancingCaseOverviewPage with new ReferenceAccountModule(page) in constructor",
+        "All imports use correct path aliases: @/ for app code, e2e/ for test files, @finstreet/forms for BaseField, @playwright/test for Page and test"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add e2e tests for a new product inquiry process called `factoringInquiryProcess`. The product-specific steps are: factoringDetails (step 1) and companyDetails (step 2). Steps 3 and 4 use the shared propertyManagerDetails and propertyManagementDetails modules (same as hoaLoan/hoaAccount). The factoring inquiry is a new product like hoaLoan or hoaAccount. Create the step modules for the 2 product-specific steps, the inquiry page, portal route resolver, fixture registration, and a spec file with the standard 3 scenarios.",
+      "expected_output": "A complete set of 6+ files: step modules, inquiry page, portal routes, fixtures, test data, and spec file. Should follow the exact InquiryPage pattern from the BFW project.",
+      "files": [],
+      "expectations": [
+        "Step modules extend FormModule<StepSchemaType> with fillAndSubmitForm that fills fields via this.form.fillField and calls this.form.submit()",
+        "Step modules use correct BaseField types (INPUT, NUMBER, SELECT, YES_NO_RADIO_GROUP, CHECKBOX, COMBOBOX, etc.) for their fields",
+        "InquiryPage subclass extends InquiryPage<CompleteInquiryProcessData> and assigns inquiryDetails and hoaDetails abstract members to concrete step modules",
+        "CompleteInquiryProcessData interface includes all 4 step types: product-specific inquiryDetails and hoaDetails, plus shared propertyManagerDetails and propertyManagementDetails",
+        "getInquiryRoutes method returns portal-aware routes via a helper from e2e/utils/portalRoutes.ts",
+        "Portal route resolver function follows existing pattern: returns routes.pm.{product}.inquiry or routes.fsp.{product}.inquiry based on portal parameter",
+        "Fixture registration adds the new page to both the MyFixtures type and the base.extend block",
+        "Spec file has 3 test scenarios: unauthenticated full (completeFullInquiryProcess), authenticated partial (completePartialInquiryProcess), existing user email redirect",
+        "Spec uses test.describe.configure({ timeout: 60000 }), clearAuthState in beforeEach, and imports test from e2e/fixtures/fixtures",
+        "Test data includes valid data for all steps with proper structure using schema types and option enums"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Add a card CRUD e2e test for `legalRepresentatives` on the HOA Loan financing case overview page. The form has fields: soleSignatureAuthorized (CHECKBOX), firstName (INPUT), lastName (INPUT), email (INPUT), phoneNumber (INPUT). Cards display the representative's full name as the headline. The module should be reusable across products (configurable sectionData and expectedUrl).",
+      "expected_output": "A complete set of 3 files: test data, reusable CardCrudModule subclass, and updated overview page. Should follow the exact LegalRepresentativesModule pattern from BFW.",
+      "files": [],
+      "expectations": [
+        "Module extends CardCrudModule<CreateLegalRepresentativeType> with correct import from @/features/legalRepresentatives/forms/legalRepresentativeSchema",
+        "Constructor takes sectionData (actionTestId + route) and expectedUrlAfterSubmit parameters for reusability, and passes dataTestIds.legalRepresentatives.legalRepresentativeCard to super()",
+        "Test data has valid (with satisfies CreateLegalRepresentativeType) and invalid variants with all 5 fields plus financingCaseId",
+        "fillAndSubmitForm fills all 5 fields with correct BaseField types: soleSignatureAuthorized (CHECKBOX), firstName (INPUT), lastName (INPUT), email (INPUT), phoneNumber (INPUT), then calls this.form.submit()",
+        "verifyCardExists constructs headline from firstName + lastName and calls this.cardHelper.verifyCardHeadline(cardIndex, expectedHeadline)",
+        "setupWithValidation calls executeCrudCycle with updateData that changes firstName and lastName, expectedErrorFields includes firstName/phoneNumber/email",
+        "Module registered on PMHoaLoanFinancingCaseOverviewPage with HOA Loan-specific sectionData (actionTestId, route) and expectedUrlAfterSubmit (overview route)"
+      ]
+    }
+  ]
+}

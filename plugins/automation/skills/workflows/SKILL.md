@@ -1,6 +1,6 @@
 ---
 name: workflows
-description: "Run any feature creation workflow. Pass the workflow type as the first argument. Available types: form, modal, page, inquiry-process, interactive-list, list-actions, secure-fetch, simple-form, task-group, generic."
+description: "Run any feature creation workflow. Pass the workflow type as the first argument. Available types: modal, page, inquiry-process, interactive-list, list-actions, secure-fetch, simple-form, task-group, generic."
 argument-hint: "<workflow-type> [subtaskId or featureName subFeatureName featureType product role]"
 ---
 
@@ -12,7 +12,6 @@ Route to the correct workflow based on the first argument.
 
 | Type | Description | File |
 |------|-------------|------|
-| `form` | End-to-end form creation (parent paths, translations, all form files) | [form.md](./form.md) |
 | `modal` | End-to-end modal creation (parent paths, translations, modal component) | [modal.md](./modal.md) |
 | `page` | End-to-end page creation (routes, translations, page component) | [page.md](./page.md) |
 | `inquiry-process` | End-to-end inquiry process creation (routes, parent paths, translations, all files) | [inquiry-process.md](./inquiry-process.md) |
