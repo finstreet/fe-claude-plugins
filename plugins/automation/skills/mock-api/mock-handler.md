@@ -5,15 +5,15 @@ Mock handlers are TypeScript files that register routes with the mock registry. 
 ## File Location
 
 ```
-src/shared/backend/mocks/handlers/{feature}.ts
+src/features/{featureName}/mock/{featureName}Mock.ts
 ```
 
-Name the file after the feature area (e.g., `contracts.ts`, `documents.ts`, `users.ts`).
+Place the mock handler inside the feature directory it belongs to. Name it using the feature name with a `Mock` suffix (e.g., `src/features/contracts/mock/contractsMock.ts`, `src/features/documents/mock/documentsMock.ts`).
 
 ## Template
 
 ```typescript
-import { registerMock } from "../registry";
+import { registerMock } from "@/shared/backend/mocks/registry";
 import { NextResponse } from "next/server";
 
 registerMock({
@@ -29,7 +29,7 @@ registerMock({
 
 ### Imports
 
-Always import `registerMock` from `"../registry"` and `NextResponse` from `"next/server"`.
+Always import `registerMock` from `"@/shared/backend/mocks/registry"` and `NextResponse` from `"next/server"`.
 
 ### Path Pattern
 
@@ -149,17 +149,17 @@ After creating a handler file, add its import to `src/shared/backend/mocks/handl
 ```typescript
 // Import mock handler files here to register them.
 // Each import triggers registerMock() calls.
-import "./contracts";
+import "@/features/contracts/mock/contractsMock";
 ```
 
 The import is side-effect only (no named imports needed) — importing the file triggers the `registerMock()` calls.
 
 ## Full Example
 
-File: `src/shared/backend/mocks/handlers/contracts.ts`
+File: `src/features/contracts/mock/contractsMock.ts`
 
 ```typescript
-import { registerMock } from "../registry";
+import { registerMock } from "@/shared/backend/mocks/registry";
 import { NextResponse } from "next/server";
 
 registerMock({
@@ -202,7 +202,7 @@ registerMock({
 Barrel update in `src/shared/backend/mocks/handlers/index.ts`:
 
 ```typescript
-import "./contracts";
+import "@/features/contracts/mock/contractsMock";
 ```
 
 ## Rules

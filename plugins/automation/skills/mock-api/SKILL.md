@@ -90,6 +90,6 @@ Then optionally clean up: remove the mock handler file and its import from the b
 1. Mock data must be **camelCase** — it matches Zod schemas directly, no snake_case transformation
 2. ALWAYS check if infrastructure files exist before creating them
 3. ALWAYS update the barrel file when adding a new mock handler
-4. One handler file per feature area (e.g., `contracts.ts`, `documents.ts`)
+4. One handler file per feature area, placed inside the feature directory (e.g., `src/features/contracts/mock/contractsMock.ts`)
 5. Use `{param}` syntax in path patterns to match path variables
 6. Do NOT run any `tsc` or `pnpm` commands after implementation
