@@ -1,0 +1,101 @@
+{
+  "skill_name": "page",
+  "evals": [
+    {
+      "id": 1,
+      "name": "list-page",
+      "prompt": "Create a list page for managing documents at `src/app/admin/dokumente/page.tsx`. The page title is 'Dokumente'. The header should have the title and an action button area. The list component is `DocumentsList` from `@/features/documents/lists/DocumentsList`. Use `documentsSearchParamsCache` from `@/features/documents/lists/DocumentsList/documentsSearchParams` for parsing search params (it yields `search` and `pagination`). The button to open the create modal is `OpenCreateDocumentModalButton` from `@/features/documents/modals/CreateDocumentModal/OpenCreateDocumentModalButton`, and the modal itself is `CreateDocumentModal` from `@/features/documents/modals/CreateDocumentModal`.",
+      "expected_output": "A single page.tsx file that follows the list page shell pattern: metadata, force-dynamic, searchParams with nuqs, PageHeader with title + actions, Suspense-wrapped list inside PageContent, modal at the bottom.",
+      "files": [
+        "evals/files/eval-1/page.tsx"
+      ],
+      "expectations": [
+        "Has `export const metadata: Metadata` with title using template literal `Dokumente | ${Constants.companyName}` and imports Constants from @/shared/utils/constants",
+        "Has `export const dynamic = \"force-dynamic\"` since this is a list page",
+        "Function is async, accepts searchParams typed as `Promise<SearchParams>` (from nuqs/server)",
+        "Awaits searchParams before parsing: `await searchParams` then `documentsSearchParamsCache.parse(...)` to extract search and pagination",
+        "Uses PageHeader > PageHeaderTitle > Headline as h1 for the title, with getExtracted() for translations",
+        "Uses PageHeaderActions containing OpenCreateDocumentModalButton",
+        "List component wrapped in `<Suspense fallback={<ListSkeleton />}>` inside PageContent, passing search and pagination as searchParams prop",
+        "CreateDocumentModal rendered at the bottom of the JSX, outside PageContent, as a sibling to PageHeader and PageContent"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "sub-page-reusable-header",
+      "prompt": "Create a sub-page for account details at `src/app/operations/weg-konten/[financingCaseId]/kontodetails/page.tsx`. This is a sub-page under the financing case overview for the FSP portal. Title is 'Kontodetails'. It should use the shared FSP sub-page header. Fetch account details using `getAccountDetails` from `@/shared/backend/models/accountDetails/server` with the financingCaseId as path variable (use fetchWithErrorHandling). The response has a `header` property for the sub-page header. Render `AccountDetailsForm` from `@/features/accountDetails/forms/AccountDetailsForm` inside the content area, passing the response as `defaultValues`.",
+      "expected_output": "A single page.tsx file that follows the sub-page shell pattern: metadata, params with financingCaseId, FspFinancingCaseOverviewSubPageHeader, and content inside PageContent.",
+      "files": [
+        "evals/files/eval-2/page.tsx"
+      ],
+      "expectations": [
+        "Has `export const metadata: Metadata` with title using template literal `Kontodetails | ${Constants.companyName}`",
+        "Function is async, accepts params typed as `Promise<{ financingCaseId: string }>`",
+        "Awaits params before destructuring: `const { financingCaseId } = await params`",
+        "Uses `FspFinancingCaseOverviewSubPageHeader` from `@/layouts/fsp/FspFinancingCaseOverviewSubPageHeader` — NOT inline PageHeader composition",
+        "Passes `title`, `financingCaseId`, and `header` (from response) to FspFinancingCaseOverviewSubPageHeader",
+        "Fetches data with `fetchWithErrorHandling(() => getAccountDetails({ pathVariables: { financingCaseId } }))`",
+        "AccountDetailsForm rendered inside PageContent with defaultValues prop",
+        "Does NOT have `export const dynamic` (not a list page)"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "inquiry-step-thin-wrapper",
+      "prompt": "Create an inquiry step page at `src/app/operations/anfragen/weg-konto/[inquiryId]/(inquiry)/bankverbindung/page.tsx`. The title is 'Bankverbindung'. This is part of the HOA account inquiry process. The step's feature page component is `BankDetailsPage` from `@/features/inquiryProcess/common/bankDetails/BankDetailsPage`.",
+      "expected_output": "A minimal thin-wrapper page.tsx that only handles metadata and param extraction, delegating everything else to the feature page component.",
+      "files": [
+        "evals/files/eval-3/page.tsx"
+      ],
+      "expectations": [
+        "Has `export const metadata: Metadata` with title using template literal `Bankverbindung | ${Constants.companyName}`",
+        "Function is async, accepts params typed as `Promise<{ inquiryId: string }>`",
+        "Awaits params before destructuring: `const { inquiryId } = await params`",
+        "Renders only `<BankDetailsPage inquiryId={inquiryId} />` — a single feature page component",
+        "Does NOT import or render InquiryHeader or InquiryContent (those belong in the feature page component)",
+        "Does NOT use getExtracted/getTranslations (no translations needed in the thin wrapper)",
+        "Does NOT use PageHeader, PageContent, or any layout primitives — the feature component owns layout"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "auth-page",
+      "prompt": "Create a forgot password page at `src/app/(auth)/passwort-vergessen/page.tsx`. Title is 'Passwort vergessen'. It should accept a searchParam `emailSent` (string) and show a success banner with the text 'E-Mail wurde erfolgreich gesendet' when it's truthy. Render the `ForgotPasswordForm` from `@/features/auth/forms/forgotPasswordForm`.",
+      "expected_output": "A single page.tsx file following the auth page pattern: metadata, typed searchParams, Panel + VStack wrapper with Headline, conditional Banner, and form component. No PageHeader.",
+      "files": [
+        "evals/files/eval-4/page.tsx"
+      ],
+      "expectations": [
+        "Has `export const metadata: Metadata` with title using template literal `Passwort vergessen | ${Constants.companyName}`",
+        "Does NOT use PageHeader or PageContent — auth pages use Panel as container",
+        "Uses `<Panel p={8}>` as the outermost wrapper",
+        "Uses `<VStack gap={8} alignItems=\"stretch\">` inside the Panel",
+        "Has `<Headline as=\"h1\">` for the page title inside the VStack",
+        "searchParams typed explicitly as `Promise<{ emailSent: string }>` (NOT nuqs SearchParams)",
+        "Awaits searchParams before accessing properties",
+        "Conditionally renders `<Banner type=\"success\">` when emailSent is truthy",
+        "ForgotPasswordForm rendered inside the VStack"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "detail-overview-page",
+      "prompt": "Create a detail overview page at `src/app/operations/weg-konten/[financingCaseId]/page.tsx`. Title is 'WEG-Konto Übersicht'. Fetch the overview data using `getHoaAccountFinancingCaseOverview` from `@/shared/backend/models/financingCaseOverview/hoaAccount/fsp/server` with financingCaseId as path variable (use fetchWithErrorHandling). The page header is a custom feature component `HoaAccountOverviewPageHeader` from `@/features/financingCaseOverview/hoaAccount/fsp/HoaAccountOverviewPageHeader` — pass it `financingCaseId` and `overviewResponse`. Inside the content area, render `CustomerDetailsTaskGroup` and `InternalTaskGroup` from `@/features/financingCaseOverview/hoaAccount/fsp/taskGroups/`, both receiving `financingCaseId` and `overviewResponse`. Add `ArchiveFinancingCaseModal` from `@/features/financingCaseOverview/common/fsp/modals/archiveFinancingCaseModal` and `AssignCaseManagerModal` from `@/features/caseManagers/modals` at the bottom.",
+      "expected_output": "A single page.tsx file following the detail overview page pattern: metadata, params, ResetScrollPosition, custom feature header, task groups inside PageContent, modals at the bottom.",
+      "files": [
+        "evals/files/eval-5/page.tsx"
+      ],
+      "expectations": [
+        "Has `export const metadata: Metadata` with title using template literal `WEG-Konto Übersicht | ${Constants.companyName}`",
+        "Function is async, accepts params typed as `Promise<{ financingCaseId: string }>`",
+        "Awaits params before destructuring",
+        "Has `<ResetScrollPosition />` at the top of the JSX, before the header",
+        "Uses the custom feature header component `HoaAccountOverviewPageHeader` with financingCaseId and overviewResponse props — NOT inline PageHeader composition",
+        "Fetches data with `fetchWithErrorHandling(() => getHoaAccountFinancingCaseOverview({ pathVariables: { financingCaseId } }))`",
+        "Task group components rendered inside PageContent with financingCaseId and overviewResponse props",
+        "Both modals (ArchiveFinancingCaseModal, AssignCaseManagerModal) rendered at the bottom, outside PageContent",
+        "Does NOT have `export const dynamic` (overview pages don't need force-dynamic)"
+      ]
+    }
+  ]
+}
