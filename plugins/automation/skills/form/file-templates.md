@@ -812,6 +812,61 @@ export const {FormName}FormFields = ({ fieldNames }: {FormName}FormFieldsProps) 
 
 Import `useWatch` from `react-hook-form` (not from `@finstreet/forms/rhf`).
 
+### Cross-Field Validation Trigger Hook
+
+File: `hooks/use{Name}CrossValidation.ts`
+
+When a sub-schema `superRefine` validates two sibling fields against each other (see [schema.md — Cross-Field Peer Validation](schema.md#cross-field-peer-validation)), react-hook-form only re-validates the field currently being edited. The sibling's error state won't update until the user interacts with it. This hook forces the sibling to re-validate immediately.
+
+```typescript
+import { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
+
+export function useUnitCountCrossValidation() {
+  const { watch, trigger, getValues } = useFormContext();
+
+  useEffect(() => {
+    // watch(callback) only fires on user-driven changes, NOT on mount or default value hydration
+    const subscription = watch((_, { name }) => {
+      if (name === "unitCount.residential") {
+        // Only trigger sibling validation if it already has a value
+        if (getValues("unitCount.commercial") != null) {
+          trigger("unitCount.commercial");
+        }
+      }
+      if (name === "unitCount.commercial") {
+        if (getValues("unitCount.residential") != null) {
+          trigger("unitCount.residential");
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [watch, trigger, getValues]);
+}
+```
+
+**Usage:** Call the hook inside the `FormFields` component (it must be inside `FormProvider`):
+
+```tsx
+export const BuildingDetailsFormFields = ({ fieldNames }: BuildingDetailsFormFieldsProps) => {
+  useUnitCountCrossValidation();
+
+  return (
+    <Fields>
+      <DynamicFormField fieldName={fieldNames.unitCount.residential} />
+      <DynamicFormField fieldName={fieldNames.unitCount.commercial} />
+    </Fields>
+  );
+};
+```
+
+> **Key rules:**
+> 1. Use `watch(callback)` — NOT `useWatch` + `useEffect`. The subscription only fires on user-driven changes, preventing premature validation on mount.
+> 2. Guard with `getValues(siblingField) != null` — only trigger sibling validation if the sibling already has a value.
+> 3. Call in `FormFields`, not `Form` — the hook needs to be inside `FormProvider`.
+> 4. Import `useFormContext` from `react-hook-form`.
+
 ### With Array Fields
 
 For array fields, create an internal component using `useFieldArray` from `@finstreet/forms/rhf`:

@@ -48,6 +48,31 @@
         "FormFields component: renders DynamicFormField for all visible fields using fieldNames.X, nested fields use fieldNames.maintenanceFeesArrearsInfo.X, wraps in Fields, does NOT render hidden financingCaseId or durationOptions select field",
         "Form component: has 'use client' directive, calls useAdditionalInformationFormConfig(defaultValues), renders Form wrapper with AdditionalInformationFormFields passing config.fieldNames"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "# Property Items Form\n\nI want you to build a property items form. The featureName is `propertyItems` and the file path is `src/features/propertyItems`. The form should include the following fields:\n\n- `street` (string, min 1, max 50, \"Straße\")\n- `houseNumber` (string, min 1, max 6, \"Hausnummer\")\n- `postalCode` (string, PostalCodeValidationSchema, \"Postleitzahl\")\n- `city` (string, min 1, max 50, \"Stadt\")\n- `plotArea` (number, min 1, 2 decimals, suffix \"m²\", \"Grundstücksfläche\")\n- `constructionYear` (number, integer, min 0, 0 decimals, no number formatting, \"Baujahr\"). Add a single-field superRefine that rejects years more than 10 years in the future using CustomErrorType.YEAR_TOO_FAR_IN_FUTURE.\n- `unitCount.residential` (number, integer, min 0, 0 decimals, \"Wohneinheiten\")\n- `unitCount.commercial` (number, integer, min 0, 0 decimals, \"Gewerbeeinheiten\")\n- `financingCaseId` (hidden, string)\n\nThe `residential` and `commercial` fields must be grouped in a `unitCount` sub-schema with cross-field peer validation: the sum of residential + commercial must be >= 4, otherwise add a custom error (CustomErrorType.COMBINED_UNIT_COUNT_TOO_LOW) to BOTH field paths. Because react-hook-form only re-validates the field being edited, also create a cross-validation trigger hook (`hooks/useUnitCountCrossValidation.ts`) that watches each field and triggers re-validation of the sibling.\n\nLayout: street/houseNumber side-by-side (8/4), postalCode/city side-by-side (4/8), then plotArea, constructionYear, and residential/commercial side-by-side (6/6).\n\nIn the form action I want you to log the formState and return the object with error null and message null. For the form actions I want you to use a back button ('Zurück') that goes to the previous page and a submit button ('Speichern') with an arrow icon.",
+      "expected_output": "A complete set of 8 form files (including hooks/useUnitCountCrossValidation.ts) that structurally match the golden reference files in evals/files/eval-3/. This form tests cross-field peer validation: a unitCount sub-schema with superRefine adding errors to both paths, a cross-validation trigger hook using watch(callback) + trigger(), nested fieldNames, and side-by-side field layouts.",
+      "files": [
+        "evals/files/eval-3/propertyItemsSchema.ts",
+        "evals/files/eval-3/usePropertyItemsFormFields.ts",
+        "evals/files/eval-3/propertyItemsFormAction.ts",
+        "evals/files/eval-3/getPropertyItemsDefaultValues.ts",
+        "evals/files/eval-3/usePropertyItemsFormConfig.tsx",
+        "evals/files/eval-3/hooks/useUnitCountCrossValidation.ts",
+        "evals/files/eval-3/PropertyItemsFormFields.tsx",
+        "evals/files/eval-3/PropertyItemsForm.tsx"
+      ],
+      "expectations": [
+        "Schema file: imports z from @/lib/zod and CustomErrorType. Defines a unitCount sub-schema with residential (z.coerce.number().int().min(0)) and commercial (z.coerce.number().int().min(0)) using .superRefine that checks sum >= 4 and adds custom issues to BOTH paths ['residential'] and ['commercial'] with CustomErrorType.COMBINED_UNIT_COUNT_TOO_LOW. constructionYear has a single-field .superRefine for year-too-far-in-future. Main schema composes unitCount as nested property. Exports all 5 type aliases.",
+        "useFormFields file: returns FormFieldsType<PropertyItemsType>, uses useExtracted. Fields include input types for address, number with decimal:2 and suffix 'm²' for plotArea, number with decimal:0 and formatNumber:false for constructionYear. unitCount is nested with residential and commercial as number fields with decimal:0. financingCaseId is hidden.",
+        "FormAction file: has 'use server' directive, (state, formData) signature, logs state and formData, returns { error: null, message: null }",
+        "DefaultValues file: accepts financingCaseId param, uses 'as const satisfies' pattern, string fields default to empty string, number fields to undefined, unitCount is nested object with residential and commercial both undefined",
+        "FormConfig file: uses createFormFieldNames(fields), passes propertyItemsFormAction directly as serverAction, includes useErrorAction, renderFormActions with back button (router.back) and submit button with arrow icon",
+        "Cross-validation hook: hooks/useUnitCountCrossValidation.ts uses useFormContext from react-hook-form, subscribes via watch(callback) inside useEffect (NOT useWatch), checks field name and triggers sibling validation with trigger(). Guards with getValues(sibling) != null before triggering. Returns cleanup via subscription.unsubscribe().",
+        "FormFields component: calls useUnitCountCrossValidation() hook at the top. Uses FieldsHStack/FieldsHStackItem for side-by-side layouts (street/houseNumber 8/4, postalCode/city 4/8, residential/commercial 6/6). Nested fields use fieldNames.unitCount.residential and fieldNames.unitCount.commercial. Does NOT render hidden financingCaseId.",
+        "Form component: has 'use client' directive, calls usePropertyItemsFormConfig(defaultValues), renders Form wrapper with PropertyItemsFormFields passing config.fieldNames"
+      ]
     }
   ]
 }

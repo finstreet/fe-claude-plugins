@@ -119,6 +119,52 @@ const hoaAccountDetailsSchema = z.object({
 });
 ```
 
+## Cross-Field Peer Validation
+
+Unlike dependent validation (where one field controls whether another is required), cross-field peer validation is when two sibling fields validate **against each other** with a mutual constraint (e.g., their combined value must meet a minimum). The mechanics are the same — group fields in a named sub-schema with `superRefine` — but the `superRefine` adds issues to **both** field paths.
+
+**Example — two number fields whose sum must be ≥ 4:**
+
+```typescript
+import { CustomErrorType } from "@/shared/backend/customErrors";
+
+const unitCountSchema = z
+  .object({
+    residential: z.coerce.number().min(0),
+    commercial: z.coerce.number().min(0),
+  })
+  .superRefine((data, ctx) => {
+    const total = (data.residential ?? 0) + (data.commercial ?? 0);
+    if (total < 4) {
+      // Add issue to BOTH paths so both fields show the error
+      ctx.addIssue({
+        code: "custom",
+        path: ["residential"],
+        params: { errorType: CustomErrorType.COMBINED_UNIT_COUNT_TOO_LOW },
+      });
+      ctx.addIssue({
+        code: "custom",
+        path: ["commercial"],
+        params: { errorType: CustomErrorType.COMBINED_UNIT_COUNT_TOO_LOW },
+      });
+    }
+  });
+
+// Compose into the main schema as a nested property
+export const buildingDetailsSchema = z.object({
+  unitCount: unitCountSchema, // nested!
+  buildingYear: z.coerce.number().min(1800).max(2100),
+  financingCaseId: z.string(),
+});
+```
+
+This nesting cascades through the rest of the form the same way as dependent validation:
+- **useFormFields**: fields are nested under the sub-schema key (e.g., `unitCount: { residential: {...}, commercial: {...} }`)
+- **defaultValues**: defaults mirror the nested structure
+- **FormFields**: uses nested fieldNames (e.g., `fieldNames.unitCount.residential`)
+
+> **Important:** A sub-schema `superRefine` only re-runs for the field currently being edited. If the user changes `residential`, the `commercial` field's error state won't update until the user interacts with it. To make both fields validate simultaneously, you need a **cross-validation trigger hook** — see [file-templates.md](file-templates.md#cross-field-validation-trigger-hook).
+
 ## Array Fields
 
 For forms needing multiple entries of the same type:

@@ -20,8 +20,8 @@ BasePage (composes: form: FormInteractor, errors: ErrorHandler, navigation: Navi
    ├── CardCrudModule<T>     ── abstract fillAndSubmitForm(data: T) + verifyCardExists(data: T)
    │                             executeCrudCycle(options)
    │
-   └── InquiryPage<T>        ── abstract inquiryDetails + hoaDetails step modules
-                                 completeFullInquiryProcess / completePartialInquiryProcess
+   └── InquiryPage (BasePage) ── composes step modules per product
+                                 completeFullInquiryProcess / fillAllStepsWithoutFinalSubmit
 ```
 
 ## Directory Structure
@@ -205,8 +205,8 @@ Use when: A feature creates items via a modal form, displays them as cards, and 
 Examples: Property items, legal representatives.
 
 ### Multi-step inquiry wizard → Read `inquiry-process-tests.md`
-Use when: Adding a new product's multi-step inquiry process (inquiry details → HOA details → property manager → property management).
-Examples: HOA Loan inquiry, HOA Account inquiry.
+Use when: Adding a new product's multi-step inquiry process with any number of steps.
+Examples: HOA Loan inquiry, HOA Account inquiry, Factoring inquiry.
 
 ### Full lifecycle integration → Read `happy-path-tests.md`
 Use when: Testing the complete workflow from inquiry creation through all financing case actions.

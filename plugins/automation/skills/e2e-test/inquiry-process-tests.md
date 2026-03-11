@@ -2,442 +2,373 @@
 
 ## When to Use
 
-Use `InquiryPage<T>` when adding e2e tests for a **new product's multi-step inquiry wizard**. The standard inquiry flow has 4 steps:
+Use this guide when adding e2e tests for a **multi-step inquiry process**. An inquiry process is a wizard where the user fills out a sequence of forms, one per step, and each step submission navigates to the next.
 
-1. **Inquiry Details** — product-specific form (e.g., loan amount, duration)
-2. **HOA Details** — product-specific form (e.g., HOA name, postal code)
-3. **Property Manager Details** — shared across all products
-4. **Property Management Details** — shared across all products
+The number of steps, their names, and their content are entirely product-specific. Before writing any code, read the inquiry process source to determine:
+
+1. **How many steps** the process has
+2. **What each step's form schema looks like** (field names, types)
+3. **How navigation works** — are step URLs based on a case ID? Is the ID known upfront or extracted after step 1?
+4. **Whether portals exist** — does the same inquiry run under different portals (e.g., property manager vs operations)?
+5. **Whether shared steps exist** — are any step modules already implemented and reused across products?
+
+## Pattern Overview
+
+Every inquiry process test follows the same architecture:
+
+```
+FormModule<T>              ── one per step, fills and submits a single form
+     │
+InquiryPage (BasePage)     ── composes all step modules, orchestrates the flow
+     │
+Spec file                  ── uses the InquiryPage to drive test scenarios
+```
 
 ## Step-by-Step Guide
 
 ### 1. Create Step Modules
 
-Create one module per product-specific step. Steps 3 and 4 are shared (`PropertyManagerDetailsStepModule`, `PropertyManagementDetailsStepModule`).
+Create one `FormModule<T>` subclass per step. Each module knows how to fill and submit its form.
 
-**File:** `e2e/modules/{product}/inquiryProcess/{Step}StepModule.ts`
+**File:** `e2e/modules/{product}/inquiryProcess/{StepName}StepModule.ts`
 
 ```typescript
 import { Page } from "@playwright/test";
 import { BaseField } from "@finstreet/forms";
-import { InquiryDetailsType } from "@/features/inquiryProcess/{product}InquiryProcess/forms/inquiryDetails/inquiryDetailsSchema";
+import { StepSchemaType } from "@/features/inquiryProcess/.../{stepName}Schema";
 import { FormModule } from "e2e/modules/FormModule";
 
-export class InquiryDetailsStepModule extends FormModule<InquiryDetailsType> {
+export class StepNameStepModule extends FormModule<StepSchemaType> {
   constructor(page: Page) {
     super(page);
   }
 
   // Optional: fill without submitting (useful for navigation tests)
-  async fill(data: InquiryDetailsType): Promise<void> {
+  async fill(data: StepSchemaType): Promise<void> {
     await this.form.fillField({
-      fieldName: "loanAmount",
+      fieldName: "fieldA",
       fieldType: BaseField.NUMBER,
-      value: data.loanAmount,
+      value: data.fieldA,
     });
 
-    if (data.loanDuration.fiveYears) {
-      await this.form.fillField({
-        fieldName: "loanDuration.fiveYears",
-        fieldType: BaseField.CHECKBOX,
-        value: true,
-      });
-    }
+    await this.form.fillField({
+      fieldName: "fieldB",
+      fieldType: BaseField.SELECT,
+      value: data.fieldB,
+    });
 
-    // ... more fields
+    // ... one fillField call per form field
   }
 
-  async fillAndSubmitForm(data: InquiryDetailsType): Promise<void> {
+  async fillAndSubmitForm(data: StepSchemaType): Promise<void> {
     await this.fill(data);
     await this.form.submit();
   }
 }
 ```
 
+**Rules:**
+- Import the schema type from the source form schema (e.g., `@/features/inquiryProcess/forms/{stepName}/{stepName}Schema`)
+- Import option enums from their source option files
+- Use `BaseField` enum to match the field type (`INPUT`, `NUMBER`, `SELECT`, `CHECKBOX`, `YES_NO_RADIO_GROUP`, `RADIO_GROUP`, `COMBOBOX`, `DATEPICKER`, `SELECTABLE_CARDS`, `FILE_UPLOAD`, `TEXTAREA`, `PASSWORD`)
+- `fieldName` must match the form's `data-testid` pattern (usually the schema field name)
+- For nested fields use dot notation: `"parent.child"`
+- Always implement both `fill()` (for navigation tests) and `fillAndSubmitForm()` (for happy path tests)
+- If a step module already exists as a shared module (e.g., in `e2e/modules/common/`), reuse it instead of creating a new one
+
 ### 2. Create Test Data
 
 **File:** `e2e/data/{product}/{product}InquiryTestData.ts`
 
+Create one data object per step, typed with `satisfies StepSchemaType`:
+
 ```typescript
-import { InquiryDetailsType } from "@/features/inquiryProcess/{product}InquiryProcess/forms/inquiryDetails/inquiryDetailsSchema";
-import { HoaDetailsType } from "@/features/inquiryProcess/{product}InquiryProcess/forms/hoaDetails/hoaDetailsSchema";
-import { PropertyManagerDetailsType } from "@/features/inquiryProcess/common/propertyManagerDetails/propertyManagerDetailsSchema";
-import { PropertyManagementDetailsType } from "@/features/inquiryProcess/common/propertyManagementDetails/propertyManagementDetailsSchema";
-import { SalutationOption } from "@/features/inquiryProcess/common/propertyManagerDetails/options/salutationOptions";
-import { LegalForms } from "@/features/inquiryProcess/common/propertyManagementDetails/options/legalFormsOptions";
-import { PropertyManagementType } from "@/features/inquiryProcess/common/propertyManagementDetails/options/typeOptions";
-import { faker } from "@faker-js/faker";
+import { Step1Type } from "@/features/inquiryProcess/forms/step1/step1Schema";
+import { Step2Type } from "@/features/inquiryProcess/forms/step2/step2Schema";
+// ... import all step schema types and option enums
 
 export const validInquiryData = {
-  inquiryDetails: {
-    // product-specific fields
-  } as InquiryDetailsType,
+  step1: {
+    // all fields with valid values
+  } satisfies Step1Type,
 
-  hoaDetails: {
-    inquiryId: "123",
-    name: "Test WEG Gemeinschaft",
-    postalCode: "10115",
-    city: "Berlin",
-    // ... product-specific fields
-  } as HoaDetailsType,
+  step2: {
+    // all fields with valid values
+  } satisfies Step2Type,
 
-  propertyManagerDetails: {
-    inquiryId: "123",
-    email: faker.internet.email(),
-    salutation: SalutationOption.MR,
-    firstName: "Max",
-    lastName: "Mustermann",
-    position: "Verwalter",
-    phoneNumber: "+49 30 123456789",
-    acceptedTerms: true,
-  } as PropertyManagerDetailsType,
-
-  propertyManagementDetailsWithSelectedCompany: {
-    inquiryId: "123",
-    propertyManagementSuggestions: "finstreet",
-    name: "Premium Hausverwaltung AG",
-    legalForm: LegalForms.AKTIENGESELLSCHAFT,
-    alreadyCustomer: "no" as const,
-    type: PropertyManagementType.GEWERBLICHER_HAUSVERWALTER,
-    association: { associationMember: "no" as const },
-    city: "München",
-    street: "Hauptstraße",
-    houseNumber: "1",
-    postalCode: "80331",
-  } as PropertyManagementDetailsType,
-};
-
-// Invalid data for banner/validation tests
-export const invalidInquiryData = {
-  hoaDetailsWithRestrictions: {
-    // ... data that triggers validation banners
-  } as HoaDetailsType,
+  // ... one entry per step
 };
 ```
 
-### 3. Create InquiryPage Subclass
+**Rules:**
+- Use `satisfies` (not `as`) for type safety
+- Import option enum values from their source files for select/radio fields
+- Use `faker` for generated values (emails, etc.) where appropriate
+- Add `invalidInquiryData` if you need validation/banner tests
+
+### 3. Create InquiryPage
 
 **File:** `e2e/pages/{product}/{Product}InquiryPage.ts`
 
+The InquiryPage composes all step modules and provides orchestration methods.
+
 ```typescript
 import { Page } from "@playwright/test";
-import { InquiryPage, InquiryRoutes } from "e2e/pages/InquiryPage";
-import { InquiryDetailsStepModule } from "e2e/modules/{product}/inquiryProcess/InquiryDetailsStepModule";
-import { HoaDetailsStepModule } from "e2e/modules/{product}/inquiryProcess/HoaDetailsStepModule";
-import { InquiryDetailsType } from "@/features/inquiryProcess/{product}InquiryProcess/forms/inquiryDetails/inquiryDetailsSchema";
-import { HoaDetailsType } from "@/features/inquiryProcess/{product}InquiryProcess/forms/hoaDetails/hoaDetailsSchema";
-import { PropertyManagerDetailsType } from "@/features/inquiryProcess/common/propertyManagerDetails/propertyManagerDetailsSchema";
-import { PropertyManagementDetailsType } from "@/features/inquiryProcess/common/propertyManagementDetails/propertyManagementDetailsSchema";
-import { Portal } from "@/shared/types/Portal";
-import { get{Product}InquiryRoutes } from "e2e/utils/portalRoutes";
+import { BasePage } from "e2e/pages/BasePage";
+import { Step1StepModule } from "e2e/modules/{product}/inquiryProcess/Step1StepModule";
+import { Step2StepModule } from "e2e/modules/{product}/inquiryProcess/Step2StepModule";
+import { Step3StepModule } from "e2e/modules/{product}/inquiryProcess/Step3StepModule";
+import { Step1Type } from "@/features/inquiryProcess/forms/step1/step1Schema";
+import { Step2Type } from "@/features/inquiryProcess/forms/step2/step2Schema";
+import { Step3Type } from "@/features/inquiryProcess/forms/step3/step3Schema";
+import { routes } from "@/routes";
 
-export interface CompleteInquiryProcessData {
-  inquiryDetails: InquiryDetailsType;
-  hoaDetails: HoaDetailsType;
-  propertyManagerDetails: PropertyManagerDetailsType;
-  propertyManagementDetails: PropertyManagementDetailsType;
+export interface InquiryProcessData {
+  step1: Step1Type;
+  step2: Step2Type;
+  step3: Step3Type;
 }
 
-export class {Product}InquiryPage extends InquiryPage<CompleteInquiryProcessData> {
-  readonly inquiryDetails: InquiryDetailsStepModule;
-  readonly hoaDetails: HoaDetailsStepModule;
+export class ProductInquiryPage extends BasePage {
+  readonly step1: Step1StepModule;
+  readonly step2: Step2StepModule;
+  readonly step3: Step3StepModule;
 
   constructor(page: Page) {
     super(page);
-    this.inquiryDetails = new InquiryDetailsStepModule(page);
-    this.hoaDetails = new HoaDetailsStepModule(page);
+    this.step1 = new Step1StepModule(page);
+    this.step2 = new Step2StepModule(page);
+    this.step3 = new Step3StepModule(page);
   }
 
-  getInquiryRoutes(portal: Portal): InquiryRoutes {
-    return get{Product}InquiryRoutes(portal);
+  // --- Individual step methods ---
+
+  async testStep1(data: InquiryProcessData): Promise<void> {
+    await this.step1.fillAndSubmitForm(data.step1);
+  }
+
+  async testStep2(
+    data: InquiryProcessData,
+    caseId: string,
+  ): Promise<void> {
+    await this.navigation.waitForUrl(routes.portal.inquiry.step2(caseId));
+    await this.step2.fillAndSubmitForm(data.step2);
+  }
+
+  async testStep3(
+    data: InquiryProcessData,
+    caseId: string,
+  ): Promise<void> {
+    await this.navigation.waitForUrl(routes.portal.inquiry.step3(caseId));
+    await this.step3.fillAndSubmitForm(data.step3);
+  }
+
+  // --- Orchestrators ---
+
+  async completeFullInquiryProcess({
+    data,
+    caseId,
+  }: {
+    data: InquiryProcessData;
+    caseId: string;
+  }): Promise<void> {
+    await this.testStep1(data);
+    await this.testStep2(data, caseId);
+    await this.testStep3(data, caseId);
+  }
+
+  async fillAllStepsWithoutFinalSubmit({
+    data,
+    caseId,
+  }: {
+    data: InquiryProcessData;
+    caseId: string;
+  }): Promise<void> {
+    await this.testStep1(data);
+    await this.testStep2(data, caseId);
+    // Last step: fill without submitting
+    await this.navigation.waitForUrl(routes.portal.inquiry.step3(caseId));
+    await this.step3.fill(data.step3);
   }
 }
 ```
 
-### Optional Overrides
+**Key design decisions (adapt per product):**
 
-**Custom existing user redirect** — Override when existing users redirect to a different step:
-```typescript
-protected getExistingUserRedirectRoute(
-  inquiryRoutes: InquiryRoutes,
-  financingCaseId: string,
-): string {
-  return inquiryRoutes.hoaDetails(financingCaseId);  // HoaAccount redirects here
-}
-```
+| Concern | Option A | Option B |
+|---|---|---|
+| Case ID source | Known upfront (from test data / URL) | Extracted from URL after step 1 (`getInquiryIdFromUrl()`) |
+| Portal awareness | Single portal — no portal param needed | Multiple portals — add `portal` param, use route resolver |
+| Shared steps | All steps product-specific | Some steps reused (instantiate shared modules) |
+| Existing user flow | Not applicable | Add detection logic + shortened flow |
 
-**Custom fourth step** — Override to support partial fill scenarios:
+**If the ID must be extracted from the URL** (e.g., the first step creates the case):
+
 ```typescript
-async testFourthStep(
-  data: CompleteInquiryProcessData,
-  portal: Portal,
-  financingCaseId: string,
-  withSubmission: boolean = true,  // custom parameter
-): Promise<void> {
-  const inquiryRoutes = this.getInquiryRoutes(portal);
-  await this.navigation.waitForUrl(
-    inquiryRoutes.propertyManagementDetails(financingCaseId),
-  );
-  if (withSubmission) {
-    await this.propertyManagementDetails.fillAndSubmitForm(data.propertyManagementDetails);
-  } else {
-    await this.propertyManagementDetails.fill(data.propertyManagementDetails);
+async getInquiryIdFromUrl(): Promise<string> {
+  const url = this.page.url();
+  const match = url.match(/\/your-pattern\/([a-f0-9-]{36})/i);
+  if (!match) {
+    throw new Error(`Could not extract inquiry ID from URL: ${url}`);
   }
+  return match[1];
+}
+
+async testStep2(data: InquiryProcessData): Promise<string> {
+  await this.navigation.waitForRedirect(routes.portal.inquiry.new);
+  const caseId = await this.getInquiryIdFromUrl();
+  await this.navigation.waitForUrl(routes.portal.inquiry.step2(caseId));
+  await this.step2.fillAndSubmitForm(data.step2);
+  return caseId;
 }
 ```
 
-**Validation banner check** — Add if the product has validation banners:
-```typescript
-async hasValidationBanner(bannerId: string): Promise<boolean> {
-  const selector = `[data-testid="${bannerId}"]`;
-  return await this.page.isVisible(selector);
-}
-```
-
-### 4. Add Portal Route Resolver
-
-**File:** `e2e/utils/portalRoutes.ts`
+**If portal-aware routing is needed:**
 
 ```typescript
-export function get{Product}InquiryRoutes(portal: Portal) {
+// e2e/utils/portalRoutes.ts
+export function getProductInquiryRoutes(portal: Portal) {
   return portal === "propertyManager"
-    ? routes.pm.{product}.inquiry
-    : routes.fsp.{product}.inquiry;
+    ? routes.pm.product.inquiry
+    : routes.fsp.product.inquiry;
+}
+
+// In the InquiryPage — add portal param to step methods
+async testStep2(data: InquiryProcessData, portal: Portal, caseId: string): Promise<void> {
+  const inquiryRoutes = getProductInquiryRoutes(portal);
+  await this.navigation.waitForUrl(inquiryRoutes.step2(caseId));
+  await this.step2.fillAndSubmitForm(data.step2);
 }
 ```
 
-### 5. Register in Fixtures
+**If a generic base class exists** (e.g., `InquiryPage<T>`):
+Extend it instead of `BasePage`. The base class may already provide shared step modules, orchestrators, and ID extraction. Your subclass only needs to provide the product-specific step modules and a route resolver. Check what the base class offers before writing orchestration methods.
+
+### 4. Register in Fixtures
 
 **File:** `e2e/fixtures/fixtures.ts`
 
 ```typescript
-import { {Product}InquiryPage } from "../pages/{product}/{Product}InquiryPage";
+import { ProductInquiryPage } from "../pages/{product}/ProductInquiryPage";
 
 type MyFixtures = {
-  // ... existing
-  {product}InquiryPage: {Product}InquiryPage;
+  // ... existing fixtures
+  productInquiryPage: ProductInquiryPage;
 };
 
 export const test = base.extend<MyFixtures>({
-  // ... existing
-  {product}InquiryPage: async ({ page }, use) => {
-    await use(new {Product}InquiryPage(page));
+  // ... existing fixtures
+  productInquiryPage: async ({ page }, use) => {
+    await use(new ProductInquiryPage(page));
   },
 });
 ```
 
-### 6. Create Spec File
+### 5. Create Spec Files
+
+#### Happy Path Test
 
 **File:** `e2e/tests/{product}/{product}InquiryProcess.spec.ts`
 
-Standard 3 scenarios for Property Manager portal:
-
 ```typescript
 import { routes } from "@/routes";
-import { validInquiryData } from "e2e/data/{product}/{product}InquiryTestData";
+import { validInquiryData, TEST_CASE_ID } from "e2e/data/{product}/{product}InquiryTestData";
 import { test } from "e2e/fixtures/fixtures";
-import { clearAuthState, testCredentials } from "e2e/utils/test-helpers";
+import { clearAuthState } from "e2e/utils/test-helpers";
 
-test.describe("{Product} Inquiry Process - Property Manager", () => {
+test.describe("Product Inquiry Process", () => {
   test.describe.configure({ timeout: 60000 });
 
   test.beforeEach(async ({ page }) => {
     await clearAuthState(page);
   });
 
-  test("unauthenticated user - complete full inquiry process", async ({
+  test("complete full inquiry process", async ({
     page,
-    {product}InquiryPage,
+    productInquiryPage,
   }) => {
-    await page.goto(routes.pm.{product}.inquiry.new);
-    await {product}InquiryPage.navigation.waitForUrl(routes.pm.{product}.inquiry.new);
+    const startUrl = routes.portal.inquiry.step1(TEST_CASE_ID);
 
-    await {product}InquiryPage.completeFullInquiryProcess({
-      data: {
-        inquiryDetails: validInquiryData.inquiryDetails,
-        hoaDetails: validInquiryData.hoaDetails,
-        propertyManagerDetails: validInquiryData.propertyManagerDetails,
-        propertyManagementDetails: validInquiryData.propertyManagementDetailsWithSelectedCompany,
-      },
-      portal: "propertyManager",
+    await test.step("Navigate to first step", async () => {
+      await page.goto(startUrl);
+      await productInquiryPage.navigation.waitForUrl(startUrl);
     });
-  });
 
-  test("authenticated user - complete partial inquiry process (2 steps only)", async ({
-    loginPage,
-    {product}InquiryPage,
-  }) => {
-    await loginPage.navigation.goto(routes.auth.login());
-    await loginPage.loginAsPropertyManager(
-      testCredentials.propertyManagerEmail,
-      testCredentials.propertyManagerPassword,
-    );
-    await loginPage.navigation.waitForRedirect(routes.auth.login());
-    await loginPage.navigation.goto(routes.pm.{product}.inquiry.new);
-
-    await {product}InquiryPage.completePartialInquiryProcess({
-      data: {
-        inquiryDetails: validInquiryData.inquiryDetails,
-        hoaDetails: {
-          ...validInquiryData.hoaDetails,
-          hoaSuggestions: "new",
-        },
-        propertyManagerDetails: validInquiryData.propertyManagerDetails,
-        propertyManagementDetails: validInquiryData.propertyManagementDetailsWithSelectedCompany,
-      },
-      portal: "propertyManager",
-    });
-  });
-
-  test("existing user email - redirect to confirmation page", async ({
-    {product}InquiryPage,
-    page,
-  }) => {
-    await page.goto(routes.pm.{product}.inquiry.new);
-    await {product}InquiryPage.navigation.waitForUrl(routes.pm.{product}.inquiry.new);
-
-    await {product}InquiryPage.completeFullInquiryProcess({
-      data: {
-        inquiryDetails: validInquiryData.inquiryDetails,
-        hoaDetails: validInquiryData.hoaDetails,
-        propertyManagerDetails: {
-          ...validInquiryData.propertyManagerDetails,
-          email: "customer@example.com",
-        },
-        propertyManagementDetails: validInquiryData.propertyManagementDetailsWithSelectedCompany,
-      },
-      portal: "propertyManager",
+    await test.step("Complete all inquiry steps", async () => {
+      await productInquiryPage.completeFullInquiryProcess({
+        data: validInquiryData,
+        caseId: TEST_CASE_ID,
+      });
     });
   });
 });
 ```
 
-### 7. Navigation Tests
+#### Navigation Test
 
 **File:** `e2e/tests/{product}/{product}InquiryProcessNavigation.spec.ts`
 
 ```typescript
 import { routes } from "@/routes";
-import { validInquiryData } from "e2e/data/{product}/{product}InquiryTestData";
+import { validInquiryData, TEST_CASE_ID } from "e2e/data/{product}/{product}InquiryTestData";
 import { test } from "e2e/fixtures/fixtures";
 import { clearAuthState } from "e2e/utils/test-helpers";
 
-test.describe("{Product} Inquiry Process Navigation", () => {
+test.describe("Product Inquiry Process Navigation", () => {
+  test.describe.configure({ timeout: 60000 });
+
   test.beforeEach(async ({ page }) => {
     await clearAuthState(page);
   });
 
-  test("should be able to navigate back to first page", async ({
+  test("should navigate back through all steps to the first page", async ({
     page,
-    {product}InquiryPage,
+    productInquiryPage,
   }) => {
-    await page.goto(routes.pm.{product}.inquiry.new);
-    await {product}InquiryPage.navigation.waitForUrl(routes.pm.{product}.inquiry.new);
+    const startUrl = routes.portal.inquiry.step1(TEST_CASE_ID);
 
-    const data = {
-      inquiryDetails: validInquiryData.inquiryDetails,
-      hoaDetails: validInquiryData.hoaDetails,
-      propertyManagerDetails: validInquiryData.propertyManagerDetails,
-      propertyManagementDetails: validInquiryData.propertyManagementDetailsWithSelectedCompany,
-    };
+    await test.step("Navigate to first step", async () => {
+      await page.goto(startUrl);
+      await productInquiryPage.navigation.waitForUrl(startUrl);
+    });
 
-    await {product}InquiryPage.testFirstStep(data);
-    const financingCaseId = await {product}InquiryPage.testSecondStep(data, "propertyManager");
-    await {product}InquiryPage.testThirdStep(data, "propertyManager", financingCaseId);
-    await {product}InquiryPage.testFourthStep(data, "propertyManager", financingCaseId);
+    await test.step("Fill all steps without final submission", async () => {
+      await productInquiryPage.fillAllStepsWithoutFinalSubmit({
+        data: validInquiryData,
+        caseId: TEST_CASE_ID,
+      });
+    });
 
-    // Navigate back through all steps
-    await {product}InquiryPage.navigation.clickBackButton(
-      routes.pm.{product}.inquiry.propertyManagerDetails(financingCaseId),
-    );
-    await {product}InquiryPage.navigation.clickBackButton(
-      routes.pm.{product}.inquiry.hoaDetails(financingCaseId),
-    );
-    await {product}InquiryPage.navigation.clickBackButton(
-      routes.pm.{product}.inquiry.inquiryDetails(financingCaseId),
-    );
-  });
-});
-```
+    // Navigate back through each step (last → first)
+    await test.step("Navigate back from step 3 to step 2", async () => {
+      await productInquiryPage.navigation.clickBackButton(
+        routes.portal.inquiry.step2(TEST_CASE_ID),
+      );
+    });
 
-### 8. Validation Banner Tests
-
-**File:** `e2e/tests/{product}/{product}InquiryProcessBanner.spec.ts`
-
-```typescript
-import { validInquiryData, invalidInquiryData } from "e2e/data/{product}/{product}InquiryTestData";
-import { test, expect } from "e2e/fixtures/fixtures";
-import { dataTestIds } from "e2e/data/dataTestIds";
-import { clearAuthState } from "e2e/utils/test-helpers";
-import { routes } from "@/routes";
-
-test.describe("Inquiry Process - Validation Banner", () => {
-  test.beforeEach(async ({ page, {product}InquiryPage }) => {
-    await clearAuthState(page);
-    await page.goto(routes.pm.{product}.inquiry.new);
-    await {product}InquiryPage.navigation.waitForUrl(routes.pm.{product}.inquiry.new);
-  });
-
-  test("should show validation banners for restrictive answers", async ({
-    {product}InquiryPage,
-  }) => {
-    const data = {
-      inquiryDetails: validInquiryData.inquiryDetails,
-      hoaDetails: invalidInquiryData.hoaDetailsWithRestrictions,
-      propertyManagerDetails: validInquiryData.propertyManagerDetails,
-      propertyManagementDetails: validInquiryData.propertyManagementDetailsWithSelectedCompany,
-    };
-
-    await {product}InquiryPage.testFirstStep(data);
-    await {product}InquiryPage.hoaDetails.fillAndSubmitForm(data.hoaDetails);
-
-    expect(
-      await {product}InquiryPage.hasValidationBanner(
-        dataTestIds.inquiryProcess.validationBanners.sufficientShareholders,
-      ),
-    ).toBeTruthy();
-  });
-});
-```
-
-## InquiryPage Inherited Methods
-
-All these methods are available on your subclass without implementation:
-
-| Method | Description |
-|---|---|
-| `completeFullInquiryProcess({ data, portal })` | Full 4-step flow (auto-detects existing user) |
-| `completePartialInquiryProcess({ data, portal })` | Steps 1-2 only, waits for thank-you page |
-| `testFirstStep(data)` | Fill and submit step 1 |
-| `testSecondStep(data, portal)` | Wait for redirect, extract ID, fill step 2. Returns `financingCaseId` |
-| `testThirdStep(data, portal, financingCaseId)` | Fill step 3 |
-| `testFourthStep(data, portal, financingCaseId)` | Fill step 4 (overridable) |
-| `getInquiryIdFromUrl()` | Extracts UUID from browser URL |
-
-## FSP Portal Tests
-
-For FSP-portal inquiry tests, the flow starts from the property managements page:
-
-```typescript
-test.describe("{Product} Inquiry Process - Financial Services Provider", () => {
-  test("non existing user - complete full inquiry process", async ({
-    {product}InquiryPage,
-    propertyManagmentsPage,
-    loginPage,
-  }) => {
-    await loginPage.loginAsFsp(testCredentials.fspEmail, testCredentials.fspPassword);
-
-    await propertyManagmentsPage.goToPropertyManagmentsPage();
-    await {product}InquiryPage.navigation.waitForUrl(routes.fsp.propertyManagements.list);
-    await propertyManagmentsPage.openFspNewInquiryModal();
-    await propertyManagmentsPage.start{Product}Inquiry();
-
-    await {product}InquiryPage.navigation.waitForRedirect(routes.fsp.propertyManagements.list);
-
-    await {product}InquiryPage.completeFullInquiryProcess({
-      data: { /* ... */ },
-      portal: "operations",
+    await test.step("Navigate back from step 2 to step 1", async () => {
+      await productInquiryPage.navigation.clickBackButton(
+        routes.portal.inquiry.step1(TEST_CASE_ID),
+      );
     });
   });
 });
 ```
+
+## File Creation Order
+
+1. **Step modules** — `e2e/modules/{product}/inquiryProcess/{StepName}StepModule.ts` (one per step)
+2. **Test data** — `e2e/data/{product}/{product}InquiryTestData.ts`
+3. **InquiryPage** — `e2e/pages/{product}/{Product}InquiryPage.ts`
+4. **Portal routes** — `e2e/utils/portalRoutes.ts` (only if portal-aware)
+5. **Fixtures** — Update `e2e/fixtures/fixtures.ts`
+6. **Spec files** — `e2e/tests/{product}/{product}InquiryProcess.spec.ts` + navigation spec
+
+## Checklist
+
+Before writing code, verify:
+- [ ] Read all step form schemas to know every field name and type
+- [ ] Read `routes.ts` to find the inquiry step URLs and how case IDs are used
+- [ ] Check if a generic `InquiryPage<T>` base class exists — if so, extend it
+- [ ] Check if any step modules are already shared (e.g., `e2e/modules/common/`)
+- [ ] Check if portal route resolvers already exist in `e2e/utils/portalRoutes.ts`
