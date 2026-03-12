@@ -62,6 +62,30 @@ parentDirectory/
   └── use{FormName}FormFields.ts        # Shared
 ```
 
+### Inquiry Details with New Variant
+
+When an inquiry process step also serves as the entry point for creating new inquiries (the "new" page pattern), add a `new/` subdirectory. The `new/` variant reuses the shared schema, fields, options, and FormFields component but has its own form action (which calls `startInquiry` + `updateDetails`), form config (no back button), and form component.
+
+```
+parentDirectory/forms/inquiryDetails/
+  ├── new/                                        # New inquiry entry point
+  │   ├── New{FormName}Form.tsx                   # Uses shared FormFields, own config
+  │   ├── new{FormName}FormAction.ts              # Calls startInquiry + updateDetails
+  │   └── useNew{FormName}FormConfig.tsx           # No back button, portal-aware
+  ├── options/                                    # Shared
+  │   └── use{OptionName}Options.ts
+  ├── {formName}Schema.ts                         # Shared
+  ├── use{FormName}FormFields.ts                  # Shared
+  ├── {formName}FormAction.ts                     # Regular update-only action
+  ├── get{FormName}DefaultValues.ts               # Shared
+  ├── use{FormName}FormConfig.tsx                  # Regular config with back button
+  ├── {FormName}FormFields.tsx                    # Shared
+  ├── {FormName}Form.tsx                          # Regular form component
+  └── mapToPayload.ts                             # Shared payload mapper (optional)
+```
+
+For full details on the new inquiry pattern (form action, config, page setup, default values), see [new-inquiry.md](new-inquiry.md).
+
 ## File Creation Order
 
 Plan files in this logical sequence to ensure consistent types and imports:
@@ -159,6 +183,7 @@ Each step has detailed documentation in a supporting file:
 - For **File templates** (action, config, fields component, form), see [file-templates.md](file-templates.md)
 - For **Editing existing forms** (adding/removing fields, changing types, adding prefill, etc.), see [editing.md](editing.md)
 - For **External form actions** (buttons outside the form using `formId`, zustand store, and `onPendingChange`), see [external-actions.md](external-actions.md)
+- For **New inquiry entry point** (the "new" page that creates an inquiry before updating details), see [new-inquiry.md](new-inquiry.md)
 
 ## Hidden Fields and IDs
 
