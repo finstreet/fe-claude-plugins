@@ -244,6 +244,66 @@ export const New{FormName}Form = ({
 };
 ```
 
+## New Layout
+
+The `neu/` route needs its own `layout.tsx` that provides the `ProgressBarProvider`, `FormLayout`, and progress bar. Without this layout, the form's `Validity` component and progress bar will break. The regular inquiry steps get these providers from the `[inquiryId]/(inquiry)/layout.tsx` — the "new" page is outside that route segment, so it must provide them itself.
+
+File: `app/.../neu/layout.tsx`
+
+```tsx
+import { {Product}ProgressBar } from "@/features/inquiryProcess/{product}InquiryProcess/components/{Product}ProgressBar";
+import { {Product}InquiryProcessSteps } from "@/features/inquiryProcess/{product}InquiryProcess/{product}InquiryProcess.types";
+import { ProgressBarProvider } from "@finstreet/forms/ProgressBar";
+import { Panel } from "@finstreet/ui/components/base/Panel";
+import {
+  FormLayout,
+  FormLayoutArea,
+} from "@finstreet/ui/components/pageLayout/Layout/FormLayout";
+import { Box } from "@styled-system/jsx";
+
+type New{Product}InquiryLayoutProps = {
+  children: React.ReactNode;
+};
+
+export default async function New{Product}InquiryLayout({
+  children,
+}: New{Product}InquiryLayoutProps) {
+  return (
+    <ProgressBarProvider<{Product}InquiryProcessSteps>
+      initialState={{
+        // All steps start as incomplete
+        stepA: false,
+        stepB: false,
+        stepC: false,
+      }}
+    >
+      <Box mt={12} mb={24}>
+        <FormLayout>
+          <FormLayoutArea gridArea="form">
+            <Panel
+              variant="invisible"
+              css={{
+                borderRight: { base: "none", lg: "light" },
+                borderRadius: 0,
+                paddingTop: 3,
+                paddingX: { base: 4, lg: 8 },
+              }}
+            >
+              {children}
+            </Panel>
+          </FormLayoutArea>
+          <FormLayoutArea gridArea="progress">
+            <{Product}ProgressBar />
+          </FormLayoutArea>
+        </FormLayout>
+      </Box>
+    </ProgressBarProvider>
+  );
+}
+```
+
+The `ProgressBarProvider` `initialState` must list every step in the inquiry process enum with `false` as the initial value.
+
 ## New Page Setup
 
 The "new" page is a server component under the app directory (e.g., `/verwalter/anfragen/{product}/neu/page.tsx`). It:
@@ -314,3 +374,4 @@ The regular inquiry step page, by contrast, fetches the existing inquiry data an
 | Button alignment | `flex-end` | `space-between` |
 | Data fetching | Options only | Options + existing inquiry |
 | `dynamic` export | `"force-dynamic"` | Inherited from layout |
+| Layout | Own `layout.tsx` with ProgressBarProvider + FormLayout | Provided by `[inquiryId]/(inquiry)/layout.tsx` |
