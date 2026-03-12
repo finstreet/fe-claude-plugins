@@ -132,10 +132,26 @@ import { clearAuthState, testCredentials } from "e2e/utils/test-helpers";
 All element interactions use `data-testid` attributes. Never use CSS selectors, class names, or text content for element selection. The `dataTestIds` object in `e2e/data/dataTestIds.ts` centralizes all test ID constants.
 
 ### test.step() Nesting
-Always wrap logical sections in `test.step()` for clear HTML report output:
+Use `test.step()` to group actions into named sections for clear HTML report output. Actions that are logically linked (e.g. one depends on the result of the other) must be in the same step. A single standalone action can be its own step if it is logically self-contained.
+
 ```typescript
-await test.step("Fill in and confirm financing details", async () => {
-  // ...
+// ✅ Correct — linked actions in one step (result of first is used by second)
+await test.step("Accept invitation and log in", async () => {
+  const invitationLink = await InvitationHelper.waitForInvitationEmailAndExtractLink(email, mailtrap);
+  await InvitationHelper.acceptInvitationInNewContext(browser, invitationLink, password);
+});
+
+// ✅ Correct — single self-contained action as its own step
+await test.step("Fill in financing details", async () => {
+  await overviewPage.financingDetails.setupWithValidation(financingCaseId);
+});
+
+// ❌ Wrong — linked actions split across separate steps
+await test.step("Get invitation link", async () => {
+  invitationLink = await InvitationHelper.waitForInvitationEmailAndExtractLink(email, mailtrap);
+});
+await test.step("Accept invitation", async () => {
+  await InvitationHelper.acceptInvitationInNewContext(browser, invitationLink, password);
 });
 ```
 
