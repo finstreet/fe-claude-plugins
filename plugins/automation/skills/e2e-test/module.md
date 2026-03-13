@@ -8,7 +8,7 @@ These three helpers are composed into every `BasePage` as `this.form`, `this.err
 
 Use to assert validation errors after submitting invalid data.
 
-```typescript
+```
 // Returns text of `${fieldName}-error` data-testid, or null if not found (5s timeout)
 async getFieldError(fieldName: string): Promise<string | null>
 
@@ -25,7 +25,7 @@ async getErrorMessage(fieldName?: string): Promise<string | null>
 
 Use to fill form fields and submit forms. The primary method is `fillField` — it covers all 12 field types via `BaseField` enum.
 
-```typescript
+```
 interface FieldInteractionOptions {
   fieldName: string;        // Maps to data-testid prefix
   fieldType: BaseField;     // Enum from @finstreet/forms
@@ -56,7 +56,7 @@ async submit(): Promise<void>  // Clicks dataTestIds.buttons.submitButton
 
 ### Additional methods
 
-```typescript
+```
 // Use when a select dropdown is already visible in the DOM (no trigger click needed)
 async selectVisibleOption(testId: string, value: string): Promise<void>
 
@@ -70,7 +70,7 @@ async selectFirstOption(testId: string): Promise<void>
 
 Use for page navigation, URL assertions, and waiting for redirects.
 
-```typescript
+```
 async goto(path: string): Promise<void>
 async reload(): Promise<void>                             // reload + waitForNavigation
 async waitForNavigation(): Promise<void>                  // waitForLoadState("networkidle")
