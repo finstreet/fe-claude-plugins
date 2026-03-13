@@ -10,6 +10,32 @@ Use `CardCrudModule<T>` when a feature:
 
 Examples: Property items, legal representatives.
 
+## Developer Input Required
+
+Before generating any code, collect the following from the developer:
+
+| Input | Example |
+|---|---|
+| Feature name (PascalCase) | `Collaterals`, `Guarantors` |
+| Feature name (camelCase) | `collaterals`, `guarantors` |
+| Feature name (kebab-case) | `collaterals`, `guarantors` |
+| Form type import path | `@/features/collaterals/forms/collateralsFormSchema` |
+| Form type name | `CreateCollateralsFormType` |
+| Test data file path | `e2e/data/{product}/collateralsTestData.ts` |
+| Valid test data (all fields) | `{ name: "Main Asset", value: 100000, type: "real-estate" }` |
+| Invalid test data | `{ name: "", value: -1, type: "" }` |
+| Update overrides (partial) | `{ name: "Updated Asset", value: 200000 }` |
+| Fields expected to show errors on invalid submit | `["name", "value", "type"]` |
+| Fields to fill (name + BaseField type + value expression) | `{ fieldName: "name", fieldType: BaseField.INPUT, value: formData.name }` |
+| Card headline construction | `` `${formData.name}` `` |
+| Navigation action test ID | `dataTestIds.{product}.financingCase.pm.goTo{FeatureName}Action` |
+| Route function | `routes.pm.{product}.financingCase.{featureName}(caseId)` |
+| Expected URL after confirmation | `routes.pm.{product}.financingCase.overview(financingCaseId)` |
+| Product/module grouping path | `e2e/modules/{product}/` |
+| Is this module reused across multiple products? | yes / no |
+
+If the module is reused across products, also collect per-product navigation configs (action test ID + route + expected URL after submit) for each product.
+
 ## Step-by-Step Guide
 
 ### 1. Add dataTestIds
@@ -19,10 +45,10 @@ Add card, new button, and confirm button test IDs to `e2e/data/dataTestIds.ts`:
 ```typescript
 export const dataTestIds = {
   // ...
-  propertyItems: {
-    propertyItemCard: "property-items-card",
-    newPropertyItemButton: "property-items-new-button",
-    confirmPropertyItemsButton: "property-items-confirm-button",
+  {featureName}: {
+    {featureName}Card: "{feature-name}-card",
+    new{FeatureName}Button: "{feature-name}-new-button",
+    confirm{FeatureName}Button: "{feature-name}-confirm-button",
   },
 };
 ```
@@ -31,108 +57,100 @@ export const dataTestIds = {
 
 **File:** `e2e/data/{product}/{feature}TestData.ts`
 
-Include `valid`, `invalid`, and optionally a base for `update` data:
+Include `valid`, `invalid`, and the fields needed for `updateData`. The `invalid` data must trigger errors on exactly the fields listed in `expectedErrorFields`.
 
 ```typescript
-import { CreatePropertyItemsFormType } from "@/features/propertyItems/forms/propertyItemsFormSchema";
+import { {FormType} } from "{formTypeImportPath}";
 
-export const propertyItemsTestData = {
+export const {featureName}TestData = {
   valid: {
-    street: "Hauptstraße",
-    houseNumber: "123",
-    postalCode: "10115",
-    city: "Berlin",
-    residentialArea: 250.5,
-    commercialArea: 50.0,
-    plotArea: 500.0,
-    constructionYear: 2010,
-    residentialUnitCount: 10,
-    residentialOwnershipShares: 1000,
-    commercialUnitCount: 2,
-    commercialOwnershipShares: 200,
-    financingCaseId: "FC123456",
-  } satisfies CreatePropertyItemsFormType,
+    // All fields required by the form type, with valid values
+    {field1}: {value1},
+    {field2}: {value2},
+    // ...
+  } satisfies {FormType},
 
   invalid: {
-    street: "Hauptstraße",
-    houseNumber: "123",
-    postalCode: "123",
-    city: "Berlin",
-    residentialArea: -10,
-    commercialArea: 50.0,
-    plotArea: 0,
-    constructionYear: 2027,
-    residentialUnitCount: 10,
-    residentialOwnershipShares: 1000,
-    commercialUnitCount: 2,
-    commercialOwnershipShares: 200,
-    financingCaseId: "FC123456",
+    // Same shape as valid, but with values that trigger validation errors
+    // on the fields listed in expectedErrorFields
+    {field1}: {value1},
+    {field2}: {invalidValue2}, // e.g., negative number, wrong format
+    // ...
   },
 };
 ```
 
 ### 3. Create CardCrudModule Subclass
 
-**File:** `e2e/modules/{product}/{Feature}Module.ts`
+**File:** `e2e/modules/{product}/{FeatureName}Module.ts`
 
 ```typescript
 import { Page, test } from "@playwright/test";
 import { CardCrudModule } from "../CardCrudModule";
 import { BaseField } from "@finstreet/forms";
-import { CreatePropertyItemsFormType } from "@/features/propertyItems/forms/propertyItemsFormSchema";
+import { {FormType} } from "{formTypeImportPath}";
 import { dataTestIds } from "e2e/data/dataTestIds";
 import { routes } from "@/routes";
-import { propertyItemsTestData } from "e2e/data/hoaLoan/propertyItemsTestData";
+import { {featureName}TestData } from "e2e/data/{product}/{featureName}TestData";
 
-export class PropertyItemsModule extends CardCrudModule<CreatePropertyItemsFormType> {
+export class {FeatureName}Module extends CardCrudModule<{FormType}> {
   constructor(page: Page) {
-    super(page, dataTestIds.propertyItems.propertyItemCard);
+    super(page, dataTestIds.{featureName}.{featureName}Card);
   }
 
   async navigate(caseId: string): Promise<void> {
     await this.navigation.navigateToSection(
-      dataTestIds.hoaLoan.financingCase.pm.goToPropertyItemsAction,
-      routes.pm.hoaLoan.financingCase.propertyItems(caseId),
+      {navigationActionTestId},
+      {routeFunction}(caseId),
     );
   }
 
   async setupWithValidation(financingCaseId: string): Promise<void> {
-    await test.step("Fill in and confirm property items", async () => {
+    await test.step("{FeatureName} CRUD Operations", async () => {
       await this.navigate(financingCaseId);
 
       await this.executeCrudCycle({
-        validData: propertyItemsTestData.valid,
-        invalidData: propertyItemsTestData.invalid,
+        validData: {featureName}TestData.valid,
+        invalidData: {featureName}TestData.invalid,
         updateData: {
-          ...propertyItemsTestData.valid,
-          street: "New Street",
-          houseNumber: "456",
+          ...{featureName}TestData.valid,
+          // Override a field or two to verify the update was applied
+          {updateField1}: {updateValue1},
         },
-        expectedErrorFields: ["residentialArea", "plotArea"],
-        expectedUrl: routes.pm.hoaLoan.financingCase.overview(financingCaseId),
-        openModalTestId: dataTestIds.propertyItems.newPropertyItemButton,
-        confirmTestId: dataTestIds.propertyItems.confirmPropertyItemsButton,
-        testName: "Property Items CRUD Operations",
+        expectedErrorFields: [{errorFields}],
+        expectedUrl: {expectedUrlFunction}(financingCaseId),
+        openModalTestId: dataTestIds.{featureName}.new{FeatureName}Button,
+        confirmTestId: dataTestIds.{featureName}.confirm{FeatureName}Button,
+        testName: "{FeatureName} CRUD Operations",
         confirmModalTestId: dataTestIds.confirmationModalConfirm.submitButton,
       });
     });
   }
 
-  async fillAndSubmitForm(formData: CreatePropertyItemsFormType): Promise<void> {
+  async fillAndSubmitForm(formData: {FormType}): Promise<void> {
+    // Fill each form field using this.form.fillField().
+    // Use the field names, BaseField types, and value expressions
+    // provided by the developer.
     await this.form.fillField({
-      fieldName: "street",
-      fieldType: BaseField.INPUT,
-      value: formData.street,
+      fieldName: "{field1}",
+      fieldType: BaseField.{FIELD_TYPE},
+      value: formData.{field1},
     });
-    // ... more fields
+    await this.form.fillField({
+      fieldName: "{field2}",
+      fieldType: BaseField.{FIELD_TYPE},
+      value: formData.{field2},
+    });
+    // ... repeat for all fields
     await this.form.submit();
   }
 
   async verifyCardExists(
-    formData: CreatePropertyItemsFormType,
+    formData: {FormType},
     cardIndex: number = 0,
   ): Promise<void> {
-    const expectedHeadline = `${formData.street} ${formData.houseNumber}`;
+    // Build the expected headline using the fields the developer specified.
+    const expectedHeadline = {headlineExpression};
     await this.cardHelper.verifyCardHeadline(cardIndex, expectedHeadline);
   }
 }
@@ -142,7 +160,7 @@ export class PropertyItemsModule extends CardCrudModule<CreatePropertyItemsFormT
 
 1. **Constructor** passes `cardTestId` to `super()`:
    ```typescript
-   super(page, dataTestIds.propertyItems.propertyItemCard);
+   super(page, dataTestIds.{featureName}.{featureName}Card);
    ```
 
 2. **Two abstract methods** instead of one:
@@ -199,12 +217,12 @@ export class PropertyItemsModule extends CardCrudModule<CreatePropertyItemsFormT
 - Click `confirmModalTestId` — confirm the modal
 - `navigation.waitForUrl(expectedUrl)` — navigate to overview
 
-## Reusable Module Pattern: LegalRepresentativesModule
+## Reusable Module Pattern
 
-When a card CRUD module is shared across multiple products, make it configurable:
+When a card CRUD module is shared across multiple products, accept navigation config as constructor parameters instead of hardcoding routes and test IDs. This lets the same module class be instantiated with different per-product configs.
 
 ```typescript
-export class LegalRepresentativesModule extends CardCrudModule<CreateLegalRepresentativeType> {
+export class {FeatureName}Module extends CardCrudModule<{FormType}> {
   private sectionData: {
     actionTestId: string;
     route: (caseId: string) => string;
@@ -216,7 +234,7 @@ export class LegalRepresentativesModule extends CardCrudModule<CreateLegalRepres
     sectionData: { actionTestId: string; route: (caseId: string) => string },
     expectedUrlAfterSubmit: (caseId: string) => string,
   ) {
-    super(page, dataTestIds.legalRepresentatives.legalRepresentativeCard);
+    super(page, dataTestIds.{featureName}.{featureName}Card);
     this.sectionData = sectionData;
     this.expectedUrlAfterSubmit = expectedUrlAfterSubmit;
   }
@@ -229,51 +247,42 @@ export class LegalRepresentativesModule extends CardCrudModule<CreateLegalRepres
   }
 
   async setupWithValidation(financingCaseId: string): Promise<void> {
-    await test.step("PM add legal representatives", async () => {
+    await test.step("{FeatureName} CRUD Operations", async () => {
       await this.navigate(financingCaseId);
 
       await this.executeCrudCycle({
-        validData: legalRepresentativesTestData.valid,
-        invalidData: legalRepresentativesTestData.invalid,
-        updateData: {
-          ...legalRepresentativesTestData.valid,
-          firstName: "Jane",
-          lastName: "Doe",
-        },
-        expectedErrorFields: ["firstName", "phoneNumber", "email"],
+        // ... same options as single-product version,
+        // but use this.expectedUrlAfterSubmit(financingCaseId) for expectedUrl
         expectedUrl: this.expectedUrlAfterSubmit(financingCaseId),
-        openModalTestId: dataTestIds.legalRepresentatives.newLegalRepresentativeButton,
-        confirmTestId: dataTestIds.legalRepresentatives.confirmLegalRepresentativesButton,
-        testName: "Legal Representatives CRUD Operations",
-        confirmModalTestId: dataTestIds.confirmationModalConfirm.submitButton,
+        // ...
       });
     });
   }
 
-  // ... fillAndSubmitForm and verifyCardExists
+  // fillAndSubmitForm and verifyCardExists — same as single-product version
 }
 ```
 
-Then register with product-specific config:
+Then instantiate with per-product config in each page object:
 
 ```typescript
-// In PMHoaLoanFinancingCaseOverviewPage
-this.legalRepresentatives = new LegalRepresentativesModule(
+// In {Product1}FinancingCaseOverviewPage
+this.{featureName} = new {FeatureName}Module(
   page,
   {
-    actionTestId: dataTestIds.hoaLoan.financingCase.pm.goToLegalRepresentativesAction,
-    route: routes.pm.hoaLoan.financingCase.legalRepresentatives,
+    actionTestId: dataTestIds.{product1}.financingCase.pm.goTo{FeatureName}Action,
+    route: routes.pm.{product1}.financingCase.{featureName},
   },
-  routes.pm.hoaLoan.financingCase.overview,
+  routes.pm.{product1}.financingCase.overview,
 );
 
-// In PMHoaAccountFinancingCaseOverviewPage
-this.legalRepresentatives = new LegalRepresentativesModule(
+// In {Product2}FinancingCaseOverviewPage
+this.{featureName} = new {FeatureName}Module(
   page,
   {
-    actionTestId: dataTestIds.hoaAccount.financingCase.pm.goToLegalRepresentativesAction,
-    route: routes.pm.hoaAccount.financingCase.legalRepresentatives,
+    actionTestId: dataTestIds.{product2}.financingCase.pm.goTo{FeatureName}Action,
+    route: routes.pm.{product2}.financingCase.{featureName},
   },
-  routes.pm.hoaAccount.financingCase.overview,
+  routes.pm.{product2}.financingCase.overview,
 );
 ```
