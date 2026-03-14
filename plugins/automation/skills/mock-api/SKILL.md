@@ -20,9 +20,9 @@ The `EndpointConfig` is identical for mock and real. Only the import changes.
 
 ## Task Approach
 
-1. **Gather input** — route path, HTTP method(s), response field descriptions or Zod schema reference
-2**Generate mock handler** — see [mock-handler.md](mock-handler.md)
-3**Update barrel** — add the import to `src/shared/backend/mocks/handlers/index.ts`
+1. **Gather input** — route path, HTTP method(s), response field descriptions or Zod schema reference. For list endpoints, check whether the feature has a `searchParams` definition — if it does, the mock needs pagination, search, and sort support.
+2. **Generate mock handler** — see [mock-handler.md](mock-handler.md). For paginated list endpoints, see the "Paginated List Endpoints" section.
+3. **Update barrel** — add the import to `src/shared/backend/mocks/handlers/index.ts`
 
 ## Using in server.ts
 

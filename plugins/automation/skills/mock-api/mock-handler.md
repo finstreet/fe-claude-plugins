@@ -120,7 +120,9 @@ registerMock({
 });
 ```
 
-**GET — return list (from store values):**
+**GET — return list (simple, no pagination):**
+
+For small collections that don't need pagination, search, or sort:
 
 ```typescript
 registerMock({
@@ -131,6 +133,8 @@ registerMock({
   },
 });
 ```
+
+For list endpoints that support pagination, search, or sort, see the [Paginated List Endpoints](#paginated-list-endpoints) section below.
 
 **POST — store submitted data:**
 
@@ -194,6 +198,166 @@ registerMock({
   - Some entries with all optional fields filled, others with `null`
   - Different realistic values (names, dates, amounts) — not just incremented copies
 - If a Zod schema is available, derive the type and seed data from it
+
+## Paginated List Endpoints
+
+List endpoints that back an InteractiveList need pagination, search, and sort support so the frontend can exercise its list-actions UI against realistic data. The mock must handle these concerns the same way the real Rails API does — through query parameters.
+
+### When to Use
+
+Use this pattern instead of the simple GET list whenever:
+- The endpoint backs an InteractiveList with pagination, search, or sort actions
+- The feature has a `searchParams` definition with `search`, `sortBy`, or `pagination` fields
+- The user asks for pagination or list-action support in the mock
+
+### Seed Data Requirements
+
+Paginated lists need enough entries to span multiple pages. Pre-seed the store with **15–20+ entries** so the frontend can test page navigation, empty-page edge cases, and varied search results. Maintain the same data quality rules (varied statuses, some nullable fields left empty, German-language placeholders), just at higher volume.
+
+### Query Parameters
+
+The API convention uses these query parameter names:
+
+| Parameter | Description | Example |
+|---|---|---|
+| `page` | Current page number (1-based) | `1` |
+| `limit` | Items per page | `20` |
+| `q[search_term]` | Free-text search string | `Müller` |
+| `q[sort]` | Sort field and direction | `created_at desc` |
+
+Extract them from `req.nextUrl.searchParams`:
+
+```typescript
+const { searchParams } = req.nextUrl;
+const search = searchParams.get("q[search_term]") ?? "";
+const sortBy = searchParams.get("q[sort]") ?? "";
+const page = parseInt(searchParams.get("page") ?? "1", 10);
+const limit = parseInt(searchParams.get("limit") ?? "20", 10);
+```
+
+### Search Helper
+
+Filter items by matching the search term (case-insensitive) against the fields users would naturally search on — typically names, titles, or identifiers. Which fields to match depends on the resource.
+
+```typescript
+function applySearch(items: ResourceData[], search: string): ResourceData[] {
+  const query = search.toLowerCase();
+  return items.filter(
+    (item) =>
+      item.name.toLowerCase().includes(query) ||
+      item.someOtherField.toLowerCase().includes(query),
+  );
+}
+```
+
+### Sort Helper
+
+Sort items by field and direction. The sort string follows the convention `"field_name asc"` or `"field_name desc"`. Use a switch statement for each supported sort option — derive the sort options from the feature's `SortByEnum` if one exists.
+
+```typescript
+function applySort(items: ResourceData[], sortBy: string): ResourceData[] {
+  return [...items].sort((a, b) => {
+    switch (sortBy) {
+      case "created_at asc":
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      case "created_at desc":
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      case "name asc":
+        return a.name.localeCompare(b.name);
+      case "name desc":
+        return b.name.localeCompare(a.name);
+      default:
+        return 0;
+    }
+  });
+}
+```
+
+Tips for sort comparisons:
+- **Strings:** use `localeCompare()` for label/name fields
+- **Dates:** compare with `new Date(x).getTime()`
+- **Numbers:** subtract directly (`a.amount - b.amount`)
+- **Nullable numbers:** use `?? 0` to handle missing values (`a.amount ?? 0`)
+
+### Pagination Calculation
+
+After filtering and sorting, slice the results for the requested page and build the pagination metadata:
+
+```typescript
+const totalCount = items.length;
+const totalPages = Math.ceil(totalCount / limit);
+const offset = (page - 1) * limit;
+const paginatedItems = items.slice(offset, offset + limit);
+```
+
+### Response Shape
+
+The paginated response wraps the sliced data with a `meta.pagination` object that matches the `MetaSchema` used across the project:
+
+```typescript
+return NextResponse.json({
+  data: paginatedItems,
+  meta: {
+    pagination: {
+      count: totalCount,
+      limit,
+      next: page < totalPages ? page + 1 : null,
+      page,
+      pages: totalPages,
+      prev: page > 1 ? page - 1 : null,
+    },
+  },
+});
+```
+
+### Handler Structure
+
+Apply search and sort before pagination — search narrows the dataset, sort orders it, then pagination slices a page from the result:
+
+```typescript
+registerMock({
+  method: "GET",
+  pathPattern: "/resources",
+  handler: (req) => {
+    const { searchParams } = req.nextUrl;
+    const search = searchParams.get("q[search_term]") ?? "";
+    const sortBy = searchParams.get("q[sort]") ?? "";
+    const page = parseInt(searchParams.get("page") ?? "1", 10);
+    const limit = parseInt(searchParams.get("limit") ?? "20", 10);
+
+    let items = Object.values(store);
+
+    if (search) {
+      items = applySearch(items, search);
+    }
+
+    if (sortBy) {
+      items = applySort(items, sortBy);
+    }
+
+    const totalCount = items.length;
+    const totalPages = Math.ceil(totalCount / limit);
+    const offset = (page - 1) * limit;
+    const paginatedItems = items.slice(offset, offset + limit);
+
+    return NextResponse.json({
+      data: paginatedItems,
+      meta: {
+        pagination: {
+          count: totalCount,
+          limit,
+          next: page < totalPages ? page + 1 : null,
+          page,
+          pages: totalPages,
+          prev: page > 1 ? page - 1 : null,
+        },
+      },
+    });
+  },
+});
+```
+
+The ordering matters: **search → sort → paginate**. Search first because it affects the total count. Sort second so the page slice is in the correct order. Paginate last so `count` reflects the filtered total, not the page size.
 
 ## Updating the Barrel File
 
@@ -337,5 +501,6 @@ import "@/features/contracts/mock/contractsMock";
 4. Always update the barrel file after creating a new handler
 5. Use `_req` (underscore prefix) when the request object is not used
 6. **Always use an in-memory store** — POST/PUT/PATCH must persist data so subsequent GETs reflect changes
-7. **Pre-seed the store** with 2–3 entries covering different data shapes and states
+7. **Pre-seed the store** with 2–3 entries for CRUD endpoints, or **15–20+ entries** for paginated list endpoints
 8. **Support arbitrary IDs** — use lazy initialization in GET handlers so any ID works
+9. For paginated list endpoints, apply operations in order: **search → sort → paginate**
