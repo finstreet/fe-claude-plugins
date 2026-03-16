@@ -142,6 +142,15 @@ export class {FeatureName}Module extends CardCrudModule<{FormType}> {
       value: formData.{field2},
     });
     // ... repeat for all fields
+
+    // CHECKBOX NOTE: Only call fillField for a checkbox when the desired value is true.
+    // checkCheckbox/uncheckCheckbox both call click() unconditionally — they do not read
+    // current state. Passing value: false still clicks and toggles the checkbox.
+    // When false is desired, skip the fillField call entirely and rely on the default unchecked state.
+    if (formData.{checkboxField}) {
+      await this.form.fillField({ fieldName: "{checkboxField}", fieldType: BaseField.CHECKBOX, value: true });
+    }
+
     await this.form.submit();
   }
 
@@ -216,6 +225,94 @@ export class {FeatureName}Module extends CardCrudModule<{FormType}> {
 - Click `confirmTestId` — proceed
 - Click `confirmModalTestId` — confirm the modal
 - `navigation.waitForUrl(expectedUrl)` — navigate to overview
+
+## Edge Cases & Advanced Patterns
+
+### Checkbox Fields in fillAndSubmitForm
+
+`FormInteractor.checkCheckbox` and `uncheckCheckbox` both call `click()` unconditionally — they do not read current state. This means passing `value: false` still clicks the checkbox and toggles it from unchecked to checked.
+
+**Rule:** Only call `fillField` with `BaseField.CHECKBOX` when the desired value is `true`. When false is desired, skip the call entirely and rely on the form's default unchecked state.
+
+```typescript
+// Correct
+if (formData.someCheckboxField) {
+  await this.form.fillField({ fieldName: "someCheckboxField", fieldType: BaseField.CHECKBOX, value: true });
+}
+
+// Wrong — passing false still clicks and toggles the checkbox
+await this.form.fillField({ fieldName: "someCheckboxField", fieldType: BaseField.CHECKBOX, value: false });
+```
+
+### Asserting a Button Is Not Rendered
+
+When a button is conditionally removed from the DOM (not just hidden), do not use `toBeDisabled()` or `not.toBeVisible()`:
+
+- `not.toBeVisible()` — for elements that exist in the DOM but are hidden
+- `toBeDisabled()` — for elements that are rendered but inactive
+- `toHaveCount(0)` — **correct** when the element is not in the DOM at all
+
+```typescript
+// Correct — button is not rendered
+await expect(this.getLocatorByTestId(buttonTestId)).toHaveCount(0);
+
+// Wrong — assumes the element exists
+await expect(this.getLocatorByTestId(buttonTestId)).not.toBeVisible();
+```
+
+### Bypassing executeCrudCycle for Conditional Multi-Item Scenarios
+
+`executeCrudCycle` handles a single-item CRUD flow only. Bypass it and write `setupWithValidation` manually when:
+
+- Adding a second item is blocked after the first (e.g. a "sole authorized" flag removes the add button)
+- A second item is required before confirming
+- Different item variants must be tested in sequence
+
+**Manual structure for `setupWithValidation`:**
+
+```typescript
+async setupWithValidation(financingCaseId: string): Promise<void> {
+  await test.step("{FeatureName} CRUD Operations", async () => {
+    await this.navigate(financingCaseId);
+
+    // 1. Test form validation with invalid data
+    await this.openModal(dataTestIds.{featureName}.new{FeatureName}Button);
+    await this.fillAndSubmitForm({featureName}TestData.invalid);
+    await this.form.assertFieldErrors([{errorFields}]);
+    await this.form.cancel();
+
+    // 2. Primary CRUD cycle (create → update → delete)
+    await this.openModal(dataTestIds.{featureName}.new{FeatureName}Button);
+    await this.fillAndSubmitForm({featureName}TestData.valid);
+    await this.verifyCardExists({featureName}TestData.valid, 0);
+    await this.cardHelper.clickUpdateCard(0);
+    await this.fillAndSubmitForm({featureName}TestData.update);
+    await this.verifyCardExists({featureName}TestData.update, 0);
+    await this.cardHelper.deleteCard(0);
+    await this.cardHelper.verifyCardDoesNotExist();
+
+    // 3. Test "blocked" state: create item that hides the add button, assert absence
+    await this.openModal(dataTestIds.{featureName}.new{FeatureName}Button);
+    await this.fillAndSubmitForm({featureName}TestData.blockedVariant);
+    await expect(this.getLocatorByTestId(dataTestIds.{featureName}.new{FeatureName}Button)).toHaveCount(0);
+    await this.cardHelper.deleteCard(0);
+
+    // 4. Test "allowed" state: create item that keeps button visible, add second item, verify both cards
+    await this.openModal(dataTestIds.{featureName}.new{FeatureName}Button);
+    await this.fillAndSubmitForm({featureName}TestData.allowedVariant);
+    await expect(this.getLocatorByTestId(dataTestIds.{featureName}.new{FeatureName}Button)).toBeEnabled();
+    await this.openModal(dataTestIds.{featureName}.new{FeatureName}Button);
+    await this.fillAndSubmitForm({featureName}TestData.valid);
+    await this.verifyCardExists({featureName}TestData.allowedVariant, 0);
+    await this.verifyCardExists({featureName}TestData.valid, 1);
+
+    // 5. Confirm and navigate
+    await this.page.getByTestId(dataTestIds.{featureName}.confirm{FeatureName}Button).click();
+    await this.page.getByTestId(dataTestIds.confirmationModalConfirm.submitButton).click();
+    await this.navigation.waitForUrl({expectedUrlFunction}(financingCaseId));
+  });
+}
+```
 
 ## Reusable Module Pattern
 
