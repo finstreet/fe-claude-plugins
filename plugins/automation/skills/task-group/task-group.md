@@ -2,157 +2,65 @@
 
 File: `{featurePath}/taskGroups/{taskGroupName}/{Product}{Role}{TaskGroupName}TaskGroup.tsx`
 
-The TaskGroup assembles all TaskPanels and the TaskAction into a two-column layout (tasks | actions).
+The TaskGroup assembles all TaskPanels under a labeled wrapper. It receives the full overview response and distributes section data to each TaskPanel.
+
+The TaskGroup itself does NOT use `TasksAndActionsLayout` — that layout lives inside each individual TaskPanel. The TaskGroup just wraps TaskPanels in a `VStack`.
 
 ## Template
 
 ```tsx
-import {
-  TasksAndActionsLayout,
-  TasksAndActionsLayoutArea as Area,
-} from '@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout';
-import { TaskGroup } from '@finstreet/ui/components/patterns/TaskGroup';
-import { VStack } from '@styled-system/jsx';
-import { useExtracted } from 'next-intl';
-import { {Product}{Role}{TaskPanelName}TaskPanel } from './taskPanels/{Product}{Role}{TaskPanelName}TaskPanel';
-import { {Product}{Role}{TaskGroupName}Action } from './{Product}{Role}{TaskGroupName}Action';
+import { TaskGroup } from "@finstreet/ui/components/patterns/TaskGroup";
+import { VStack } from "@styled-system/jsx";
+import { useTranslations } from "next-intl";
+import { {Product}{Role}{Panel1}TaskPanel } from "./taskPanels/{Product}{Role}{Panel1}TaskPanel";
+import { {Product}{Role}{Panel2}TaskPanel } from "./taskPanels/{Product}{Role}{Panel2}TaskPanel";
 
-type {TaskGroupName}TaskGroupProps = {
+type Props = {
   financingCaseId: string;
-  sections: {
-    {taskPanelName}: {
-      completed: boolean;
-      // subtask completions as needed
-    };
-    // one entry per TaskPanel
-  };
-  flags: {
-    {actionName}: boolean;   // ← one per disabled action flag
-  };
+  financingCaseOverviewResponse: OverviewResponseType;
 };
 
-export function {TaskGroupName}TaskGroup({
+export const {Product}{Role}{TaskGroupName}TaskGroup = ({
   financingCaseId,
-  sections,
-  flags,
-}: {TaskGroupName}TaskGroupProps) {
-  const t = useExtracted();
+  financingCaseOverviewResponse,
+}: Props) => {
+  const t = useTranslations(
+    "{translationNamespace}.taskGroups.{taskGroupName}",
+  );
+
+  const { sections, flags } = financingCaseOverviewResponse;
 
   return (
-    <TaskGroup label={t("{German task group label}")}>
-      <TasksAndActionsLayout>
-        <Area gridArea="tasks">
-          <VStack gap={4} alignItems="stretch">
-            <{Product}{Role}{TaskPanelName}TaskPanel
-              financingCaseId={financingCaseId}
-              completed={sections.{taskPanelName}.completed}
-            />
-            {/* add remaining TaskPanels */}
-          </VStack>
-        </Area>
-        <Area gridArea="actions">
-          <{Product}{Role}{TaskGroupName}Action
-            financingCaseId={financingCaseId}
-            {actionName}Disabled={!flags.{actionName}}
-          />
-        </Area>
-      </TasksAndActionsLayout>
+    <TaskGroup label={t("label")}>
+      <VStack gap={4} alignItems="stretch">
+        <{Product}{Role}{Panel1}TaskPanel
+          financingCaseId={financingCaseId}
+          completed={sections.{panel1Section}.completed}
+        />
+
+        <{Product}{Role}{Panel2}TaskPanel
+          financingCaseId={financingCaseId}
+          completed={sections.{panel2Section}.completed}
+          flags={flags}
+        />
+      </VStack>
     </TaskGroup>
   );
-}
-```
-
-## Without Actions
-
-If there is no `TaskAction`, omit the `actions` area entirely:
-
-```tsx
-return (
-  <TaskGroup label={t('label')}>
-    <TasksAndActionsLayout>
-      <Area gridArea="tasks">
-        <VStack gap={4} alignItems="stretch">
-          <{TaskPanelName}TaskPanel
-            financingCaseId={financingCaseId}
-            completed={sections.{taskPanelName}.completed}
-          />
-        </VStack>
-      </Area>
-    </TasksAndActionsLayout>
-  </TaskGroup>
-);
-```
-
-## Full Example
-
-```tsx
-import {
-  TasksAndActionsLayout,
-  TasksAndActionsLayoutArea as Area,
-} from '@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout';
-import { TaskGroup } from '@finstreet/ui/components/patterns/TaskGroup';
-import { VStack } from '@styled-system/jsx';
-import { useExtracted } from 'next-intl';
-import { HoaLoanFspInquiryTaskPanel } from './taskPanels/HoaLoanFspInquiryTaskPanel';
-import { HoaLoanFspApplicationInformationTaskPanel } from './taskPanels/HoaLoanFspApplicationInformationTaskPanel';
-import { HoaLoanFspActions } from './HoaLoanFspActions';
-
-type HoaLoanFspTaskGroupProps = {
-  financingCaseId: string;
-  sections: {
-    hoaLoanInquiry: { completed: boolean };
-    applicationDetails: {
-      completed: boolean;
-      propertyItemsConfirmed: boolean;
-      financingDetailsConfirmed: boolean;
-    };
-  };
-  flags: {
-    mutable: boolean;
-  };
 };
-
-export function HoaLoanFspTaskGroup({
-  financingCaseId,
-  sections,
-  flags,
-}: HoaLoanFspTaskGroupProps) {
-  const t = useExtracted();
-
-  return (
-    <TaskGroup label={t("Kreditantrag")}>
-      <TasksAndActionsLayout>
-        <Area gridArea="tasks">
-          <VStack gap={4} alignItems="stretch">
-            <HoaLoanFspInquiryTaskPanel
-              financingCaseId={financingCaseId}
-              completed={sections.hoaLoanInquiry.completed}
-            />
-            <HoaLoanFspApplicationInformationTaskPanel
-              financingCaseId={financingCaseId}
-              completed={sections.applicationDetails.completed}
-              propertyItemsConfirmed={sections.applicationDetails.propertyItemsConfirmed}
-              financingDetailsConfirmed={sections.applicationDetails.financingDetailsConfirmed}
-            />
-          </VStack>
-        </Area>
-        <Area gridArea="actions">
-          <HoaLoanFspActions
-            financingCaseId={financingCaseId}
-            startValueIndicationDisabled={!flags.mutable}
-            provideDocumentDisabled={!flags.mutable}
-            placeOfferDisabled={!flags.mutable}
-          />
-        </Area>
-      </TasksAndActionsLayout>
-    </TaskGroup>
-  );
-}
 ```
+
+## Passing Data to TaskPanels
+
+The TaskGroup destructures `sections` and `flags` from the response and passes the relevant slice to each TaskPanel. How much data each panel gets depends on its complexity:
+
+- **Simple panel**: just `completed` boolean
+- **Panel with summary**: `completed`, `completedCount`, `totalCount`
+- **Panel with subtasks**: the whole section object (e.g. `contractDetails={sections.contractDetails}`)
+- **Panel with actions**: also gets `flags` for enable/disable state
 
 ## Rules
 
-- Derive all props from the TaskPanel and TaskAction components — the TaskGroup only passes data down
-- `sections` groups TaskPanel-related data; `flags` groups action enable/disable states
+- The TaskGroup only passes data down — it contains no business logic
 - Always wrap TaskPanels in `<VStack gap={4} alignItems="stretch">`
-- `gridArea="tasks"` and `gridArea="actions"` are fixed string values
+- Use `useTranslations` with the TaskGroup's namespace for the `label`
+- The overview response type should be imported from the backend schema

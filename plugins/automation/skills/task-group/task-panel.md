@@ -1,158 +1,330 @@
 # Building a Task Panel
 
-File: `{featurePath}/taskGroups/{taskGroupName}/taskPanels/{Product}{Role}{TaskPanelName}TaskPanel.tsx`
+File: `{featurePath}/taskGroups/{taskGroupName}/taskPanels/{Product}{Role}{PanelName}TaskPanel/index.tsx`
 
-## Shell (required)
+Every TaskPanel wraps itself in `TasksAndActionsLayout`. This layout gives each panel its own `tasks` area (the card itself) and `actions` area (an optional ActionPanel). Even panels without actions include the empty actions area — this keeps the layout grid consistent.
 
-Every TaskPanel needs these four components:
+## Translation Namespace
+
+The translation namespace for a TaskPanel always includes the full path through the taskGroup:
+
+```
+{translationNamespace}.taskGroups.{taskGroupName}.taskPanels.{panelName}
+```
+
+For example, if the base namespace is `financingCaseOverview.hoaAccount.fsp` and the taskGroup is `customerDetails`, a panel called `inquiry` uses:
+```
+financingCaseOverview.hoaAccount.fsp.taskGroups.customerDetails.taskPanels.inquiry
+```
+
+This matters because taskGroups namespace the translation keys — without the `taskGroups.{taskGroupName}` segment, you'll get the wrong translations.
+
+## Minimal TaskPanel (link, no actions)
+
+The simplest case: a panel that links somewhere and shows a completion status.
 
 ```tsx
-import { routes } from '@/routes';
+import { routes } from "@/routes";
 import {
   TaskPanel,
   TaskPanelHeader,
   TaskPanelStatus,
   TaskPanelTitle,
-} from '@finstreet/ui/components/patterns/TaskPanel';
-import { useExtracted } from 'next-intl';
+} from "@finstreet/ui/components/patterns/TaskPanel";
+import {
+  TasksAndActionsLayout,
+  TasksAndActionsLayoutArea as Area,
+} from "@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout";
+import { useTranslations } from "next-intl";
 
-type {TaskPanelName}TaskPanelProps = {
-  financingCaseId: string;    // ← or whatever ID is needed for route building
+type Props = {
+  financingCaseId: string;
   completed: boolean;
-  // add more specific completion props as needed
 };
 
-export function {TaskPanelName}TaskPanel({
-  financingCaseId,
+export const {Product}{Role}{PanelName}TaskPanel = ({
   completed,
-}: {TaskPanelName}TaskPanelProps) {
-  const t = useExtracted();
+  financingCaseId,
+}: Props) => {
+  const t = useTranslations(
+    "{translationNamespace}.taskGroups.{taskGroupName}.taskPanels.{panelName}",
+  );
 
   return (
-    <TaskPanel
-      href={routes.{role}.{resource}.{action}(financingCaseId)}
-      prefetch={true}
-      scroll={true}
-      name={t("{German task title}")}
-    >
-      <TaskPanelHeader>
-        <TaskPanelStatus status={completed ? 'done' : 'active'} />
-        <TaskPanelTitle>{t("{German task title}")}</TaskPanelTitle>
-      </TaskPanelHeader>
-    </TaskPanel>
+    <TasksAndActionsLayout>
+      <Area gridArea={"tasks"}>
+        <TaskPanel
+          href={routes.{role}.{resource}.{action}(financingCaseId)}
+          prefetch={true}
+          scroll={true}
+          name={t("title")}
+        >
+          <TaskPanelHeader>
+            <TaskPanelStatus status={completed ? "done" : "active"} />
+            <TaskPanelTitle>{t("title")}</TaskPanelTitle>
+          </TaskPanelHeader>
+        </TaskPanel>
+      </Area>
+      <Area gridArea={"actions"}>
+        <></>
+      </Area>
+    </TasksAndActionsLayout>
   );
-}
-```
-
-### TaskPanel props
-
-```typescript
-type TaskPanelProps = {
-  collapsible?: boolean;
-  startOpen?: boolean;
-  children: React.ReactNode;
-  href?: string;          // ← link destination for the whole panel
-  name?: string;          // ← used for accessibility
-  variant?: 'bordered' | 'flat';
-  css?: SystemStyleObject;
-  error?: boolean;
-} & Pick<LinkProps, 'scroll' | 'replace' | 'prefetch'>;
-```
-
-### TaskPanelStatus
-
-```typescript
-type TaskPanelStatusProps = {
-  status: 'done' | 'active' | 'inactive' | 'warning';
 };
-
-// Default pattern:
-<TaskPanelStatus status={completed ? 'done' : 'active'} />
 ```
 
-## TaskPanelContent with SubTasks
+## TaskPanel with ActionPanel
 
-Add `TaskPanelContent` and `SubTask` components when the context defines subtasks:
+When a panel has associated actions, import the co-located ActionPanel and render it in the `actions` area.
 
 ```tsx
-import { SubTask } from '@finstreet/ui/components/patterns/SubTask';
+import { routes } from "@/routes";
+import {
+  TaskPanel,
+  TaskPanelHeader,
+  TaskPanelStatus,
+  TaskPanelTitle,
+} from "@finstreet/ui/components/patterns/TaskPanel";
+import {
+  TasksAndActionsLayout,
+  TasksAndActionsLayoutArea as Area,
+} from "@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout";
+import { useTranslations } from "next-intl";
+import { {Product}{Role}{PanelName}ActionPanel } from "./{Product}{Role}{PanelName}ActionPanel";
+
+type Props = {
+  financingCaseId: string;
+  completed: boolean;
+  flags: FlagsType;
+};
+
+export const {Product}{Role}{PanelName}TaskPanel = ({
+  financingCaseId,
+  completed,
+  flags,
+}: Props) => {
+  const t = useTranslations(
+    "{translationNamespace}.taskGroups.{taskGroupName}.taskPanels.{panelName}",
+  );
+
+  return (
+    <TasksAndActionsLayout>
+      <Area gridArea={"tasks"}>
+        <TaskPanel
+          href={routes.{role}.{resource}.{action}(financingCaseId)}
+          prefetch={true}
+          scroll={true}
+          name={t("title")}
+        >
+          <TaskPanelHeader>
+            <TaskPanelStatus status={completed ? "done" : "active"} />
+            <TaskPanelTitle>{t("title")}</TaskPanelTitle>
+          </TaskPanelHeader>
+        </TaskPanel>
+      </Area>
+      <Area gridArea={"actions"}>
+        <{Product}{Role}{PanelName}ActionPanel
+          financingCaseId={financingCaseId}
+          flags={flags}
+        />
+      </Area>
+    </TasksAndActionsLayout>
+  );
+};
+```
+
+## TaskPanel with Summary
+
+`TaskPanelSummary` sits inside `TaskPanelHeader`, after `TaskPanelTitle`. Wrap it in `<Box hideBelow={"lg"}>` so it hides on mobile.
+
+```tsx
+import { Typography } from "@finstreet/ui/components/base/Typography";
+import {
+  TaskPanel,
+  TaskPanelHeader,
+  TaskPanelStatus,
+  TaskPanelTitle,
+  TaskPanelSummary,
+} from "@finstreet/ui/components/patterns/TaskPanel";
+import {
+  TasksAndActionsLayout,
+  TasksAndActionsLayoutArea as Area,
+} from "@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout";
+import { Box } from "@styled-system/jsx";
+import { useTranslations } from "next-intl";
+
+type Props = {
+  financingCaseId: string;
+  completed: boolean;
+  completedCount: number;
+  totalCount: number;
+};
+
+export const {Product}{Role}{PanelName}TaskPanel = ({
+  financingCaseId,
+  completed,
+  completedCount,
+  totalCount,
+}: Props) => {
+  const t = useTranslations(
+    "{translationNamespace}.taskGroups.{taskGroupName}.taskPanels.{panelName}",
+  );
+
+  return (
+    <TasksAndActionsLayout>
+      <Area gridArea={"tasks"}>
+        <TaskPanel
+          href={routes.{role}.{resource}.{action}(financingCaseId)}
+          prefetch={true}
+          scroll={true}
+          name={t("title")}
+        >
+          <TaskPanelHeader>
+            <TaskPanelStatus status={completed ? "done" : "active"} />
+            <TaskPanelTitle>{t("title")}</TaskPanelTitle>
+            <Box hideBelow={"lg"}>
+              <TaskPanelSummary justifyContent={"flex-end"}>
+                <Typography textAlign={"right"}>
+                  {t.rich("summary", {
+                    br: () => <br />,
+                    strong: (chunks) => <strong>{chunks}</strong>,
+                    current: () => completedCount,
+                    total: () => totalCount,
+                  })}
+                </Typography>
+              </TaskPanelSummary>
+            </Box>
+          </TaskPanelHeader>
+        </TaskPanel>
+      </Area>
+      <Area gridArea={"actions"}>
+        <></>
+      </Area>
+    </TasksAndActionsLayout>
+  );
+};
+```
+
+## Collapsible TaskPanel with SubTasks
+
+Use `collapsible` on `TaskPanel` and add `TaskPanelContent` with `SubTask` children. Collapsible panels typically don't have an `href` on the outer `TaskPanel` — the SubTasks provide the links instead.
+
+```tsx
+import { routes } from "@/routes";
+import { SubTask } from "@finstreet/ui/components/patterns/SubTask";
 import {
   TaskPanel,
   TaskPanelHeader,
   TaskPanelStatus,
   TaskPanelTitle,
   TaskPanelContent,
-} from '@finstreet/ui/components/patterns/TaskPanel';
+} from "@finstreet/ui/components/patterns/TaskPanel";
+import {
+  TasksAndActionsLayout,
+  TasksAndActionsLayoutArea as Area,
+} from "@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout";
+import { useTranslations } from "next-intl";
 
-type {TaskPanelName}TaskPanelProps = {
+type Props = {
   financingCaseId: string;
-  completed: boolean;
-  subtaskOneCompleted: boolean;
-  subtaskTwoCompleted: boolean;
+  contractDetails: ContractDetailsType;
 };
 
-export function {TaskPanelName}TaskPanel({
+export const {Product}{Role}{PanelName}TaskPanel = ({
   financingCaseId,
-  completed,
-  subtaskOneCompleted,
-  subtaskTwoCompleted,
-}: {TaskPanelName}TaskPanelProps) {
-  const t = useExtracted();
+  contractDetails,
+}: Props) => {
+  const t = useTranslations(
+    "{translationNamespace}.taskGroups.{taskGroupName}.taskPanels.{panelName}",
+  );
 
   return (
-    <TaskPanel
-      href={routes.{role}.{resource}.overview(financingCaseId)}
-      prefetch={true}
-      scroll={true}
-      name={t("{German task title}")}
-    >
-      <TaskPanelHeader>
-        <TaskPanelStatus status={completed ? 'done' : 'active'} />
-        <TaskPanelTitle>{t("{German task title}")}</TaskPanelTitle>
-      </TaskPanelHeader>
-      <TaskPanelContent>
-        <SubTask
-          status={subtaskOneCompleted ? 'done' : 'active'}
-          actionLabel={t("{German action label for subtask one}")}
-          name={t("{German subtask one title}")}
-          href={routes.{role}.{resource}.subtaskOne(financingCaseId)}
-          prefetch={true}
-          scroll={true}
-        >
-          {t("{German subtask one title}")}
-        </SubTask>
-        <SubTask
-          status={subtaskTwoCompleted ? 'done' : 'active'}
-          actionLabel={t("{German action label for subtask two}")}
-          name={t("{German subtask two title}")}
-          href={routes.{role}.{resource}.subtaskTwo(financingCaseId)}
-          prefetch={true}
-          scroll={true}
-        >
-          {t("{German subtask two title}")}
-        </SubTask>
-      </TaskPanelContent>
-    </TaskPanel>
+    <TasksAndActionsLayout>
+      <Area gridArea={"tasks"}>
+        <TaskPanel collapsible>
+          <TaskPanelHeader>
+            <TaskPanelStatus
+              status={contractDetails.completed ? "done" : "active"}
+            />
+            <TaskPanelTitle>{t("title")}</TaskPanelTitle>
+          </TaskPanelHeader>
+          <TaskPanelContent>
+            <SubTask
+              status={
+                contractDetails.subtaskOne.completed ? "done" : "active"
+              }
+              actionLabel={
+                contractDetails.subtaskOne.completed
+                  ? t("subtasks.subtaskOne.actions.viewData")
+                  : t("subtasks.subtaskOne.actions.addData")
+              }
+              name={t("subtasks.subtaskOne.title")}
+              href={routes.{role}.{resource}.subtaskOne(financingCaseId)}
+              prefetch={true}
+              scroll={true}
+            >
+              {t("subtasks.subtaskOne.title")}
+            </SubTask>
+            <SubTask
+              status={
+                contractDetails.subtaskTwo.completed ? "done" : "active"
+              }
+              actionLabel={
+                contractDetails.subtaskTwo.completed
+                  ? t("subtasks.subtaskTwo.actions.viewData")
+                  : t("subtasks.subtaskTwo.actions.addData")
+              }
+              name={t("subtasks.subtaskTwo.title")}
+              href={routes.{role}.{resource}.subtaskTwo(financingCaseId)}
+              prefetch={true}
+              scroll={true}
+            >
+              {t("subtasks.subtaskTwo.title")}
+            </SubTask>
+          </TaskPanelContent>
+        </TaskPanel>
+      </Area>
+      <Area gridArea={"actions"}>
+        <></>
+      </Area>
+    </TasksAndActionsLayout>
   );
-}
+};
 ```
 
-### SubTask props
+## TaskPanel Props Reference
+
+```typescript
+type TaskPanelProps = {
+  collapsible?: boolean;
+  startOpen?: boolean;
+  children: React.ReactNode;
+  href?: string;
+  name?: string;
+  variant?: "bordered" | "flat";
+  css?: SystemStyleObject;
+  error?: boolean;
+} & Pick<LinkProps, "scroll" | "replace" | "prefetch">;
+```
+
+## TaskPanelStatus
+
+```typescript
+type TaskPanelStatusProps = {
+  status: "done" | "active" | "inactive" | "warning";
+};
+// Default: status={completed ? "done" : "active"}
+```
+
+## SubTask Props Reference
 
 ```typescript
 type SubTaskProps = {
   children: React.ReactNode;
-  status: 'done' | 'active' | 'inactive' | 'warning';
+  status: "done" | "active" | "inactive" | "warning";
   href: string;
   name: string;
-  actionLabel?: string;       // ← text displayed at the far right
-  'data-testid'?: string;
-} & Pick<LinkProps, 'scroll' | 'replace' | 'prefetch'>;
+  actionLabel?: string;
+  "data-testid"?: string;
+} & Pick<LinkProps, "scroll" | "replace" | "prefetch">;
 ```
-
-## Component Props Pattern
-
-Props always include:
-- `completed: boolean` — overall panel completion
-- `{subTaskName}Completed: boolean` — one per subtask
-- Any route params needed (e.g. `financingCaseId: string`)

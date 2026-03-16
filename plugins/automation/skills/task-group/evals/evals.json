@@ -1,0 +1,39 @@
+{
+  "skill_name": "task-group",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a TaskGroup called 'VerifyInquiry' for the product 'PersonalLoan' and role 'Fsp'. It belongs to the feature path 'src/features/financingCaseOverview/personalLoan/fsp'. The translation namespace is 'financingCaseOverview.personalLoan.fsp'. The TaskGroup has 2 TaskPanels:\n\n1. InquiryTaskPanel — links to routes.fsp.personalLoan.financingCase.inquiryDetails(financingCaseId), shows completion status from sections.inquiry.completed. No actions.\n\n2. RequiredDocumentsTaskPanel — links to routes.fsp.personalLoan.financingCase.documents(financingCaseId), shows completion status from sections.requiredDocuments.completed. It also has a summary showing completedCount/totalCount from sections.requiredDocuments. No actions.\n\nThe overview response type is PersonalLoanFinancingCaseOverviewType imported from '@/shared/backend/models/financingCaseOverview/personalLoan/fsp/schema'.",
+      "expected_output": "A complete set of 3 files (1 TaskGroup + 2 TaskPanels) that structurally match the golden reference files in evals/files/eval-1/. Each file should follow the correct directory structure, use TasksAndActionsLayout at the panel level, arrow function exports, Props type naming, useTranslations with full taskGroups namespace.",
+      "files": [
+        "evals/files/eval-1/PersonalLoanFspVerifyInquiryTaskGroup.tsx",
+        "evals/files/eval-1/PersonalLoanFspInquiryTaskPanel.tsx",
+        "evals/files/eval-1/PersonalLoanFspRequiredDocumentsTaskPanel.tsx"
+      ],
+      "expectations": [
+        "TaskGroup file follows evals/files/eval-1/PersonalLoanFspVerifyInquiryTaskGroup.tsx: imports PersonalLoanFinancingCaseOverviewType, uses TaskGroup+VStack wrapper, destructures sections from response, passes completed and count props to panels",
+        "InquiryTaskPanel follows evals/files/eval-1/PersonalLoanFspInquiryTaskPanel.tsx: wraps in TasksAndActionsLayout with tasks+actions areas, empty actions area, uses useTranslations with full namespace including taskGroups.verifyInquiry.taskPanels.inquiry",
+        "RequiredDocumentsTaskPanel follows evals/files/eval-1/PersonalLoanFspRequiredDocumentsTaskPanel.tsx: includes TaskPanelSummary with t.rich() pattern wrapped in Box hideBelow='lg', empty actions area, full translation namespace"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a TaskGroup called 'CustomerDetails' for the product 'BuildingLoan' and role 'Fsp'. It belongs to the feature path 'src/features/financingCaseOverview/buildingLoan/fsp'. The translation namespace is 'financingCaseOverview.buildingLoan.fsp'. The TaskGroup has 3 TaskPanels:\n\n1. ApplicationTaskPanel — links to routes.fsp.buildingLoan.financingCase.applicationDetails(financingCaseId), shows completion status from sections.application.completed. No actions.\n\n2. DocumentsTaskPanel — links to routes.fsp.buildingLoan.financingCase.documents(financingCaseId), shows completion status from sections.documents.completed. Has an ActionPanel with one click action 'requestDocuments' that is disabled when !flags.mutable. The action should use a modal store pattern with a TODO comment.\n\n3. ContractTaskPanel — collapsible with 2 SubTasks:\n   - 'bankDetails' subtask: links to routes.fsp.buildingLoan.financingCase.bankDetails(financingCaseId), completed from sections.contract.bankDetails.completed\n   - 'guarantors' subtask: links to routes.fsp.buildingLoan.financingCase.guarantors(financingCaseId), completed from sections.contract.guarantors.completed\n   Overall completed from sections.contract.completed. No actions.\n\nThe overview response type is BuildingLoanFinancingCaseOverviewType imported from '@/shared/backend/models/financingCaseOverview/buildingLoan/fsp/schema'. The flags type is FinancingCaseOverviewFlagsType imported from '@/shared/backend/models/financingCaseOverview/schema'.",
+      "expected_output": "A complete set of 5 files (1 TaskGroup + 3 TaskPanels + 1 ActionPanel) that structurally match the golden reference files in evals/files/eval-2/. Tests advanced patterns: co-located ActionPanel with 'use client', collapsible TaskPanel with SubTasks, flags passing, modal store TODO pattern.",
+      "files": [
+        "evals/files/eval-2/BuildingLoanFspCustomerDetailsTaskGroup.tsx",
+        "evals/files/eval-2/BuildingLoanFspApplicationTaskPanel.tsx",
+        "evals/files/eval-2/BuildingLoanFspDocumentsTaskPanel.tsx",
+        "evals/files/eval-2/BuildingLoanFspDocumentsActionPanel.tsx",
+        "evals/files/eval-2/BuildingLoanFspContractTaskPanel.tsx"
+      ],
+      "expectations": [
+        "TaskGroup file follows evals/files/eval-2/BuildingLoanFspCustomerDetailsTaskGroup.tsx: destructures sections+flags, passes completed to Application, completed+flags to Documents, full contract section to Contract",
+        "ApplicationTaskPanel follows evals/files/eval-2/BuildingLoanFspApplicationTaskPanel.tsx: minimal panel with link, empty actions area, full translation namespace",
+        "DocumentsTaskPanel follows evals/files/eval-2/BuildingLoanFspDocumentsTaskPanel.tsx: imports and renders co-located ActionPanel in actions area, passes actionDisabled computed from flags",
+        "DocumentsActionPanel follows evals/files/eval-2/BuildingLoanFspDocumentsActionPanel.tsx: 'use client', variant='invisible', click action with disabled+disabledHint, TODO modal store pattern",
+        "ContractTaskPanel follows evals/files/eval-2/BuildingLoanFspContractTaskPanel.tsx: collapsible with TaskPanelContent, 2 SubTasks with viewData/addData actionLabels, empty actions area"
+      ]
+    }
+  ]
+}

@@ -1,31 +1,35 @@
 ---
 name: task-group
-description: "Complete guide to building TaskGroups with @finstreet/ui. A TaskGroup displays a set of tasks a user must complete before proceeding. Covers TaskPanels, TaskActions, and the TaskGroup wrapper."
+description: "Complete guide to building TaskGroups with @finstreet/ui. A TaskGroup displays a set of tasks a user must complete before proceeding. Covers TaskPanels, TaskActions, and the TaskGroup wrapper. Use when building, modifying, or debugging any task group in the finstreet context."
 ---
 
 # Task Group — Complete Guide
 
 A `TaskGroup` shows users a set of tasks they need to complete. It consists of:
 
-- **TaskPanels** — individual task cards, each with a status indicator and optional subtasks
-- **TaskAction** — a panel with action buttons (links or modal triggers)
-- **TaskGroup** — the wrapper that lays out panels and actions side by side
+- **TaskPanels** — individual task cards with a status indicator, optional subtasks, and optional summary
+- **ActionPanels** — optional action buttons co-located with their TaskPanel (modal triggers or links)
+- **TaskGroup** — the outer wrapper that groups TaskPanels under a label
 
 ## Directory Structure
 
+Each TaskPanel lives in its own folder. If the panel has actions, the ActionPanel is co-located inside that folder.
+
 ```
 {featurePath}/taskGroups/{taskGroupName}/
-  ├── taskPanels/
-  │   ├── {Product}{Role}{TaskPanelName}TaskPanel.tsx
-  │   └── ...                                          ← one file per TaskPanel
-  ├── {Product}{Role}{TaskGroupName}Action.tsx
-  └── {Product}{Role}{TaskGroupName}TaskGroup.tsx
+  ├── {Product}{Role}{TaskGroupName}TaskGroup.tsx
+  └── taskPanels/
+      ├── {Product}{Role}{PanelName}TaskPanel/
+      │   ├── index.tsx                                    ← the TaskPanel component
+      │   └── {Product}{Role}{PanelName}ActionPanel.tsx    ← optional, only if panel has actions
+      └── {Product}{Role}{PanelName2}TaskPanel/
+          └── index.tsx
 ```
 
 ## File Creation Order
 
 1. All TaskPanels (can be built independently of each other)
-2. TaskAction
+2. ActionPanels for panels that need them
 3. TaskGroup (assembles everything)
 
 ## Key Imports
@@ -38,41 +42,49 @@ import {
   TaskPanelStatus,
   TaskPanelTitle,
   TaskPanelContent,
-} from '@finstreet/ui/components/patterns/TaskPanel';
+  TaskPanelSummary,
+} from "@finstreet/ui/components/patterns/TaskPanel";
 
 // SubTask (for TaskPanelContent)
-import { SubTask } from '@finstreet/ui/components/patterns/SubTask';
+import { SubTask } from "@finstreet/ui/components/patterns/SubTask";
 
 // ActionPanel components
 import {
   ActionPanel,
   ActionPanelContent,
   ActionPanelAction,
-} from '@finstreet/ui/components/patterns/ActionPanel';
+} from "@finstreet/ui/components/patterns/ActionPanel";
 
-// TaskGroup layout
-import { TaskGroup } from '@finstreet/ui/components/patterns/TaskGroup';
+// Layout — used INSIDE each TaskPanel, not at TaskGroup level
 import {
   TasksAndActionsLayout,
   TasksAndActionsLayoutArea as Area,
-} from '@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout';
+} from "@finstreet/ui/components/pageLayout/Layout/TasksAndActionsLayout";
 
-// Routes and translations
-import { routes } from '@/routes';
-import { useExtracted } from 'next-intl';
-import { VStack } from '@styled-system/jsx';
+// TaskGroup wrapper
+import { TaskGroup } from "@finstreet/ui/components/patterns/TaskGroup";
+
+// Common utilities
+import { routes } from "@/routes";
+import { useTranslations } from "next-intl";
+import { VStack } from "@styled-system/jsx";
 ```
 
 ## Step-by-Step Reference
 
-- For **TaskPanel** patterns (shell, status, subtasks), see [task-panel.md](task-panel.md)
-- For **TaskAction** patterns (link and click actions), see [task-action.md](task-action.md)
+- For **TaskPanel** patterns (shell, status, subtasks, summary), see [task-panel.md](task-panel.md)
+- For **ActionPanel** patterns (modal triggers, link actions), see [action-panel.md](action-panel.md)
 - For **TaskGroup** assembly, see [task-group.md](task-group.md)
 
 ## Rules
 
-1. Build all TaskPanels before the Action and TaskGroup
-2. `prefetch={true}` and `scroll={true}` on `TaskPanel` and `SubTask` unless told otherwise
-3. Each `TaskPanel` always receives a `completed` prop; add more specific props as needed
-4. Each click action in a TaskAction gets a `handle{ActionName}` function with a `console.log` TODO
+1. Build all TaskPanels before the TaskGroup
+2. `TasksAndActionsLayout` goes INSIDE each TaskPanel, not around the TaskGroup
+3. Each TaskPanel always wraps itself in `TasksAndActionsLayout` with `tasks` and `actions` areas — even if there are no actions (use `<></>` as empty placeholder)
+4. `prefetch={true}` and `scroll={true}` on `TaskPanel` and `SubTask` unless told otherwise
 5. Use `done` / `active` status — only use `inactive` or `warning` if explicitly required
+6. ActionPanels always use `variant="invisible"`
+7. ActionPanels are always `"use client"` components
+8. Use `useTranslations` from `next-intl` (not `useExtracted`)
+9. Use arrow function exports: `export const MyComponent = ({}: Props) => {}`
+10. Props type is always named `Props`
