@@ -2,7 +2,6 @@
 name: path-resolver
 description: Resolves feature and backend paths based on naming conventions and project structure rules. Use when you need to determine where files should be created for a given feature.
 user-invocable: true
-model: sonnet
 ---
 
 You resolve file paths for features based on the project's directory conventions. You NEVER search inside the project — you only apply the rules below.
