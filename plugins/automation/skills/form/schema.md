@@ -165,6 +165,16 @@ This nesting cascades through the rest of the form the same way as dependent val
 
 > **Important:** A sub-schema `superRefine` only re-runs for the field currently being edited. If the user changes `residential`, the `commercial` field's error state won't update until the user interacts with it. To make both fields validate simultaneously, you need a **cross-validation trigger hook** — see [file-templates.md](file-templates.md#cross-field-validation-trigger-hook).
 
+## File Upload Fields
+
+For file upload fields, use `z.any().refine((files) => files.length > 0)`:
+
+```typescript
+fspDocument: z.any().refine((files) => files.length > 0),
+```
+
+> **Important:** Do NOT use `z.any().array()`. Zod's `.array()` type collides with the `array` field type handling in the form library (which treats any Zod array schema as a repeatable-entry array field). Using `.refine()` instead keeps the file field as a plain, non-array field while still validating that at least one file was selected.
+
 ## Array Fields
 
 For forms needing multiple entries of the same type:

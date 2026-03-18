@@ -260,7 +260,9 @@ type ComboboxItem<Data = any> = {
 
 ## `file-upload`
 
-For file upload fields. Schema should use `z.any().array()`.
+For file upload fields. Schema must use `z.any().refine((files) => files.length > 0)`.
+
+> **Important:** Do NOT use `z.any().array()` for file upload fields. Zod's `.array()` type collides with the `array` field type handling in the form library and causes incorrect behavior. Always use `.refine()` instead.
 
 ```typescript
 fspDocument: {
@@ -289,7 +291,7 @@ Additional properties:
 Schema for file upload fields:
 
 ```typescript
-fspDocument: z.any().array(),
+fspDocument: z.any().refine((files) => files.length > 0),
 ```
 
 ## `array`
