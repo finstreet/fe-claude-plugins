@@ -131,29 +131,27 @@ import { clearAuthState, testCredentials } from "e2e/utils/test-helpers";
 ### data-testid Selectors
 All element interactions use `data-testid` attributes. Never use CSS selectors, class names, or text content for element selection. The `dataTestIds` object in `e2e/data/dataTestIds.ts` centralizes all test ID constants.
 
-### Field Interaction via data-testid
-The `FormInteractor.fillField()` method appends field-type suffixes to the `fieldName`:
-
-| BaseField Type | data-testid Pattern |
-|---|---|
-| `INPUT` | `${fieldName}-input` |
-| `PASSWORD` | `${fieldName}-password` |
-| `NUMBER` | `${fieldName}-number` |
-| `TEXTAREA` | `${fieldName}-textarea` |
-| `CHECKBOX` | `${fieldName}-checkbox` |
-| `YES_NO_RADIO_GROUP` | `${fieldName}-yes-no-radio-group__item-yes/no` |
-| `RADIO_GROUP` | `${fieldName}-radio-group__item-${value}` |
-| `SELECT` | `${fieldName}-select__trigger` / `__content` / `__item-${value}` |
-| `COMBOBOX` | `${fieldName}-combobox__input` (5s wait, then click `__item-0` or `__item-1`) |
-| `DATEPICKER` | `${fieldName}-datepicker` |
-| `SELECTABLE_CARDS` | `${fieldName}-selectable-cards__card-${value}` |
-| `FILE_UPLOAD` | `${fieldName}-file-upload` |
-
 ### test.step() Nesting
-Always wrap logical sections in `test.step()` for clear HTML report output:
+Use `test.step()` to group actions into named sections for clear HTML report output. Actions that are logically linked (e.g. one depends on the result of the other) must be in the same step. A single standalone action can be its own step if it is logically self-contained.
+
 ```typescript
-await test.step("Fill in and confirm financing details", async () => {
-  // ...
+// ✅ Correct — linked actions in one step (result of first is used by second)
+await test.step("Accept invitation and log in", async () => {
+  const invitationLink = await InvitationHelper.waitForInvitationEmailAndExtractLink(email, mailtrap);
+  await InvitationHelper.acceptInvitationInNewContext(browser, invitationLink, password);
+});
+
+// ✅ Correct — single self-contained action as its own step
+await test.step("Fill in financing details", async () => {
+  await overviewPage.financingDetails.setupWithValidation(financingCaseId);
+});
+
+// ❌ Wrong — linked actions split across separate steps
+await test.step("Get invitation link", async () => {
+  invitationLink = await InvitationHelper.waitForInvitationEmailAndExtractLink(email, mailtrap);
+});
+await test.step("Accept invitation", async () => {
+  await InvitationHelper.acceptInvitationInNewContext(browser, invitationLink, password);
 });
 ```
 
@@ -212,14 +210,15 @@ Examples: HOA Loan inquiry, HOA Account inquiry, Factoring inquiry.
 Use when: Testing the complete workflow from inquiry creation through all financing case actions.
 Examples: HOA Loan happy path, HOA Account happy path.
 
-### Helper/field type reference → Read `core-reference.md`
-Use when: You need the exact API for base classes, helpers, or field interaction patterns.
+### Helper/field type reference → Read `module.md` or `core-reference.md`
+Use when: You need the API for FormInteractor, ErrorHandler, or NavigationHelper. For CardHelper, InteractiveListHelper, and other base classes, read `core-reference.md`.
 
 ## Reference Files
 
 | File | When to Read |
-|------|-------------|
-| `core-reference.md` | Need exact method signatures for BaseHelper, FormInteractor, NavigationHelper, ErrorHandler, CardHelper, InteractiveListHelper, or field type patterns |
+|------|--------------|
+| `module.md` | Need method signatures for FormInteractor, ErrorHandler, or NavigationHelper |
+| `core-reference.md` | Need method signatures for BaseHelper, CardHelper, InteractiveListHelper, or other base classes |
 | `form-module-tests.md` | Adding a standalone form test module (validate → submit → navigate) |
 | `card-crud-tests.md` | Adding card-based CRUD tests (modal → card → update/delete cycle) |
 | `inquiry-process-tests.md` | Adding a new product's multi-step inquiry process tests |
