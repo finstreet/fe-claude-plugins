@@ -66,7 +66,7 @@ import { TaskGroup } from "@finstreet/ui/components/patterns/TaskGroup";
 
 // Common utilities
 import { routes } from "@/routes";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { VStack } from "@styled-system/jsx";
 ```
 
@@ -85,6 +85,6 @@ import { VStack } from "@styled-system/jsx";
 5. Use `done` / `active` status — only use `inactive` or `warning` if explicitly required
 6. ActionPanels always use `variant="invisible"`
 7. ActionPanels are always `"use client"` components
-8. Use `useTranslations` from `next-intl` (not `useExtracted`)
+8. Use `useExtracted` from `next-intl` (not `useTranslations`)
 9. Use arrow function exports: `export const MyComponent = ({}: Props) => {}`
 10. Props type is always named `Props`

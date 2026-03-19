@@ -11,7 +11,7 @@ The TaskGroup itself does NOT use `TasksAndActionsLayout` — that layout lives 
 ```tsx
 import { TaskGroup } from "@finstreet/ui/components/patterns/TaskGroup";
 import { VStack } from "@styled-system/jsx";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 import { {Product}{Role}{Panel1}TaskPanel } from "./taskPanels/{Product}{Role}{Panel1}TaskPanel";
 import { {Product}{Role}{Panel2}TaskPanel } from "./taskPanels/{Product}{Role}{Panel2}TaskPanel";
 
@@ -24,9 +24,7 @@ export const {Product}{Role}{TaskGroupName}TaskGroup = ({
   financingCaseId,
   financingCaseOverviewResponse,
 }: Props) => {
-  const t = useTranslations(
-    "{translationNamespace}.taskGroups.{taskGroupName}",
-  );
+  const t = useExtracted();
 
   const { sections, flags } = financingCaseOverviewResponse;
 
@@ -62,5 +60,5 @@ The TaskGroup destructures `sections` and `flags` from the response and passes t
 
 - The TaskGroup only passes data down — it contains no business logic
 - Always wrap TaskPanels in `<VStack gap={4} alignItems="stretch">`
-- Use `useTranslations` with the TaskGroup's namespace for the `label`
+- Use `useExtracted` for the `label` translation
 - The overview response type should be imported from the backend schema

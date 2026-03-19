@@ -16,7 +16,7 @@ import {
   ActionPanelContent,
   ActionPanelAction,
 } from "@finstreet/ui/components/patterns/ActionPanel";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 type Props = {
   financingCaseId: string;
@@ -27,9 +27,7 @@ export const {Product}{Role}{PanelName}ActionPanel = ({
   financingCaseId,
   actionDisabled,
 }: Props) => {
-  const t = useTranslations(
-    "{translationNamespace}.taskGroups.{taskGroupName}.taskPanels.{panelName}.actionPanel",
-  );
+  const t = useExtracted();
 
   // TODO: import and use the actual modal store hook
   // const { setData } = useMyModal();
@@ -66,7 +64,7 @@ import {
   ActionPanelContent,
   ActionPanelAction,
 } from "@finstreet/ui/components/patterns/ActionPanel";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 type Props = {
   financingCaseId: string;
@@ -77,9 +75,7 @@ export const {Product}{Role}{PanelName}ActionPanel = ({
   financingCaseId,
   actionDisabled,
 }: Props) => {
-  const t = useTranslations(
-    "{translationNamespace}.taskGroups.{taskGroupName}.taskPanels.{panelName}.actionPanel",
-  );
+  const t = useExtracted();
 
   return (
     <ActionPanel variant="invisible">
@@ -112,7 +108,7 @@ import {
   ActionPanelContent,
   ActionPanelAction,
 } from "@finstreet/ui/components/patterns/ActionPanel";
-import { useTranslations } from "next-intl";
+import { useExtracted } from "next-intl";
 
 type Props = {
   financingCaseId: string;
@@ -123,9 +119,7 @@ export const {Product}{Role}{PanelName}ActionPanel = ({
   financingCaseId,
   flags,
 }: Props) => {
-  const t = useTranslations(
-    "{translationNamespace}.taskGroups.{taskGroupName}.taskPanels.{panelName}.actionPanel",
-  );
+  const t = useExtracted();
 
   // TODO: import and use the actual modal store hooks
   // const { setData: setFirstModalData } = useFirstModal();
