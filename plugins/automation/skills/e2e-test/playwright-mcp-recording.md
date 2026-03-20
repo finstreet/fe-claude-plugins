@@ -67,23 +67,10 @@ When the user says the recording is done, output the filled-out template. Every 
 
 After outputting the template, ask the user whether to proceed with generating the test files.
 
-### Determine the Test Type
-
-Pick the correct template based on what the session covered:
-
-| Session covered... | Test type |
-|---|---|
-| A single form with fields, validation, and submit | **Form Module** |
-| Any subset of: card creation via modal, update, delete, confirm | **Card CRUD Module** |
-| Multiple sequential form steps | **Inquiry Process** |
-
-### Form Module Template
+### Template
 
 ```
 ## E2E Test Template: [Feature Name]
-
-### Test Type
-Form Module
 
 ### Feature
 - Feature name: [from session]
@@ -94,112 +81,27 @@ Form Module
 ### Navigation to Section
 | Step | Action | data-testid | Resulting URL |
 |---|---|---|---|
-| 1 | [e.g., Click list item] | [testid or ⚠ missing] | [URL] |
-| 2 | [e.g., Click form link] | [testid or ⚠ missing] | [URL] |
+| 1 | [description of action] | [testid or ⚠ missing] | [URL] |
 
-### Form Fields
-| Field Name (data-testid prefix) | Field Type | Valid Value | Invalid Value | Error Field? |
-|---|---|---|---|---|
-| [from session] | [from DOM] | [value entered] | [value that triggered error] | yes/no |
+### Recorded Steps
+A chronological list of every action the user performed, with the data captured for each.
 
-### Validation
-- Expected error fields: [comma-separated list of prefixes that showed errors]
-
-### Post-Submit Behavior
-- Confirmation modal before navigation: yes / no
-- Confirmation modal submit data-testid: [from session, if applicable]
-- Redirect URL after success: [as routes.* expression]
-
-### Missing testids — add to source before generating files
-- [description of element] at [URL] — identified by [how it was found]
-
-### Additional Notes
-[Any conditional fields or special behavior observed]
-```
-
-### Card CRUD Template
-
-```
-## E2E Test Template: [Feature Name]
-
-### Test Type
-Card CRUD Module
-
-### Feature
-- Feature name: [from session]
-- Product: [from session]
-- Portal: [from session]
-- TypeScript schema import: [look up in the codebase]
-
-### Navigation to Section
-| Step | Action | data-testid | Resulting URL |
-|---|---|---|---|
-| 1 | [e.g., Click list item] | [testid or ⚠ missing] | [URL] |
-| 2 | [e.g., Expand panel] | [testid or ⚠ missing] | [URL] |
-| 3 | [e.g., Click section link] | [testid or ⚠ missing] | [URL] |
-
-### Recorded Operations
-Only generate code for checked operations — do not pad with the full CRUD cycle.
-- [ ] Delete existing card
-- [ ] Validate empty/invalid form submission
-- [ ] Create card with valid data
-- [ ] Update existing card
-- [ ] Confirm section / redirect
-
-### dataTestIds to Add
-- Card: [from session, if create or update was recorded]
-- New item button: [from session, if create was recorded]
-- Confirm section button: [from session, if confirm was recorded]
-
-### Form Fields (in modal)
-| Field Name (data-testid prefix) | Field Type | Valid Value | Update Value | Invalid Value | Error Field? |
+| # | Action | data-testid | Field Type | Value | Resulting URL / Observation |
 |---|---|---|---|---|---|
-| [from session] | [from DOM] | [value entered] | [changed value or —] | [value that triggered error or —] | yes/no |
+| 1 | Navigate | — | — | — | [URL] |
+| 2 | Click [element label] | [testid] | — | — | [URL or observation] |
+| 3 | Fill [field label] | [testid prefix] | [BaseField type] | [value entered] | — |
+| 4 | Submit form | [testid] | — | — | [URL or modal appeared] |
+| … | … | … | … | … | … |
 
-### Card Verification
-- Card headline composed from: [which field values appear in the heading]
-- Card data-testid: [from session]
-
-### Confirm Section
-- Confirm button data-testid: [from session, or — if not recorded]
-- Confirmation modal submit data-testid: [from session, or — if not recorded]
-- Redirect URL after confirm: [from session, or — if not recorded]
-
-### Missing testids — add to source before generating files
-- [description of element] at [URL] — identified by [how it was found]
-```
-
-### Inquiry Process Template
-
-```
-## E2E Test Template: [Product] Inquiry Process
-
-### Test Type
-Inquiry Process
-
-### Feature
-- Product: [from session]
-- Portal(s): [from session]
-- Number of steps: [from session]
-
-### Navigation to Section
-| Step | Action | data-testid | Resulting URL |
-|---|---|---|---|
-| 1 | [e.g., Navigate directly to URL] | — | [URL] |
-
-### Step N: [Step Name]
-- URL: [as routes.* expression]
-- Schema import: [look up in the codebase]
-- Fields:
-  | Field Name (data-testid prefix) | Field Type | Valid Value |
-  |---|---|---|
-  | [from session] | [from DOM] | [value entered] |
-- After submit: [URL pattern observed; note if case ID is embedded]
-
-[repeat for every step]
-
-### Final Step Redirect
-- URL after last step submit: [from session]
+### Observations
+Free-form notes about what was observed during the session that are relevant for test generation:
+- Validation errors seen: [field: error message, …]
+- Confirmation modals seen: [data-testid of submit button]
+- Redirect URLs after submit: [URL]
+- Conditional fields observed: [description]
+- Cards created/updated/deleted: [data-testid, headline text]
+- Any other relevant behaviour
 
 ### Missing testids — add to source before generating files
 - [description of element] at [URL] — identified by [how it was found]
@@ -209,12 +111,16 @@ Inquiry Process
 
 ## Generating the Test Files
 
-After the template is confirmed, check the "Missing testids" section first. If it is non-empty, add those `data-testid` attributes to the source components before generating any test files. Then generate in this order:
+After the template is confirmed, check the "Missing testids" section first. If it is non-empty, add those `data-testid` attributes to the source components before generating any test files.
+
+Use the recorded steps and observations to determine the correct test type (Form Module, Card CRUD, Inquiry Process) and generate only what was actually recorded — do not pad with operations that were not part of the session.
+
+Generate in this order:
 
 1. Add `data-testid` attributes to source components for any flagged missing testids
 2. Add entries to `e2e/data/dataTestIds.ts`
 3. Create `e2e/data/{product}/{feature}TestData.ts`
-4. Create the module in `e2e/modules/{product}/` — implement only the operations that are checked in "Recorded Operations"
+4. Create the module in `e2e/modules/{product}/`
 5. Register the module on the parent overview page
 6. Create or update the spec file in `e2e/tests/{product}/`
 
@@ -267,9 +173,6 @@ User: That's it, generate the template
 ---
 ## E2E Test Template: Reference Account
 
-### Test Type
-Form Module
-
 ### Feature
 - Feature name: Reference Account
 - Product: hoaAccount
@@ -280,21 +183,21 @@ Form Module
 ### Navigation to Section
 | Step | Action | data-testid | Resulting URL |
 |---|---|---|---|
-| 1 | Click overview page action button | hoaAccount-financingCase-pm-goToReferenceAccountAction | /reference-account |
+| 1 | Click overview action button | hoaAccount-financingCase-pm-goToReferenceAccountAction | /reference-account |
 
-### Form Fields
-| Field Name       | Field Type | Valid Value               | Invalid Value  | Error Field? |
-|---|---|---|---|---|
-| bankAccountOwner | INPUT      | "Max Mustermann"          | ""             | yes          |
-| iban             | INPUT      | "DE89370400440532013000"  | "INVALID_IBAN" | yes          |
+### Recorded Steps
+| # | Action | data-testid | Field Type | Value | Resulting URL / Observation |
+|---|---|---|---|---|---|
+| 1 | Navigate | — | — | — | /pm/hoa-account/financing-case/abc123/overview |
+| 2 | Click action button | hoaAccount-financingCase-pm-goToReferenceAccountAction | — | — | /reference-account |
+| 3 | Fill bank account owner | bankAccountOwner | INPUT | "Max Mustermann" | — |
+| 4 | Fill IBAN | iban | INPUT | "DE89370400440532013000" | — |
+| 5 | Click submit | submit-button | — | — | Confirmation modal appeared |
+| 6 | Click modal confirm | confirmation-modal-confirm-submit-button | — | — | /pm/hoa-account/financing-case/abc123/overview |
 
-### Validation
-- Expected error fields: bankAccountOwner, iban
-
-### Post-Submit Behavior
-- Confirmation modal before navigation: yes
-- Confirmation modal submit data-testid: confirmation-modal-confirm-submit-button
-- Redirect URL after success: routes.pm.hoaAccount.financingCase.overview(caseId)
+### Observations
+- Redirect URL after submit: /pm/hoa-account/financing-case/abc123/overview
+- Confirmation modal present: yes — submit data-testid: confirmation-modal-confirm-submit-button
 
 ### Missing testids — add to source before generating files
 (none)
