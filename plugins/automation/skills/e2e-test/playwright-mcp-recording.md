@@ -2,98 +2,42 @@
 
 ## Purpose
 
-When a user wants to create an e2e test by walking through a feature in the browser, use the Playwright MCP server to operate the browser yourself. The user describes the feature in plain language — you drive the browser, extract all technical details, and produce a filled-out template. Then generate the actual test files from that template using the e2e-test skill.
+This guide describes a two-phase workflow for creating e2e tests with non-technical users.
 
-## Workflow
+**Phase 1 — Recording:** The user provides test steps one at a time in plain language. Execute each step in the browser using the Playwright MCP server. After each step, silently record all observed technical details (URLs, `data-testid` values, field types, error messages). Do not generate steps yourself. Do not suggest what to test next. Only execute what the user provides.
 
-```
-1. Recording   — Drive the browser step by step, capturing all required data as you go
-2. Template    — Output the filled-out template immediately after the session ends
-3. Generation  — Use the template + e2e-test skill to generate the actual test files
-```
+**Phase 2 — Template:** Once the user signals the recording is done, produce the filled-out template from everything collected during the session. Then generate the test files using the e2e-test skill.
 
 ---
 
-## Before Starting: Identify the Test Type
+## Phase 1: Executing Steps
 
-Before touching the browser, determine which test type applies from what the user describes:
+### Your Role During Recording
 
-| User describes... | Test type |
+- Execute each step the user provides — nothing more
+- After every step, silently log what was observed (see "What to Record" below)
+- Confirm each completed step with a brief status and the key values captured (e.g., URL, data-testids found)
+- If a step is ambiguous or cannot be executed, ask one clarifying question — do not guess
+
+### What to Record on Every Step
+
+After executing any step, capture and retain:
+
+| Observed detail | When to capture |
 |---|---|
-| A form page with fields to fill and submit | **Form Module** |
-| A section that creates items shown as cards, with update/delete | **Card CRUD Module** |
-| A multi-step wizard where each step submits and moves to the next | **Inquiry Process** |
-| The complete flow from inquiry creation through all financing case steps | **Happy Path** |
+| Current URL | After every navigation and every form submission |
+| `data-testid` of the interacted element | On every click, fill, or interaction |
+| `data-testid` prefix + DOM element type of form fields | When a form becomes visible |
+| `data-testid` and text of error messages | After any failed/invalid form submission |
+| Whether a confirmation modal appeared | After any form submission |
+| `data-testid` of confirmation modal submit button | When a modal is visible |
+| `data-testid` and heading text of new cards | After any successful card creation |
 
-If it is not clear, ask: *"Does this feature create items shown as cards, or is it a single form you fill and submit?"*
+### Field Type Identification
 
----
+When a form becomes visible, inspect each field and map it to the `BaseField` enum:
 
-## What to Capture on Every Interaction
-
-Never interact with an element without capturing its `data-testid`. Never navigate without reading the resulting URL. Specifically, always collect:
-
-- The `data-testid` of every button, input, card, and menu item you interact with
-- The full URL before and after every navigation and every form submission
-- The `data-testid` prefix and DOM element type of every form field
-- The `data-testid` and text content of every error message that appears
-- Whether a confirmation modal appears after submit — and if so, its submit button `data-testid`
-- The `data-testid` and heading text of any card that appears after a successful creation
-
----
-
-## Recording Steps: Standalone Form
-
-1. Navigate to the overview page URL the user provides
-2. Find the button that leads to the form page — read its `data-testid`
-3. Click it — read the new URL
-4. Query all `[data-testid]` attributes on the form — record each field's testid prefix and element type
-5. Click Submit without filling in anything — query `[data-testid$="-error"]` — record every error testid and its message text
-6. Reload the page
-7. Fill each field with a reasonable valid value — record the exact value used for each field
-8. Click Submit
-9. Check whether a confirmation modal appeared — if yes, read its submit button `data-testid`, then click it
-10. Read the final URL
-
-## Recording Steps: Card CRUD
-
-1. Navigate to the section page URL the user provides
-2. Find the "New" / "Add" button — read its `data-testid`
-3. Click it — the modal opens
-4. Query all `[data-testid]` attributes inside the modal — record each field's testid prefix and element type
-5. Click Submit without filling anything — record all `[data-testid$="-error"]` testids and messages
-6. Close the modal (cancel button or Escape)
-7. Click the New button again — fill each field with valid values — record the values — submit the modal
-8. Read the `data-testid` and heading text of the card that appeared
-9. Open the card's action menu — read the menu trigger's `data-testid`
-10. Click Update — fill fields with slightly changed values — record the changed values — submit
-11. Verify the card heading updated
-12. Delete the card — read the delete option and delete confirm button `data-testid` values
-13. Re-create the card with the original valid values
-14. Find the "Confirm" / "Done" button that finalises the section — read its `data-testid`
-15. Click it — check for a confirmation modal — if present, read its submit `data-testid` and click it
-16. Read the final URL
-
-## Recording Steps: Inquiry Process
-
-Repeat for each step until the final redirect:
-
-1. Navigate to step 1 URL
-2. Read the current URL
-3. Query all `[data-testid]` attributes on the visible form — record each field's testid prefix and element type
-4. Fill each field with a valid value — record the exact value used
-5. Click the Submit / Next button
-6. Read the new URL — if the URL contains a case ID, note the pattern and extract the ID
-
-After the final step: read the redirect URL.
-
----
-
-## Field Type Identification
-
-When inspecting a form field, map the DOM to the `BaseField` enum:
-
-| DOM element / input type | `BaseField` value |
+| DOM element | `BaseField` value |
 |---|---|
 | `<input type="text">` | `INPUT` |
 | `<input type="number">` | `NUMBER` |
@@ -112,11 +56,21 @@ The `data-testid` prefix is the part before the type suffix: `bankAccountOwner-i
 
 ---
 
-## After the Session: Output the Template
+## Phase 2: Producing the Template
 
-Immediately after the session, output the filled-out template below. Fill in every field from what was observed. Do not leave placeholders — if a value is missing, ask one targeted question to resolve it before writing the template.
+When the user says the recording is done, output the filled-out template. Every field must be filled from what was observed — leave nothing as a placeholder. If a value is genuinely missing, ask one targeted question before writing the template.
 
 After outputting the template, ask the user whether to proceed with generating the test files.
+
+### Determine the Test Type
+
+Pick the correct template based on what the session covered:
+
+| Session covered... | Test type |
+|---|---|
+| A single form with fields, validation, and submit | **Form Module** |
+| Card creation via modal + update + delete + confirm | **Card CRUD Module** |
+| Multiple sequential form steps | **Inquiry Process** |
 
 ### Form Module Template
 
@@ -141,10 +95,10 @@ Form Module
 ### Form Fields
 | Field Name (data-testid prefix) | Field Type | Valid Value | Invalid Value | Error Field? |
 |---|---|---|---|---|
-| [from session] | [from DOM] | [value used] | [value used for invalid submit] | yes/no |
+| [from session] | [from DOM] | [value entered] | [value that triggered error] | yes/no |
 
 ### Validation
-- Expected error fields: [comma-separated list of field name prefixes that showed errors]
+- Expected error fields: [comma-separated list of prefixes that showed errors]
 
 ### Post-Submit Behavior
 - Confirmation modal before navigation: yes / no
@@ -152,7 +106,7 @@ Form Module
 - Redirect URL after success: [as routes.* expression]
 
 ### Additional Notes
-[Any conditional fields, special interactions, or portal-specific behavior observed]
+[Any conditional fields or special behavior observed]
 ```
 
 ### Card CRUD Template
@@ -182,10 +136,10 @@ Card CRUD Module
 ### Form Fields (in modal)
 | Field Name (data-testid prefix) | Field Type | Valid Value | Update Value | Invalid Value | Error Field? |
 |---|---|---|---|---|---|
-| [from session] | [from DOM] | [value used] | [changed value used] | [invalid value used] | yes/no |
+| [from session] | [from DOM] | [value entered] | [changed value] | [value that triggered error] | yes/no |
 
 ### Card Verification
-- Card headline is composed from: [which field values appear in the heading]
+- Card headline composed from: [which field values appear in the heading]
 - Card data-testid: [from session]
 
 ### Confirm Section
@@ -213,8 +167,8 @@ Inquiry Process
 - Fields:
   | Field Name (data-testid prefix) | Field Type | Valid Value |
   |---|---|---|
-  | [from session] | [from DOM] | [value used] |
-- After submit: [URL pattern observed; note if case ID must be extracted from URL]
+  | [from session] | [from DOM] | [value entered] |
+- After submit: [URL pattern observed; note if case ID is embedded]
 
 [repeat for every step]
 
@@ -226,7 +180,7 @@ Inquiry Process
 
 ## Generating the Test Files
 
-Once the template is confirmed, generate the test files using the e2e-test skill in this order:
+After the template is confirmed, generate the test files using the e2e-test skill in this order:
 
 1. Add entries to `e2e/data/dataTestIds.ts`
 2. Create `e2e/data/{product}/{feature}TestData.ts`
@@ -236,45 +190,45 @@ Once the template is confirmed, generate the test files using the e2e-test skill
 
 ---
 
-## Example: Complete Session for a Standalone Form
+## Example Session
 
 ```
-User: I want to create a test for the reference account form.
-      Start at http://localhost:3000/pm/hoa-account/financing-case/abc123/overview
+User: Go to http://localhost:3000/pm/hoa-account/financing-case/abc123/overview
 
-[Navigate to the overview page. Take a screenshot. Query [data-testid] on all visible action buttons.]
+[Navigate. Read URL. Take screenshot.]
+URL: /pm/hoa-account/financing-case/abc123/overview ✓
 
-Found: data-testid="hoaAccount-financingCase-pm-goToReferenceAccountAction"
+User: Click the button that opens the reference account form
 
-[Click the button. Read the new URL.]
-
+[Inspect [data-testid] on visible buttons. Click the matching one. Read new URL.]
+Clicked: data-testid="hoaAccount-financingCase-pm-goToReferenceAccountAction"
 URL: /pm/hoa-account/financing-case/abc123/reference-account
 
-[Query all [data-testid] on the form.]
-
 Fields found:
-- bankAccountOwner-input  →  <input type="text">  →  BaseField.INPUT
-- iban-input              →  <input type="text">  →  BaseField.INPUT
+- bankAccountOwner-input  →  <input type="text">  →  INPUT
+- iban-input              →  <input type="text">  →  INPUT
 - submit-button
 
-[Click Submit without filling anything. Query [data-testid$="-error"].]
+User: Submit the form without filling anything in
 
+[Click Submit. Query [data-testid$="-error"].]
 Errors:
-- data-testid="bankAccountOwner-error"  →  "This field is required"
-- data-testid="iban-error"              →  "Please enter a valid IBAN"
+- bankAccountOwner-error  →  "This field is required"
+- iban-error              →  "Please enter a valid IBAN"
+
+User: Reload the page and fill in "Max Mustermann" for bank account owner
+      and "DE89370400440532013000" for IBAN, then submit
 
 [Reload. Fill fields. Click Submit.]
+Filled bankAccountOwner = "Max Mustermann", iban = "DE89370400440532013000"
+Confirmation modal appeared → data-testid="confirmation-modal-confirm-submit-button"
 
-bankAccountOwner = "Max Mustermann"
-iban = "DE89370400440532013000"
+User: Confirm the modal
 
-[Confirmation modal appeared. Read its submit button testid.]
+[Click the confirmation button. Read final URL.]
+URL: /pm/hoa-account/financing-case/abc123/overview ✓
 
-data-testid="confirmation-modal-confirm-submit-button"
-
-[Click it. Read the final URL.]
-
-Final URL: /pm/hoa-account/financing-case/abc123/overview
+User: That's it, generate the template
 
 ---
 ## E2E Test Template: Reference Account
