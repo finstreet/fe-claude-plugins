@@ -9,7 +9,7 @@
         "name": "automation",
         "source": "./plugins/automation",
         "description": "Plugin for automating development with all @finstreet frontend libraries",
-        "version": "0.0.37",
+        "version": "0.0.38",
         "author": {
           "name": "Patrick Engelkes"
         }

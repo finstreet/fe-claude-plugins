@@ -26,6 +26,18 @@ Do not run additional queries to discover things the user did not ask about. If 
 
 If a step is ambiguous, ask one clarifying question. Do not guess and do not proceed with a broader action to compensate.
 
+### Missing data-testid
+
+If you attempt to interact with an element and it has no `data-testid` attribute, do not silently skip it or use a fallback selector without flagging it. Instead, record it as a missing testid in the session log and continue:
+
+```
+⚠ Missing data-testid: [description of element, e.g., "inquiry details panel header"]
+  URL at time of interaction: [current URL]
+  Element identified by: [how you found it, e.g., text content "Anfrage-Details"]
+```
+
+When producing the template, these are collected into a "Missing testids" section. The code generation step will include adding those testids to the source before generating test files.
+
 ### Field Type Identification
 
 When the user asks you to interact with a form field, read its element type and map it to the `BaseField` enum:
@@ -62,7 +74,7 @@ Pick the correct template based on what the session covered:
 | Session covered... | Test type |
 |---|---|
 | A single form with fields, validation, and submit | **Form Module** |
-| Card creation via modal + update + delete + confirm | **Card CRUD Module** |
+| Any subset of: card creation via modal, update, delete, confirm | **Card CRUD Module** |
 | Multiple sequential form steps | **Inquiry Process** |
 
 ### Form Module Template
@@ -79,11 +91,11 @@ Form Module
 - Portal: [from session]
 - TypeScript schema import: [look up in the codebase from the feature route]
 
-### Routes
-- Overview page URL: [as routes.* expression]
-- Form page URL: [as routes.* expression]
-- Navigation button data-testid: [from session]
-- dataTestIds key path: [e.g., hoaAccount.financingCase.pm.goToReferenceAccountAction]
+### Navigation to Section
+| Step | Action | data-testid | Resulting URL |
+|---|---|---|---|
+| 1 | [e.g., Click list item] | [testid or ⚠ missing] | [URL] |
+| 2 | [e.g., Click form link] | [testid or ⚠ missing] | [URL] |
 
 ### Form Fields
 | Field Name (data-testid prefix) | Field Type | Valid Value | Invalid Value | Error Field? |
@@ -97,6 +109,9 @@ Form Module
 - Confirmation modal before navigation: yes / no
 - Confirmation modal submit data-testid: [from session, if applicable]
 - Redirect URL after success: [as routes.* expression]
+
+### Missing testids — add to source before generating files
+- [description of element] at [URL] — identified by [how it was found]
 
 ### Additional Notes
 [Any conditional fields or special behavior observed]
@@ -116,29 +131,42 @@ Card CRUD Module
 - Portal: [from session]
 - TypeScript schema import: [look up in the codebase]
 
-### Routes
-- Overview page URL: [as routes.* expression]
-- Section page URL: [as routes.* expression]
-- Navigation button data-testid: [from session]
+### Navigation to Section
+| Step | Action | data-testid | Resulting URL |
+|---|---|---|---|
+| 1 | [e.g., Click list item] | [testid or ⚠ missing] | [URL] |
+| 2 | [e.g., Expand panel] | [testid or ⚠ missing] | [URL] |
+| 3 | [e.g., Click section link] | [testid or ⚠ missing] | [URL] |
+
+### Recorded Operations
+Only generate code for checked operations — do not pad with the full CRUD cycle.
+- [ ] Delete existing card
+- [ ] Validate empty/invalid form submission
+- [ ] Create card with valid data
+- [ ] Update existing card
+- [ ] Confirm section / redirect
 
 ### dataTestIds to Add
-- Card: [from session]
-- New item button: [from session]
-- Confirm section button: [from session]
+- Card: [from session, if create or update was recorded]
+- New item button: [from session, if create was recorded]
+- Confirm section button: [from session, if confirm was recorded]
 
 ### Form Fields (in modal)
 | Field Name (data-testid prefix) | Field Type | Valid Value | Update Value | Invalid Value | Error Field? |
 |---|---|---|---|---|---|
-| [from session] | [from DOM] | [value entered] | [changed value] | [value that triggered error] | yes/no |
+| [from session] | [from DOM] | [value entered] | [changed value or —] | [value that triggered error or —] | yes/no |
 
 ### Card Verification
 - Card headline composed from: [which field values appear in the heading]
 - Card data-testid: [from session]
 
 ### Confirm Section
-- Confirm button data-testid: [from session]
-- Confirmation modal submit data-testid: [from session, if applicable]
-- Redirect URL after confirm: [as routes.* expression]
+- Confirm button data-testid: [from session, or — if not recorded]
+- Confirmation modal submit data-testid: [from session, or — if not recorded]
+- Redirect URL after confirm: [from session, or — if not recorded]
+
+### Missing testids — add to source before generating files
+- [description of element] at [URL] — identified by [how it was found]
 ```
 
 ### Inquiry Process Template
@@ -154,6 +182,11 @@ Inquiry Process
 - Portal(s): [from session]
 - Number of steps: [from session]
 
+### Navigation to Section
+| Step | Action | data-testid | Resulting URL |
+|---|---|---|---|
+| 1 | [e.g., Navigate directly to URL] | — | [URL] |
+
 ### Step N: [Step Name]
 - URL: [as routes.* expression]
 - Schema import: [look up in the codebase]
@@ -167,19 +200,23 @@ Inquiry Process
 
 ### Final Step Redirect
 - URL after last step submit: [from session]
+
+### Missing testids — add to source before generating files
+- [description of element] at [URL] — identified by [how it was found]
 ```
 
 ---
 
 ## Generating the Test Files
 
-After the template is confirmed, generate the test files using the e2e-test skill in this order:
+After the template is confirmed, check the "Missing testids" section first. If it is non-empty, add those `data-testid` attributes to the source components before generating any test files. Then generate in this order:
 
-1. Add entries to `e2e/data/dataTestIds.ts`
-2. Create `e2e/data/{product}/{feature}TestData.ts`
-3. Create the module in `e2e/modules/{product}/`
-4. Register the module on the parent overview page
-5. Create or update the spec file in `e2e/tests/{product}/`
+1. Add `data-testid` attributes to source components for any flagged missing testids
+2. Add entries to `e2e/data/dataTestIds.ts`
+3. Create `e2e/data/{product}/{feature}TestData.ts`
+4. Create the module in `e2e/modules/{product}/` — implement only the operations that are checked in "Recorded Operations"
+5. Register the module on the parent overview page
+6. Create or update the spec file in `e2e/tests/{product}/`
 
 ---
 
@@ -240,11 +277,10 @@ Form Module
 - TypeScript schema import: UpdateReferenceAccountType from
   @/features/referenceAccount/forms/updateReferenceAccountForm/updateReferenceAccountFormSchema
 
-### Routes
-- Overview page URL: routes.pm.hoaAccount.financingCase.overview(caseId)
-- Form page URL: routes.pm.hoaAccount.financingCase.referenceAccount(caseId)
-- Navigation button data-testid: hoaAccount-financingCase-pm-goToReferenceAccountAction
-- dataTestIds key path: hoaAccount.financingCase.pm.goToReferenceAccountAction
+### Navigation to Section
+| Step | Action | data-testid | Resulting URL |
+|---|---|---|---|
+| 1 | Click overview page action button | hoaAccount-financingCase-pm-goToReferenceAccountAction | /reference-account |
 
 ### Form Fields
 | Field Name       | Field Type | Valid Value               | Invalid Value  | Error Field? |
@@ -259,6 +295,9 @@ Form Module
 - Confirmation modal before navigation: yes
 - Confirmation modal submit data-testid: confirmation-modal-confirm-submit-button
 - Redirect URL after success: routes.pm.hoaAccount.financingCase.overview(caseId)
+
+### Missing testids — add to source before generating files
+(none)
 ---
 
 Shall I proceed to generate the test files?
