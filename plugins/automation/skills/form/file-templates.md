@@ -611,6 +611,67 @@ export function use{FormName}FormConfig(
 }
 ```
 
+### With confirmation modal
+
+For forms that require explicit user confirmation before submission. The submit button validates the form first, then opens a confirmation modal. The modal's confirm button triggers the actual submission. For the full pattern (architecture, flow, form action, form component), see [confirmation-modal.md](confirmation-modal.md).
+
+```tsx
+import { useConfirmationModal } from "@/shared/components/ConfirmationModal/store";
+import { ValidatedSubmitButton } from "@/shared/components/ValidatedSubmitButton/ValidatedSubmitButton";
+
+export function use{FormName}FormConfig(
+  defaultValues: {FormName}DefaultValues,
+): {FormName}FormConfig {
+  const t = useExtracted();
+  const fields = use{FormName}FormFields();
+  const router = useRouter();
+  const { setIsOpen, setIsPending } = useConfirmationModal();
+
+  return {
+    fields,
+    defaultValues,
+    formId: "{formName}",
+    schema: {formName}Schema,
+    fieldNames: createFormFieldNames(fields),
+    onPendingChange: (isPending: boolean) => {
+      setIsPending(isPending);
+    },
+    serverAction: {formName}FormAction,
+    useErrorAction: () => {
+      return (formState: {FormName}FormState) => {
+        console.log(formState?.error);
+        setIsOpen(false);
+      };
+    },
+    useSuccessAction: () => {
+      return () => {
+        setIsOpen(false);
+        router.push("/target/path");
+      };
+    },
+    renderFormActions: (isPending: boolean) => {
+      return (
+        <HStack mt={12} justifyContent={"space-between"}>
+          <Button
+            type={"button"}
+            variant={"text"}
+            icon={<FaArrowLeft />}
+            onClick={() => router.back()}
+          >
+            {t("Zurück")}
+          </Button>
+          <ValidatedSubmitButton
+            label={t("Absenden")}
+            loading={isPending}
+            onValidationSuccess={() => setIsOpen(true)}
+          />
+        </HStack>
+      );
+    },
+  };
+}
+```
+
 ### With back button using `useRouter`
 
 For forms that need a back/cancel button navigating to the previous page:
@@ -994,6 +1055,35 @@ export const {FormName}Form = ({ defaultValues }: {FormName}FormProps) => {
   return (
     <Form formConfig={config}>
       <{FormName}FormFields fieldNames={config.fieldNames} />
+    </Form>
+  );
+};
+```
+
+### With confirmation modal
+
+Render the `ConfirmationModal` as a child of `<Form>`, passing the `formId` from config. For the full pattern, see [confirmation-modal.md](confirmation-modal.md).
+
+```tsx
+"use client";
+
+import { Form } from "@/shared/components/form/Form";
+import { use{FormName}FormConfig } from "./use{FormName}FormConfig";
+import { {FormName}FormFields } from "./{FormName}FormFields";
+import { {FormName}DefaultValues } from "./{formName}Schema";
+import { ConfirmationModal } from "@/shared/components/ConfirmationModal/modal";
+
+type {FormName}FormProps = {
+  defaultValues: {FormName}DefaultValues;
+};
+
+export const {FormName}Form = ({ defaultValues }: {FormName}FormProps) => {
+  const config = use{FormName}FormConfig(defaultValues);
+
+  return (
+    <Form formConfig={config}>
+      <{FormName}FormFields fieldNames={config.fieldNames} />
+      <ConfirmationModal formId={config.formId!} />
     </Form>
   );
 };

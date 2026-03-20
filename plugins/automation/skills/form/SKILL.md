@@ -183,6 +183,7 @@ Each step has detailed documentation in a supporting file:
 - For **File templates** (action, config, fields component, form), see [file-templates.md](file-templates.md)
 - For **Editing existing forms** (adding/removing fields, changing types, adding prefill, etc.), see [editing.md](editing.md)
 - For **External form actions** (buttons outside the form using `formId`, zustand store, and `onPendingChange`), see [external-actions.md](external-actions.md)
+- For **Confirmation modal** (form with a confirmation dialog before submission, using `ValidatedSubmitButton` and `ConfirmationModal`), see [confirmation-modal.md](confirmation-modal.md)
 - For **New inquiry entry point** (the "new" page that creates an inquiry before updating details), see [new-inquiry.md](new-inquiry.md)
 
 ## Hidden Fields and IDs
