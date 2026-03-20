@@ -14,28 +14,21 @@ This guide describes a two-phase workflow for creating e2e tests with non-techni
 
 ### Your Role During Recording
 
-- Execute each step the user provides — nothing more
-- After every step, silently log what was observed (see "What to Record" below)
-- Confirm each completed step with a brief status and the key values captured (e.g., URL, data-testids found)
-- If a step is ambiguous or cannot be executed, ask one clarifying question — do not guess
+Execute exactly what the user describes — no more. Do not add extra Playwright calls, do not inspect elements the user did not ask you to interact with, do not check for errors unless the user tells you to, do not navigate unless the user tells you to. Every Playwright action you take must directly correspond to an instruction the user gave.
 
-### What to Record on Every Step
+As a byproduct of executing each step, passively note what you observe:
 
-After executing any step, capture and retain:
+- The `data-testid` of the element you located to perform the action
+- The URL after any navigation or form submission
+- Any text or attributes that become visible as a direct result of the action (e.g., an error message that appeared after a submit, the URL the page landed on)
 
-| Observed detail | When to capture |
-|---|---|
-| Current URL | After every navigation and every form submission |
-| `data-testid` of the interacted element | On every click, fill, or interaction |
-| `data-testid` prefix + DOM element type of form fields | When a form becomes visible |
-| `data-testid` and text of error messages | After any failed/invalid form submission |
-| Whether a confirmation modal appeared | After any form submission |
-| `data-testid` of confirmation modal submit button | When a modal is visible |
-| `data-testid` and heading text of new cards | After any successful card creation |
+Do not run additional queries to discover things the user did not ask about. If the user says "click the submit button", click the submit button — read its `data-testid` to locate it, note the resulting URL — that is all.
+
+If a step is ambiguous, ask one clarifying question. Do not guess and do not proceed with a broader action to compensate.
 
 ### Field Type Identification
 
-When a form becomes visible, inspect each field and map it to the `BaseField` enum:
+When the user asks you to interact with a form field, read its element type and map it to the `BaseField` enum:
 
 | DOM element | `BaseField` value |
 |---|---|
@@ -195,37 +188,41 @@ After the template is confirmed, generate the test files using the e2e-test skil
 ```
 User: Go to http://localhost:3000/pm/hoa-account/financing-case/abc123/overview
 
-[Navigate. Read URL. Take screenshot.]
+[Navigate to the URL.]
 URL: /pm/hoa-account/financing-case/abc123/overview ✓
 
 User: Click the button that opens the reference account form
 
-[Inspect [data-testid] on visible buttons. Click the matching one. Read new URL.]
+[Locate the button by its visible label, read its data-testid, click it, read new URL.]
 Clicked: data-testid="hoaAccount-financingCase-pm-goToReferenceAccountAction"
-URL: /pm/hoa-account/financing-case/abc123/reference-account
+URL: /pm/hoa-account/financing-case/abc123/reference-account ✓
 
-Fields found:
-- bankAccountOwner-input  →  <input type="text">  →  INPUT
-- iban-input              →  <input type="text">  →  INPUT
-- submit-button
+User: Fill in "Max Mustermann" for bank account owner
 
-User: Submit the form without filling anything in
+[Locate the field, read its data-testid and element type, fill it.]
+data-testid="bankAccountOwner-input" (<input type="text"> → INPUT)
+Filled: "Max Mustermann" ✓
 
-[Click Submit. Query [data-testid$="-error"].]
-Errors:
-- bankAccountOwner-error  →  "This field is required"
-- iban-error              →  "Please enter a valid IBAN"
+User: Fill in "DE89370400440532013000" for IBAN
 
-User: Reload the page and fill in "Max Mustermann" for bank account owner
-      and "DE89370400440532013000" for IBAN, then submit
+[Locate the field, read its data-testid and element type, fill it.]
+data-testid="iban-input" (<input type="text"> → INPUT)
+Filled: "DE89370400440532013000" ✓
 
-[Reload. Fill fields. Click Submit.]
-Filled bankAccountOwner = "Max Mustermann", iban = "DE89370400440532013000"
-Confirmation modal appeared → data-testid="confirmation-modal-confirm-submit-button"
+User: Submit the form
 
-User: Confirm the modal
+[Locate the submit button, read its data-testid, click it. Read resulting URL.]
+Clicked: data-testid="submit-button"
+A confirmation modal appeared. ✓
 
-[Click the confirmation button. Read final URL.]
+User: Read the data-testid of the confirmation modal submit button
+
+[Read the attribute from the visible modal button.]
+data-testid="confirmation-modal-confirm-submit-button" ✓
+
+User: Click it
+
+[Click the button. Read the final URL.]
 URL: /pm/hoa-account/financing-case/abc123/overview ✓
 
 User: That's it, generate the template
