@@ -118,14 +118,20 @@ Free-form notes about what was observed during the session that are relevant for
 
 After the template is confirmed, check the "Missing testids" section first. If it is non-empty, add those `data-testid` attributes to the source components before generating any test files.
 
-Use the recorded steps and observations to determine the correct test type (Form Module, Card CRUD, Inquiry Process) and generate only what was actually recorded — do not pad with operations that were not part of the session.
+### Match the recording exactly — do not apply full abstractions
+
+The e2e-test skill defines reusable abstractions (FormModule, CardCrudModule, full CRUD cycle, etc.). Only apply an abstraction if the recording covers it completely. If the recording covers only a subset of operations, generate a test that reflects exactly that subset — do not pad it with steps that were not recorded.
+
+Concretely: if the user recorded updating a field value on an existing card and deleting one card, generate a test that does exactly that. Do not build the full `executeCrudCycle` with validate → create → update → delete → recreate → confirm just because the feature uses cards.
+
+For each section of the e2e-test skill templates, ask: "Was this operation present in the recorded steps?" If no, leave it out.
 
 Generate in this order:
 
 1. Add `data-testid` attributes to source components for any flagged missing testids
 2. Add entries to `e2e/data/dataTestIds.ts`
 3. Create `e2e/data/{product}/{feature}TestData.ts`
-4. Create the module in `e2e/modules/{product}/`
+4. Create the module in `e2e/modules/{product}/` — implement only the methods needed for what was recorded
 5. Register the module on the parent overview page
 6. Create or update the spec file in `e2e/tests/{product}/`
 
