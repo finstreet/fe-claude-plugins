@@ -224,4 +224,4 @@ Use when: You need the exact API for base classes, helpers, or field interaction
 | `card-crud-tests.md` | Adding card-based CRUD tests (modal → card → update/delete cycle) |
 | `inquiry-process-tests.md` | Adding a new product's multi-step inquiry process tests |
 | `happy-path-tests.md` | Adding full lifecycle integration tests |
-| `playwright-mcp-recording.md` | Recording a test session via the Playwright MCP server and converting it into a test template for code generation |
+| `automation:playwright-mcp-recording` skill | Recording a browser session via the Playwright MCP server and converting it into a test template for code generation |

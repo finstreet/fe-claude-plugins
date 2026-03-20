@@ -1,3 +1,8 @@
+---
+name: playwright-mcp-recording
+description: "Two-phase workflow for recording e2e test sessions with non-technical users. Phase 1: execute browser steps via the Playwright MCP server exactly as the user describes them, passively collecting data-testids, URLs, field types, and observations. Phase 2: produce a filled-out session template and generate test files using the e2e-test skill. Use when a user wants to record a feature walkthrough in the browser to create an e2e test."
+---
+
 # Playwright MCP Recording Guide
 
 ## Purpose
