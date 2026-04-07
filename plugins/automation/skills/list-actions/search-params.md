@@ -28,16 +28,23 @@ export const {listName}SearchParams = {
 };
 ```
 
-Multiple lists with separate pagination keys:
+### Multi-List Pagination (typed keys)
+
+When two+ lists share SearchParams, use a typed union for the pagination keys instead of `Record<string, string>`. This provides type safety and IDE autocomplete for the pagination keys used in each request function.
 
 ```typescript
+type {ListName}Type = '{listKeyA}' | '{listKeyB}';
+
 export const {listName}SearchParams = {
-  pagination: createBase64Parser<Record<string, string>>().withDefault({
-    members: '1',
-    invitedMembers: '1',
-  }),
+    search: parseAsString.withDefault(''),
+    pagination: createBase64Parser<Record<{ListName}Type, string>>().withDefault({
+        {listKeyA}: '1',
+        {listKeyB}: '1',
+    }),
 };
 ```
+
+For the full multi-list pattern, see [multi-list-shared-search.md](multi-list-shared-search.md).
 
 ## Search
 

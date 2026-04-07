@@ -67,6 +67,10 @@ export async function get{ListName}List(
 }
 ```
 
+## Multi-List Note
+
+When multiple lists share the same SearchParams, create **one request function per list**. Each function reads its own key from the `pagination` object (e.g., `pagination['{listKeyA}']` vs `pagination['{listKeyB}']`) and uses a matching `groupKey` in `collectPaginatedData`. Both functions receive the full `searchParams` so the shared `search` param is passed to `buildApiUrl` automatically. See [multi-list-shared-search.md](multi-list-shared-search.md) for the full pattern.
+
 ## Pagination + Search + Sort + Group
 
 NEVER change the structure below. Always initialize `listItems` before the `if-else`.

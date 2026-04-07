@@ -74,6 +74,12 @@ return (
 );
 ```
 
+## Step 3b — Multi-List Search Action (Case 4)
+
+When two+ lists share a search input, do NOT use `useRenderSearchAction`. Instead, create a standalone `{ListName}SearchAction` component that uses `useQueryState` for both `search` and `pagination`, and resets pagination to `null` on search change. Only the **first** list passes `renderActions={{ListName}SearchAction}` — additional lists omit the prop entirely, since the search modifies the shared URL state which triggers re-renders for all lists.
+
+See [multi-list-shared-search.md](multi-list-shared-search.md) for the full pattern and templates.
+
 ## Step 4 — Add Sort + Group (Case 3)
 
 ```typescript

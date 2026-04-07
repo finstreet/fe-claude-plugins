@@ -22,6 +22,10 @@ export async function {ListName}({ searchParams }: {ListName}Props) {
 }
 ```
 
+## Multi-List
+
+When multiple lists share SearchParams, create one container per list. Each container accepts the same `Parsed{ListName}SearchParams` type and calls its own request function. The page parses SearchParams once and passes the same object to all containers, each wrapped in `<Suspense>`. See [multi-list-shared-search.md](multi-list-shared-search.md) for the full pattern.
+
 ## Rules
 
 - This is a Server Component (`async function`) — no `'use client'` directive
