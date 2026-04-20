@@ -5,7 +5,7 @@ Skills for building Finstreet frontend features with `@finstreet/forms`, `@finst
 ## Install
 
 ```
-/plugin marketplace add finstreet/fe-claude-plugins
+/plugin marketplace add finstreet/claude-plugins
 /plugin install finstreet-fe@finstreet-plugins
 ```
 

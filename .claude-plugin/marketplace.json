@@ -16,8 +16,8 @@
       "author": {
         "name": "Finstreet Frontend"
       },
-      "homepage": "https://github.com/finstreet/fe-claude-plugins",
-      "repository": "https://github.com/finstreet/fe-claude-plugins",
+      "homepage": "https://github.com/finstreet/claude-plugins",
+      "repository": "https://github.com/finstreet/claude-plugins",
       "keywords": ["finstreet", "frontend", "forms", "ui", "nextjs"]
     }
   ]
