@@ -12,7 +12,7 @@ You will receive one of:
 
 ### Step 1: Create all request schemas and endpoint configs
 
-Follow the order of the `Request Paths` from the metadata to create ALL necessary schemas and requests. For each request path, invoke the `automation:secure-fetch` skill with the following information:
+Follow the order of the `Request Paths` from the metadata to create ALL necessary schemas and requests. For each request path, invoke the `finstreet-fe:secure-fetch` skill with the following information:
 
 - ALL metadata fields from this request (this contains the endpoint)
 

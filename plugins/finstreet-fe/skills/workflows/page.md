@@ -12,7 +12,7 @@ You will receive one of:
 
 ### Step 1: Determine routes
 
-Invoke the `automation:routes` skill to determine the route of the page and add it to the `routes.ts` file. It will update the task context with the `update_task_context` tool with its findings after it is done. ALWAYS pass the following information:
+Invoke the `finstreet-fe:routes` skill to determine the route of the page and add it to the `routes.ts` file. It will update the task context with the `update_task_context` tool with its findings after it is done. ALWAYS pass the following information:
 
 - featureName
 - featureType
@@ -22,7 +22,7 @@ Invoke the `automation:routes` skill to determine the route of the page and add 
 
 ### Step 2: Implement the page
 
-Invoke the `automation:page` skill to implement the page for this task based on the context. ALWAYS pass the following information:
+Invoke the `finstreet-fe:page` skill to implement the page for this task based on the context. ALWAYS pass the following information:
 
 - taskId
 - subtaskId

@@ -9,7 +9,7 @@ The `@finstreet/secure-fetch` library provides a fully type-safe approach to bac
 
 ## Path Resolution
 
-Before creating any files, invoke the `automation:path-resolver` skill with your input parameters (featureName, featureType, product, role) to resolve the correct paths. Use the returned **Feature Path** with `/backend` appended as `{featurePath}` in the file structure below.
+Before creating any files, invoke the `finstreet-fe:path-resolver` skill with your input parameters (featureName, featureType, product, role) to resolve the correct paths. Use the returned **Feature Path** with `/backend` appended as `{featurePath}` in the file structure below.
 
 ## File Structure
 

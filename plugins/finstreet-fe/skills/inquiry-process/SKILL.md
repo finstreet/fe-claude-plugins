@@ -18,7 +18,7 @@ InquiryProcess
 
 ## Path Resolution
 
-Before creating any files, invoke the `automation:path-resolver` skill with your input parameters (featureName, featureType=inquiryProcess, product, role) to resolve the correct paths. Use the returned **Feature Path** as the base directory for the inquiry process feature.
+Before creating any files, invoke the `finstreet-fe:path-resolver` skill with your input parameters (featureName, featureType=inquiryProcess, product, role) to resolve the correct paths. Use the returned **Feature Path** as the base directory for the inquiry process feature.
 
 ## Directory Structure
 

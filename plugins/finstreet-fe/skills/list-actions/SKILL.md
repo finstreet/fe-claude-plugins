@@ -9,7 +9,7 @@ This skill covers adding pagination and related features (search, sort, filter, 
 
 ## Path Resolution
 
-Before creating any files, invoke the `automation:path-resolver` skill with your input parameters (featureName, subFeatureName, featureType=interactiveList, product, role) to resolve the correct paths. Use the returned **Feature Path** as `{featurePath}`. For `{requestPath}`, take the base feature path (without the interactiveLists segment) and append `/backend`.
+Before creating any files, invoke the `finstreet-fe:path-resolver` skill with your input parameters (featureName, subFeatureName, featureType=interactiveList, product, role) to resolve the correct paths. Use the returned **Feature Path** as `{featurePath}`. For `{requestPath}`, take the base feature path (without the interactiveLists segment) and append `/backend`.
 
 ## Directory Structure
 

@@ -1,0 +1,10 @@
+{
+  "name": "finstreet-fe",
+  "description": "Skills for building Finstreet frontend features with @finstreet/forms, @finstreet/ui, and related libraries",
+  "author": {
+    "name": "Finstreet Frontend"
+  },
+  "homepage": "https://github.com/finstreet/fe-claude-plugins",
+  "repository": "https://github.com/finstreet/fe-claude-plugins",
+  "keywords": ["finstreet", "frontend", "forms", "ui", "nextjs"]
+}

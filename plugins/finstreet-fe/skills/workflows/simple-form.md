@@ -12,7 +12,7 @@ You will receive one of:
 
 ### Step 1: Implement the SimpleForm
 
-Invoke the `automation:simple-form` skill. ALWAYS pass the following information:
+Invoke the `finstreet-fe:simple-form` skill. ALWAYS pass the following information:
 
 - featureName
 - subFeatureName

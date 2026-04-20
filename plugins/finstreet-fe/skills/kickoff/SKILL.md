@@ -1,6 +1,6 @@
 ---
 name: kickoff
-description: "Decomposes a larger prompt into a structured, skill-annotated task plan. Pass it a description of the work you want done and it returns a step-by-step plan where each task is mapped to the right automation skill. Use when starting a new feature, tackling a multi-step request, or when you want Claude Code to work through a complex prompt task by task with progress tracking. Trigger this whenever the user says 'kickoff', 'plan this', 'break this down', 'structure this', or passes a long multi-part prompt they want organized."
+description: "Decomposes a larger prompt into a structured, skill-annotated task plan. Pass it a description of the work you want done and it returns a step-by-step plan where each task is mapped to the right finstreet-fe skill. Use when starting a new feature, tackling a multi-step request, or when you want Claude Code to work through a complex prompt task by task with progress tracking. Trigger this whenever the user says 'kickoff', 'plan this', 'break this down', 'structure this', or passes a long multi-part prompt they want organized."
 user-invocable: true
 argument-hint: "<description of the work to be done>"
 ---

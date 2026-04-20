@@ -12,7 +12,7 @@ You will receive one of:
 
 ### Step 1: Get parent paths
 
-Invoke the `automation:path-resolver` skill to resolve the correct paths for this feature. It will update the subtask content with its findings after it is done. ALWAYS pass the following information:
+Invoke the `finstreet-fe:path-resolver` skill to resolve the correct paths for this feature. It will update the subtask content with its findings after it is done. ALWAYS pass the following information:
 
 - featureName
 - subFeatureName (which is the name of the subtask)
@@ -22,7 +22,7 @@ Invoke the `automation:path-resolver` skill to resolve the correct paths for thi
 
 ### Step 2: Implement the InteractiveList
 
-Invoke the `automation:ui` skill to build the InteractiveList. ALWAYS pass the following information:
+Invoke the `finstreet-fe:ui` skill to build the InteractiveList. ALWAYS pass the following information:
 
 - subtask_id
 - featureName

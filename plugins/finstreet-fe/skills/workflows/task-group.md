@@ -13,7 +13,7 @@ You will receive one of:
 
 ### Step 1: Implement the task group
 
-Invoke the `automation:task-group` skill. It contains the complete guide for implementing task groups. Follow the order from the skill and create ALL necessary files. ALWAYS pass the following information:
+Invoke the `finstreet-fe:task-group` skill. It contains the complete guide for implementing task groups. Follow the order from the skill and create ALL necessary files. ALWAYS pass the following information:
 
 - subtask_id (or context file reference)
 - featureName

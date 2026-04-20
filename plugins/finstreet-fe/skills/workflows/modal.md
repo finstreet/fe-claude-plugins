@@ -1,6 +1,6 @@
-# List Actions Workflow
+# Modal Workflow
 
-End-to-end orchestration for creating list actions (pagination) for an interactive list.
+End-to-end orchestration for creating a modal feature.
 
 ## Input
 
@@ -10,9 +10,9 @@ You will receive one of:
 
 ## Steps
 
-### Step 1: Implement the pagination
+### Step 1: Implement the modal
 
-Invoke the `automation:list-actions` skill. It contains the complete guide for implementing list actions and pagination. Follow the order from the skill and create ALL necessary files. ALWAYS pass the following information:
+Invoke the `finstreet-fe:modal` skill to implement everything that is needed for the modal. ALWAYS pass the following information:
 
 - subtask_id
 - featureName
@@ -20,7 +20,6 @@ Invoke the `automation:list-actions` skill. It contains the complete guide for i
 - featureType
 - product (optional)
 - role (optional)
-- List of all files created previously
 
 ## Rules
 

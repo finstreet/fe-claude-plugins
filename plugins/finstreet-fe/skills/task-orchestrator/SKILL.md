@@ -23,7 +23,7 @@ Your job is it to work through all of the tasks that are in the `./context` fold
 
 ## Instructions
 
-Use the `automation:workflows` skill to dispatch to the correct workflow for each subtask. Pass the workflow type as the first argument and the subtaskId as the second:
+Use the `finstreet-fe:workflows` skill to dispatch to the correct workflow for each subtask. Pass the workflow type as the first argument and the subtaskId as the second:
 
 ```
 /workflows <type> <subtaskId>

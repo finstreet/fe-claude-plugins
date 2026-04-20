@@ -21,7 +21,7 @@ Form Component ("use client")
 
 ## Path Resolution
 
-Before creating any files, invoke the `automation:path-resolver` skill with your input parameters (featureName, subFeatureName, featureType, product, role) to resolve the correct paths. Use the returned **Feature Path** as `parentDirectory` below. The `backend/` directory sits as a sibling at the feature/product/role level.
+Before creating any files, invoke the `finstreet-fe:path-resolver` skill with your input parameters (featureName, subFeatureName, featureType, product, role) to resolve the correct paths. Use the returned **Feature Path** as `parentDirectory` below. The `backend/` directory sits as a sibling at the feature/product/role level.
 
 ## Directory Structure
 

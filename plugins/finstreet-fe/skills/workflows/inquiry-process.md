@@ -12,7 +12,7 @@ You will receive one of:
 
 ### Step 1: Determine routes
 
-Invoke the `automation:routes` skill to determine the routes for the layout and all page files of the inquiry process. It will update the subtask content with its findings after it is done. ALWAYS pass the following information:
+Invoke the `finstreet-fe:routes` skill to determine the routes for the layout and all page files of the inquiry process. It will update the subtask content with its findings after it is done. ALWAYS pass the following information:
 
 - featureName
 - featureType
@@ -26,7 +26,7 @@ All steps mentioned in the metadata are pages for data entry inside the inquiry 
 
 ### Step 2: Implement the inquiry process
 
-Invoke the `automation:inquiry-process` skill. It contains the complete guide for implementing inquiry processes. Follow the order from the skill and create ALL necessary files. ALWAYS pass the following information:
+Invoke the `finstreet-fe:inquiry-process` skill. It contains the complete guide for implementing inquiry processes. Follow the order from the skill and create ALL necessary files. ALWAYS pass the following information:
 
 - subtask_id
 - featureName
