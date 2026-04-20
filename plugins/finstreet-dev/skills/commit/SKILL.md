@@ -6,81 +6,104 @@ disable-model-invocation: true
 
 # Commit & Push
 
-Review, stage, commit, and push all current changes.
+Review, stage, commit, and push the current changes.
 
 ## Workflow
 
-Execute these steps in order:
+Execute these steps in order.
 
-### 1. Review All Changed Files
-
-Before committing, thoroughly review all files in the changeset:
+### 1. Review All Changes
 
 ```bash
-# View all changed files (staged and unstaged)
 git status
-
-# View the actual changes
 git diff
 git diff --staged
 ```
 
-**Important checks before committing:**
-- **Scan for debug `console.log` statements** - List all found instances and ask the user if they should be removed
-- Check for commented-out code that shouldn't be committed
-- Verify no sensitive data (API keys, credentials, etc.) is included
-- Ensure no unintended files are being committed
+Before committing, check for:
 
-If any issues are found, **stop and ask the user** before proceeding.
+- **Nothing to commit** — if `git status` shows a clean tree, stop and tell the user.
+- **Debug statements** (e.g. `console.log`, `dbg!`, stray `print` calls) added during the session
+- **Commented-out code** that shouldn't ship
+- **Secrets** — `.env`, keys, tokens, passwords
+- **Unintended files** — editor backups, large binaries, scratch dirs
 
-### 2. Stage All Changes
+If anything is suspicious, stop and ask the user before proceeding.
+
+### 2. Stage Specific Files
+
+Prefer explicit paths over `git add .` or `git add -A` — blanket staging can silently pick up `.env` files, local scratch work, or other unintended files.
 
 ```bash
-git add .
+git add <path1> <path2> ...
 ```
 
-### 3. Write Commit Message
+If every tracked change is in-scope and there are no risky untracked files, `git add .` is fine — but only after you've looked at `git status` and confirmed.
 
-Analyze the changes to write a **comprehensive yet concise** commit message:
+### 3. Write the Commit Message
 
 **Format:**
-```
-<ticket>: <Short summary of changes>
 
-- Bullet point for each significant change
-- Group related changes together
-- Focus on WHAT changed and WHY
+```
+<ticket>: <summary>
+
+- What changed and why
+- Group related changes
+- Focus on intent, not mechanics
 ```
 
 **Guidelines:**
-- Extract the ticket number from the branch name (e.g., `feature/eb-1250-...` → `EB-1250`)
-- Summary line should be max 72 characters
-- Use imperative mood ("Add feature" not "Added feature")
-- Be specific but concise in bullet points
 
-**Example:**
+- **Ticket is optional.** Extract a ticket from the branch name if one is present (e.g. `feature/eb-1250-...` → `EB-1250: <summary>`). If the branch has no ticket, skip the prefix and write `<summary>` directly.
+- Summary ≤ 72 characters, imperative mood ("Add X" not "Added X")
+- Bullet points explain the *why* when it isn't obvious from the diff
+
+**Examples:**
+
+With a ticket:
 ```
 EB-1250: Add user authentication flow
 
 - Implement login form with email/password validation
 - Add JWT token handling in auth service
 - Create protected route wrapper component
-- Update navigation to show user state
 ```
 
-### 4. Commit Changes
+Without a ticket:
+```
+Replace hardcoded base branch with git auto-detection
+
+- Read origin/HEAD to pick the trunk branch at runtime
+- Fall back to probing dev/main/master locally
+```
+
+### 4. Commit
+
+For multi-line messages, use a HEREDOC so quoting is safe:
 
 ```bash
-git commit -m "<commit message>"
+git commit -m "$(cat <<'EOF'
+<summary line>
+
+- <bullet>
+- <bullet>
+EOF
+)"
 ```
 
-### 5. Push to Remote
+**If a pre-commit hook fails:** the commit did NOT happen. Fix the issue, re-stage, and create a **new** commit. Never use `--amend` here — there is no previous commit from this run to amend; `--amend` would modify the commit that came before.
+
+### 5. Push
 
 ```bash
-# Push and set upstream if first push
-git push -u origin $(git branch --show-current)
+git push -u origin "$(git branch --show-current)"
 ```
 
-### 6. Confirm Success
+The `-u` flag is harmless if the upstream is already set — it only sets tracking on first push.
 
-After pushing, confirm the push was successful and show the current branch name.
+### 6. Confirm
+
+Report to the user:
+
+- The commit hash and summary line
+- The branch name and that the push succeeded
