@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Create Pull Request
 
-Create a pull request for the current branch. Run `/commit` first if you have uncommitted changes.
+Create a pull request for the current branch. Run `/finstreet-dev:commit` first if you have uncommitted changes.
 
 ## Workflow
 
@@ -22,7 +22,7 @@ git status
 gh pr view --json url,title 2>/dev/null
 ```
 
-- If there are **uncommitted changes**, tell the user to run `/commit` first and stop.
+- If there are **uncommitted changes**, tell the user to run `/finstreet-dev:commit` first and stop.
 - If a **PR already exists**, show the existing PR URL and stop.
 
 ### 2. Gather Context

@@ -78,9 +78,9 @@ Reference this catalog when mapping tasks to skills. Each entry describes what t
 
 | Skill | What It Does | When to Use |
 |-------|-------------|-------------|
-| **commit** | Reviews, stages, commits, and pushes changes. | When you're done with a piece of work and want to commit. Invoke: `/commit`. |
-| **pr** | Creates a pull request for the current branch. | After all work is committed and you want to open a PR. Invoke: `/pr`. |
-| **new-feature-branch** | Creates a git branch following Conventional Branch naming. | At the very start of a new feature, before any code changes. |
+| **commit** | Reviews, stages, commits, and pushes changes. | When you're done with a piece of work and want to commit. Invoke: `/finstreet-dev:commit`. Requires the `finstreet-dev` plugin. |
+| **pr** | Creates a pull request for the current branch. | After all work is committed and you want to open a PR. Invoke: `/finstreet-dev:pr`. Requires the `finstreet-dev` plugin. |
+| **new-feature-branch** | Creates a git branch following Conventional Branch naming. | At the very start of a new feature, before any code changes. Invoke: `/finstreet-dev:new-feature-branch`. Requires the `finstreet-dev` plugin. |
 | **workflows** | Dispatches to the correct end-to-end workflow by type. | When you want to run a complete workflow (modal, page, inquiry-process, etc.) as a single orchestrated flow. |
 
 ## Task Plan Format
@@ -153,7 +153,7 @@ This gives the user a live progress tracker. As each task is worked on, update i
 1. **Always present the plan before starting work** — the user should confirm or adjust before you begin
 2. **Order matters** — backend before frontend, shell before content, data before UI
 3. **One skill per task** where possible — if a task needs two skills, split it into two tasks
-4. **Include git tasks** — suggest `new-feature-branch` at the start and `commit`/`pr` at the end if appropriate
+4. **Include git tasks** — if the `finstreet-dev` plugin is available, suggest `new-feature-branch` at the start and `commit`/`pr` at the end; otherwise leave them out or mark them manual
 5. **Be specific** — don't just say "build the form", say what the form is for, what fields it needs, what the action does
 6. **Preserve the user's intent** — the plan should accomplish everything the user asked for, not just the parts that map cleanly to skills
 7. **Mark non-skill tasks as "manual"** — some work doesn't have a matching skill, and that's fine

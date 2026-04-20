@@ -1,0 +1,10 @@
+{
+  "name": "finstreet-dev",
+  "description": "Generic developer workflow skills — git branching, committing, and pull requests. Usable in any project, not tied to the Finstreet frontend stack.",
+  "author": {
+    "name": "Finstreet"
+  },
+  "homepage": "https://github.com/finstreet/claude-plugins",
+  "repository": "https://github.com/finstreet/claude-plugins",
+  "keywords": ["finstreet", "git", "workflow", "developer-tools"]
+}

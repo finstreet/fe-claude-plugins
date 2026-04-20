@@ -19,6 +19,18 @@
       "homepage": "https://github.com/finstreet/claude-plugins",
       "repository": "https://github.com/finstreet/claude-plugins",
       "keywords": ["finstreet", "frontend", "forms", "ui", "nextjs"]
+    },
+    {
+      "name": "finstreet-dev",
+      "source": "./plugins/finstreet-dev",
+      "description": "Generic developer workflow skills — git branching, committing, and pull requests. Usable in any project.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Finstreet"
+      },
+      "homepage": "https://github.com/finstreet/claude-plugins",
+      "repository": "https://github.com/finstreet/claude-plugins",
+      "keywords": ["finstreet", "git", "workflow", "developer-tools"]
     }
   ]
 }

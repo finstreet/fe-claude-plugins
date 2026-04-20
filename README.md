@@ -1,17 +1,30 @@
-# Finstreet Frontend Claude Code Plugin
+# Finstreet Claude Code Plugins
 
-Skills for building Finstreet frontend features with `@finstreet/forms`, `@finstreet/ui`, and related libraries — packaged as a [Claude Code plugin](https://code.claude.com/docs/en/plugins) so every developer on the team gets the same tooling.
+[Claude Code plugin](https://code.claude.com/docs/en/plugins) marketplace maintained by Finstreet. Two plugins today:
+
+- **`finstreet-fe`** — skills for building Finstreet frontend features with `@finstreet/forms`, `@finstreet/ui`, etc. Requires the Frontend MCP server.
+- **`finstreet-dev`** — generic git workflow skills (branching, committing, PRs). Works in any project; no MCP dependency.
+
+Install whichever you need. Frontend devs typically want both.
 
 ## Install
 
+Add the marketplace once:
+
 ```
 /plugin marketplace add finstreet/claude-plugins
-/plugin install finstreet-fe@finstreet-plugins
 ```
 
-## Required setup
+Then install the plugin(s) you want:
 
-The plugin's skills depend on the [Frontend MCP Server](https://github.com/finstreet/frontend-mcp) for live documentation lookups. The MCP defaults to the hosted Fly.io deployment and requires a bearer token.
+```
+/plugin install finstreet-fe@finstreet-plugins
+/plugin install finstreet-dev@finstreet-plugins
+```
+
+## Required setup (finstreet-fe only)
+
+The `finstreet-fe` skills depend on the [Frontend MCP Server](https://github.com/finstreet/frontend-mcp) for live documentation lookups. The MCP defaults to the hosted Fly.io deployment and requires a bearer token.
 
 Add this to your shell profile (`~/.zshrc` or `~/.bashrc`):
 
@@ -35,48 +48,54 @@ export FINSTREET_MCP_URL=http://localhost:4444/sse
 ```
 /plugin marketplace update finstreet-plugins
 /plugin update finstreet-fe@finstreet-plugins
+/plugin update finstreet-dev@finstreet-plugins
 ```
 
 ## Skills
 
-All skills are invoked as `/finstreet-fe:<name>`. Most also trigger automatically based on context.
+### `finstreet-fe`
 
-### Orchestration
+Invoked as `/finstreet-fe:<name>`. Most also trigger automatically based on context.
+
+#### Orchestration
 - `kickoff` — Decompose a freeform prompt into a skill-annotated task plan
 - `workflows` — Dispatcher for feature creation workflows (modal, page, inquiry-process, list-actions, secure-fetch, simple-form, task-group, generic)
 - `task-orchestrator` — Work through tasks in a `./context` folder using the Frontend MCP
 
-### Pages & UI
+#### Pages & UI
 - `page` — Next.js page shells, metadata, header patterns, content wrappers
 - `loading` — `loading.tsx` skeleton pages mirroring page content structure
 - `ui` — PandaCSS layout primitives + `@finstreet/ui` component composition
 - `modal` — Modal store, component, and open button
 
-### Forms
+#### Forms
 - `form` — Full `@finstreet/forms` flow: options, schema, useFormFields, formAction, defaults, config, FormFields, Form
 - `simple-form` — Lightweight action-only forms without input fields
 - `inquiry-process` — Multi-step form wizard using `@finstreet/forms` + `@finstreet/ui`
 
-### Lists & task groups
+#### Lists & task groups
 - `list-actions` — Pagination, search, sort, filter, group for `InteractiveList`
 - `task-group` — `@finstreet/ui` TaskGroups with panels, actions, status
 
-### Business features
+#### Business features
 - `document-exchange` — Document upload/download pages with collapsible request groups
 - `contract-upload` — Contract upload page for signature process start
 
-### Backend & data
+#### Backend & data
 - `secure-fetch` — Type-safe server/client HTTP requests via `@finstreet/secure-fetch`
 - `mock-api` — Mock endpoints that plug into the secure-fetch pattern
 
-### Testing
+#### Testing
 - `e2e-test` — Playwright e2e tests (page objects, fixtures, form modules, dataTestIds)
 
-### Project structure
+#### Project structure
 - `path-resolver` — Resolve feature/backend paths from naming conventions
 - `routes` — Add or look up entries in `routes.ts`
 
-### Git workflow
+### `finstreet-dev`
+
+Invoked as `/finstreet-dev:<name>`. All user-invoked only — no automatic triggering.
+
 - `new-feature-branch` — Create a branch using Conventional Branch naming
 - `commit` — Review, stage, commit, push current changes
 - `pr` — Create a PR against `dev` for the current branch
@@ -95,10 +114,9 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to author new skills, test loca
 
 ## Changelog
 
-### 1.0.0
-- Renamed plugin from `automation` to `finstreet-fe` (invocations change from `/automation:*` to `/finstreet-fe:*`).
-- Renamed marketplace from `fe-plugin` to `finstreet-plugins`.
-- Added explicit `plugin.json` manifest, skill index, and contributing guide for team use.
+### finstreet-fe 1.0.0 / finstreet-dev 1.0.0
+- Split git skills (`new-feature-branch`, `commit`, `pr`) into a new `finstreet-dev` plugin so non-frontend projects can install them without pulling in the frontend stack.
+- `finstreet-fe`: renamed from `automation` (invocations change from `/automation:*` to `/finstreet-fe:*`); renamed marketplace from `fe-plugin` to `finstreet-plugins`; added explicit `plugin.json`, skill index, contributing guide.
 
 ### 0.0.37
 - `finstreet-mcp` now defaults to the hosted Fly.io deployment and requires a bearer token. Set `FINSTREET_MCP_TOKEN` in your shell; see README for details. Set `FINSTREET_MCP_URL` to override the URL (useful when developing the MCP server locally).
