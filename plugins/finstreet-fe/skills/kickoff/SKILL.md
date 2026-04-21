@@ -81,7 +81,6 @@ Reference this catalog when mapping tasks to skills. Each entry describes what t
 | **commit** | Reviews, stages, commits, and pushes changes. | When you're done with a piece of work and want to commit. Invoke: `/finstreet-dev:commit`. Requires the `finstreet-dev` plugin. |
 | **pr** | Creates a pull request for the current branch. | After all work is committed and you want to open a PR. Invoke: `/finstreet-dev:pr`. Requires the `finstreet-dev` plugin. |
 | **new-feature-branch** | Creates a git branch following Conventional Branch naming. | At the very start of a new feature, before any code changes. Invoke: `/finstreet-dev:new-feature-branch`. Requires the `finstreet-dev` plugin. |
-| **workflows** | Dispatches to the correct end-to-end workflow by type. | When you want to run a complete workflow (modal, page, inquiry-process, etc.) as a single orchestrated flow. |
 
 ## Task Plan Format
 
@@ -157,4 +156,3 @@ This gives the user a live progress tracker. As each task is worked on, update i
 5. **Be specific** — don't just say "build the form", say what the form is for, what fields it needs, what the action does
 6. **Preserve the user's intent** — the plan should accomplish everything the user asked for, not just the parts that map cleanly to skills
 7. **Mark non-skill tasks as "manual"** — some work doesn't have a matching skill, and that's fine
-8. **Use `workflows` for end-to-end flows** — if the user's request maps to a single workflow type (e.g., "create a modal"), suggest using `/workflows modal` directly instead of decomposing into individual skills

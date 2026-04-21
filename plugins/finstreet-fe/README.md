@@ -50,8 +50,6 @@ Invoked as `/finstreet-fe:<name>`. Most also trigger automatically based on cont
 
 ### Orchestration
 - `kickoff` — Decompose a freeform prompt into a skill-annotated task plan
-- `workflows` — Dispatcher for feature creation workflows (modal, page, inquiry-process, list-actions, secure-fetch, simple-form, task-group, generic)
-- `task-orchestrator` — Work through tasks in a `./context` folder using the Frontend MCP (see [below](#task-orchestrator))
 
 ### Pages & UI
 - `page` — Next.js page shells, metadata, header patterns, content wrappers
@@ -82,14 +80,6 @@ Invoked as `/finstreet-fe:<name>`. Most also trigger automatically based on cont
 ### Project structure
 - `path-resolver` — Resolve feature/backend paths from naming conventions
 - `routes` — Add or look up entries in `routes.ts`
-
-## Task Orchestrator
-
-A general-purpose task runner. Pass it a directory of context files and it works through the tasks one by one, fetching instructions from the Frontend MCP's `get_task_instructions` tool:
-
-```
-/finstreet-fe:task-orchestrator Please implement all tasks inside the `./context/master_data` directory.
-```
 
 ## Changelog
 

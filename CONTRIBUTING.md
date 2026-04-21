@@ -67,6 +67,8 @@ Workspace conventions are documented in [`CLAUDE.md`](./CLAUDE.md). In short: ag
 
 ## Releasing
 
+Run `/release` in a Claude Code session on this repo — the skill walks the steps below, detects which plugins have changed since the last release, and handles the version bump, changelog, commit, and push. The manual process below is kept as a reference.
+
 1. Bump the `version` field of the plugin(s) you changed in `.claude-plugin/marketplace.json` using [semver](https://semver.org):
    - `PATCH` for skill content tweaks and bug fixes
    - `MINOR` for new skills or additive changes
