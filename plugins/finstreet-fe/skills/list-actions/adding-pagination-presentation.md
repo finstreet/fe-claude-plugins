@@ -23,7 +23,7 @@ The `renderItem` / `renderSmallScreenItem` callbacks use the singular item type:
 const renderItem = (item: {ListName}Type) => ( /* ... */ );
 ```
 
-## Step 2 — Add Pagination (all cases)
+## Step 2 — Add Pagination
 
 ```typescript
 import { usePagination } from '@/shared/hooks/usePagination';
@@ -46,41 +46,9 @@ return (
 );
 ```
 
-## Step 3 — Add Search (Case 2)
+## Step 3 — Add Actions
 
-```typescript
-import { useRenderSearchAction } from '@/shared/hooks/useRenderSearchAction';
-import { {listName}SearchParams } from './{listName}SearchParams';
-
-// inside the component:
-const renderActions = useRenderSearchAction({
-  searchParams: {listName}SearchParams,
-  translations: {
-    label: tActions('label'),
-    reset: tActions('reset'),
-    search: {
-      label: tActions('search.label'),
-      placeholder: tActions('search.placeholder'),
-    },
-  },
-});
-
-return (
-  <InteractiveList<{ListName}Type>
-    data={paginated{ListName}s}
-    renderActions={renderActions}
-    // other props...
-  />
-);
-```
-
-## Step 3b — Multi-List Search Action (Case 4)
-
-When two+ lists share a search input, do NOT use `useRenderSearchAction`. Instead, create a standalone `{ListName}SearchAction` component that uses `useQueryState` for both `search` and `pagination`, and resets pagination to `null` on search change. Only the **first** list passes `renderActions={{ListName}SearchAction}` — additional lists omit the prop entirely, since the search modifies the shared URL state which triggers re-renders for all lists.
-
-See [multi-list-shared-search.md](multi-list-shared-search.md) for the full pattern and templates.
-
-## Step 4 — Add Sort + Group (Case 3)
+When the list has any actions beyond pagination, create a `use{ListName}RenderActions` hook (see [actions.md](actions.md)) and pass its result as `renderActions`.
 
 ```typescript
 import { use{ListName}RenderActions } from './use{ListName}RenderActions';
@@ -97,8 +65,16 @@ return (
 );
 ```
 
+The wiring is the same regardless of which actions the list uses — search only, search + sort + group, with or without archived. Which slots are rendered lives entirely inside `use{ListName}RenderActions`, not here.
+
+## Step 3b — Multi-List Search Action
+
+When two+ lists share a search input, do NOT use `useListActions`. Instead, create a standalone `{ListName}SearchAction` component that uses `useQueryState` for both `search` and `pagination`, and resets pagination to `null` on search change. Only the **first** list passes `renderActions={{ListName}SearchAction}` — additional lists omit the prop entirely, since the search modifies the shared URL state which triggers re-renders for all lists.
+
+See [multi-list-shared-search.md](multi-list-shared-search.md) for the full pattern and templates.
+
 ## Rules
 
 - For any TypeScript errors from changed types, use values that fit the new type and context — cleanup happens separately
 - Always use the plural schema type for `ListItems<>` and the singular type for item callbacks
-- `usePagination` is always required regardless of case
+- `usePagination` is always required, regardless of which actions (if any) the list uses

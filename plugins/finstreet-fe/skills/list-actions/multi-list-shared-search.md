@@ -23,15 +23,15 @@ When two or more lists on the same page share a single search input with indepen
   ├── {listName}SearchParams.ts           ← single file, shared by all lists
   ├── {ListName}SearchAction.tsx          ← standalone search component
   ├── {ListNameA}/
-  │   ├── index.tsx                       ← container (server component)
   │   └── {ListNameA}Presentation.tsx     ← presentation (client component)
   ├── {ListNameB}/
-  │   ├── index.tsx                       ← container (server component)
   │   └── {ListNameB}Presentation.tsx     ← presentation (client component)
 
 {requestPath}/
   ├── get{ListNameA}.ts                   ← request for list A
   └── get{ListNameB}.ts                   ← request for list B
+
+No per-list `index.tsx` server containers — see § 5 (Page Composition) below.
 ```
 
 ## Step-by-Step
@@ -159,26 +159,7 @@ export const {ListName}SearchAction = () => {
 };
 ```
 
-### 4. Container Components (one per list)
-
-Each list gets its own server container. Both accept the same `Parsed{ListName}SearchParams`.
-
-```typescript
-import { {ListNameA}Presentation } from './{ListNameA}Presentation';
-import { Parsed{ListName}SearchParams } from '../{listName}SearchParams';
-import { get{ListNameA} } from '@/shared/backend/models/{model}/get{ListNameA}';
-
-type {ListNameA}Props = {
-    searchParams: Parsed{ListName}SearchParams;
-};
-
-export async function {ListNameA}({ searchParams }: {ListNameA}Props) {
-    const items = await get{ListNameA}(searchParams);
-    return <{ListNameA}Presentation data={items} />;
-}
-```
-
-### 5. Presentation Components
+### 4. Presentation Components
 
 Both presentation components handle pagination manually with `useQueryState`. Only the **first** list renders `renderActions`.
 
@@ -244,32 +225,41 @@ return (
 );
 ```
 
-### 6. Page Composition
+### 5. Page Composition
 
-Parse SearchParams once in the page. Pass the same object to all list containers. Wrap each in `<Suspense>`.
+Parse SearchParams once. Run all request functions in parallel via `Promise.all`. Pass the resulting data straight to each Presentation component. **No per-list server containers, no `<Suspense>` wrappers** — the page does the fetches itself.
 
 ```typescript
-import { Suspense } from 'react';
 import { {listName}SearchParamsCache } from '@/features/.../{listName}SearchParams';
-import { {ListNameA} } from '@/features/.../{ListNameA}';
-import { {ListNameB} } from '@/features/.../{ListNameB}';
+import { {ListNameA}Presentation } from '@/features/.../{ListNameA}/{ListNameA}Presentation';
+import { {ListNameB}Presentation } from '@/features/.../{ListNameB}/{ListNameB}Presentation';
+import { get{ListNameA} } from '@/features/.../backend/get{ListNameA}';
+import { get{ListNameB} } from '@/features/.../backend/get{ListNameB}';
+import { SearchParams } from 'nuqs';
 
-export default async function {PageName}({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
+type {PageName}Props = {
+    searchParams: Promise<SearchParams>;
+};
+
+export default async function {PageName}({ searchParams }: {PageName}Props) {
     const resolvedSearchParams = await searchParams;
     const { pagination, search } = {listName}SearchParamsCache.parse(resolvedSearchParams);
 
+    const [dataA, dataB] = await Promise.all([
+        get{ListNameA}({ pagination, search }),
+        get{ListNameB}({ pagination, search }),
+    ]);
+
     return (
         <>
-            <Suspense fallback={<ListSkeleton />}>
-                <{ListNameA} searchParams={{ pagination, search }} />
-            </Suspense>
-            <Suspense fallback={<ListSkeleton />}>
-                <{ListNameB} searchParams={{ pagination, search }} />
-            </Suspense>
+            <{ListNameA}Presentation data={dataA} />
+            <{ListNameB}Presentation data={dataB} />
         </>
     );
 }
 ```
+
+The `Promise.all` runs both fetches concurrently — equivalent to the parallelism a `<Suspense>` boundary would give, but without the streaming wrapper. Why this shape: per-list server containers add ceremony without changing the user-visible behavior on multi-list pages, and `<Suspense>` boundaries here add streaming where it isn't useful (both lists land at the same time anyway).
 
 ## Rules
 
@@ -277,4 +267,5 @@ export default async function {PageName}({ searchParams }: { searchParams: Promi
 2. Use a typed union for pagination keys — not `Record<string, string>`
 3. `setPagination(null)` to reset all lists on search change — never reset individual keys
 4. Only the first list renders `renderActions` — additional lists omit it
+5. No per-list server containers and no `<Suspense>` wrappers — the page parses, fetches via `Promise.all`, and renders Presentations directly
 5. Each list gets its own container, request function, and presentation component

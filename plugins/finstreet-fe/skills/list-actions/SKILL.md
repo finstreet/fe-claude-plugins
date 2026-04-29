@@ -1,79 +1,85 @@
 ---
 name: list-actions
-description: "Complete guide to adding pagination, search, sorting, filtering, and grouping to an InteractiveList built with @finstreet/ui. Use when implementing or modifying list actions in the finstreet context."
+description: "Complete guide to list actions on an InteractiveList built with @finstreet/ui — how to wire any combination of pagination, search, sort, group, archived, and reset onto a list, and how to author or modify the slot components themselves. Use when implementing or modifying list actions, when adding search/sort/group/archived/reset to a list, or when building a new kind of filter/toggle slot for the shared RenderActions system."
 ---
 
 # List Actions — Complete Guide
 
-This skill covers adding pagination and related features (search, sort, filter, group) to an `InteractiveList` component.
+This skill covers two distinct workflows:
+
+- **Path 1 — Add actions to a list.** Set up the list scaffold and wire any combination of the existing actions (`Search`, `Sort`, `Group`, `Archived`, `Reset`) onto it. Most tasks land here.
+- **Path 2 — Build or modify an action.** Author a brand-new slot for the shared `useListActions` system, or change the behavior of an existing slot.
+
+## Which Path?
+
+| Signal | Path |
+|--------|------|
+| Task names an existing action: search, sort, group, archived, reset, pagination | Path 1 |
+| Task introduces a new dimension (date range, status filter, multi-select tag, etc.) with no existing slot | Path 2 (section A) |
+| Task changes the props or behavior of `SearchAction` / `GroupByAction` / `SortByAction` / `ArchivedAction` / `ResetAction` itself | Path 2 (section B) |
+
+When in doubt, start at Path 1. If it turns out the slot you need doesn't exist, switch to Path 2.
 
 ## Path Resolution
 
-Before creating any files, invoke the `finstreet-fe:path-resolver` skill with your input parameters (featureName, subFeatureName, featureType=interactiveList, product, role) to resolve the correct paths. Use the returned **Feature Path** as `{featurePath}`. For `{requestPath}`, take the base feature path (without the interactiveLists segment) and append `/backend`.
+Before creating any files for **Path 1**, invoke the `finstreet-fe:path-resolver` skill with your input parameters (featureName, subFeatureName, featureType=interactiveList, product, role) to resolve the correct paths. Use the returned **Feature Path** as `{featurePath}`. For `{requestPath}`, take the base feature path (without the `interactiveLists` segment) and append `/backend`.
 
-## Directory Structure
+Path 2 work happens in `src/shared/components/RenderActions/` and `src/shared/types/searchParams.ts` — no path resolver needed.
 
-```
-{featurePath}/
-  ├── {listName}SearchParams.ts
-  ├── {listName}GroupConfigs.ts         ← only for grouping
-  ├── {ListName}PresentationList.tsx    ← update existing file
-  ├── index.tsx                         ← container component
-  ├── use{ListName}RenderActions.tsx    ← only for sort/group
-  ├── use{ListName}SortByItems.ts       ← only for sorting
-  └── use{ListName}GroupByItems.ts      ← only for grouping
+---
 
-{requestPath}/
-  └── get{ListName}List.ts
-```
+## Path 1 — Add Actions to a List
 
-## Which Files to Create
+Two pieces: a **scaffold** that every list has, plus the **actions** the list needs. Build the scaffold once, then add each action by following its section in [actions.md](actions.md).
 
-### Case 1 — Pagination only
-1. SearchParams → 2. Request → 3. Presentation (add pagination) → 4. Container
+### Scaffold (always)
 
-### Case 2 — Pagination + Search
-1. SearchParams → 2. Request → 3. Presentation (add search + pagination) → 4. Container
+Every list has these files. Build them first, even if the list has no actions beyond pagination.
 
-### Case 3 — Pagination + Search + Sort + Filter/Group
-1. SearchParams → 2. GroupConfigs → 3. Request → 4. SortByItems + GroupByItems + RenderActions → 5. Presentation → 6. Container
+| File | Purpose | Reference |
+|------|---------|-----------|
+| `{featurePath}/{listName}SearchParams.ts` | URL state — pagination + each action's parser | [search-params.md](search-params.md) |
+| `{requestPath}/get{ListName}List.ts` | Server fetch | [creating-the-request.md](creating-the-request.md) |
+| `{featurePath}/index.tsx` | Server container | [implementing-the-container.md](implementing-the-container.md) |
+| `{featurePath}/{ListName}PresentationList.tsx` | Client presentation, `usePagination`, `<InteractiveList />` | [adding-pagination-presentation.md](adding-pagination-presentation.md) |
 
-### Case 4 — Multi-List Shared Search (two+ lists on one page)
-1. SearchParams (multi-key pagination) → 2. Request per list → 3. SearchAction component → 4. Presentation per list → 5. Container per list → 6. Page composition
+### Actions (pick what the list needs)
 
-For the full walkthrough, see [multi-list-shared-search.md](multi-list-shared-search.md)
+Each action has a self-contained recipe (parser, items hook if any, group config if any, request handling if any, slot JSX). Read each action's section as needed:
 
-#### Multi-List Directory Structure
+| Action | What it does | Extra files | See |
+|--------|--------------|-------------|-----|
+| Search | Free-text input filtering the list | — | [actions.md § Search](actions.md#search) |
+| Sort | Single-select dropdown of `column asc/desc` | `use{ListName}SortByItems.ts` | [actions.md § Sort](actions.md#sort) |
+| Group | Single-select dropdown that pivots the list into grouped sub-lists | `use{ListName}GroupByItems.ts`, `{listName}GroupConfigs.ts` | [actions.md § Group](actions.md#group) |
+| Archived | Active/Archived toggle, maps to `q[show_archived]` | — | [actions.md § Archived](actions.md#archived) |
+| Reset | "Clear all" text button | — | [actions.md § Reset](actions.md#reset) |
 
-```
-{featurePath}/
-  ├── {listName}SearchParams.ts           ← single file, shared
-  ├── {ListName}SearchAction.tsx          ← standalone search component
-  ├── {ListNameA}/
-  │   ├── index.tsx                       ← container A
-  │   └── {ListNameA}Presentation.tsx     ← presentation A (renders search action)
-  ├── {ListNameB}/
-  │   ├── index.tsx                       ← container B
-  │   └── {ListNameB}Presentation.tsx     ← presentation B (no search action)
+When the list has any actions beyond pagination, also create `{featurePath}/use{ListName}RenderActions.tsx` — the composition hook that pulls the slots together. The full template lives in [actions.md § The composition hook](actions.md#the-composition-hook).
 
-{requestPath}/
-  ├── get{ListNameA}.ts
-  └── get{ListNameB}.ts
-```
+### Multi-list shared search
 
-## Step-by-Step Reference
+When two or more lists on one page share a single search input, the file layout itself differs: per-list directories with just a Presentation (no per-list server container, no `<Suspense>`), a standalone `{ListName}SearchAction.tsx` component, and the page does the parallel fetches via `Promise.all` and renders Presentations directly. The `useListActions` hook isn't used in this pattern. See [multi-list-shared-search.md](multi-list-shared-search.md) for the full walkthrough.
 
-- For **SearchParams** setup (pagination, search, sort, group enums), see [search-params.md](search-params.md)
-- For **creating the request** (`get{ListName}List.ts`), see [creating-the-request.md](creating-the-request.md)
-- For **the container** (`index.tsx`), see [implementing-the-container.md](implementing-the-container.md)
-- For **action item hooks** (sortBy, groupBy, renderActions), see [action-items-hooks.md](action-items-hooks.md)
-- For **updating the presentation** component, see [adding-pagination-presentation.md](adding-pagination-presentation.md)
-- For **group configs**, see [group-config.md](group-config.md)
-- For **multi-list shared search** (Case 4), see [multi-list-shared-search.md](multi-list-shared-search.md)
+---
 
-## Rules
+## Path 2 — Build or Modify an Action
 
-1. Always create a single SearchParams file per feature (not per list) when multiple lists share params. For full multi-list guidance, see [multi-list-shared-search.md](multi-list-shared-search.md)
-2. Never change the structure of the request file — keep the `if-else` block and pre-initialized `listItems`
-3. Never build query param schemas in the endpoint config
-4. Always use `nuqs` for URL-based state (no client-side state for pagination/sort/filter)
+When no existing slot fits, or when an existing slot needs a new prop or behavior change.
+
+- **Authoring a new action** — declare the parser, decide on the API mapping, implement the slot following the six-step contract, handle cross-action effects via callback props.
+- **Modifying an existing action** — adding a prop, changing throttle/debounce behavior, lifting feature-specific coupling out into a callback prop.
+
+See [building-a-new-action.md](building-a-new-action.md).
+
+---
+
+## Rules (apply to both paths)
+
+1. One SearchParams file per feature, even when multiple lists share it.
+2. Don't change the structure of the request file's `if-else` block (with grouping) — keep the pre-initialized `listItems` and the two branches.
+3. Don't build query param schemas in the endpoint config — everything flows through `buildApiUrl`.
+4. Always use `nuqs` for URL-based state. No client-side state for pagination, search, sort, group, or archived.
+5. Inside an action slot, always go through `useListActionsContext` for the parser, pagination, and reset registration. Don't reinvent these.
+6. Always reset pagination on filter change (`setPagination(null)` inside the slot's change handler).
+7. Don't import a feature-specific enum into a shared action component — pass cross-action effects in as callback props (see [building-a-new-action.md § A.4](building-a-new-action.md)).

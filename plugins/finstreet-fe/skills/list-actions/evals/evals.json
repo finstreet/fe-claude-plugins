@@ -1,0 +1,97 @@
+{
+  "skill_name": "list-actions",
+  "evals": [
+    {
+      "id": 1,
+      "name": "multi-list-shared-search",
+      "prompt": "Add a shared search input to the FSP members area. The page is at `src/app/admin/benutzer/page.tsx` and renders TWO `InteractiveList` components side-by-side:\n\n- Active members: `src/features/members/fsp/lists/MembersList/`\n- Pending invitations: `src/features/members/fsp/lists/MembersPendingInvitationsList/`\n\nBoth lists share `src/features/members/fsp/lists/MembersList/MembersListSearchParams.ts`, which currently has only `pagination` with typed keys `members` and `invitedMembers` (so each list paginates independently).\n\nGoal: the user types in one search input → BOTH lists filter by name/email. Each list still paginates independently. The backend supports `q[name_or_email_cont]=<query>` for both endpoints (`/financial_service_provider/memberships` and `/financial_service_provider/invitations/pending`).\n\nWire it end-to-end:\n\n1. Add `search` to `MembersListSearchParams.ts` (keep the multi-key pagination union typed).\n2. Create a standalone `MembersSearchAction` component the first list will render via `renderActions`. Search changes must reset pagination to `null` so both lists go back to page 1.\n3. Update both request functions (`src/features/members/backend/getFspMembers.ts` and `src/features/members/backend/getPendingFspInvitations.ts`) so the search param flows through `buildApiUrl`.\n4. Update both presentation components for the multi-list pattern (manual pagination via `useQueryState`, only the first list passes `renderActions`).\n5. Update `src/app/admin/benutzer/page.tsx` to also destructure `search` from the parsed cache and pass it into both fetches.\n\nKeep the existing page composition shape: the page parses search params, runs both fetches in parallel via `Promise.all`, and renders the Presentations directly. Do NOT introduce per-list server containers or `<Suspense>` wrappers — neither exists on this page today and we don't want them.\n\nThe item types (`FspMemberType`, `InvitationType`) and the existing fetch helpers (`getFspMembers`, `getPendingInvitations`) are already in place — don't change those, just thread search through.",
+      "expected_output": "An end-to-end multi-list shared-search wiring. SearchParams gains `search`. A standalone `MembersSearchAction.tsx` exists. Both request functions pass searchParams to buildApiUrl. Both presentations switch to manual `useQueryState` pagination handling. Only the first list renders `renderActions`. The page extracts `search` and passes it to both fetches.",
+      "files": [],
+      "expectations": [
+        "MembersListSearchParams.ts declares `search: parseAsString.withDefault(\"\")` alongside the existing pagination",
+        "MembersListSearchParams.ts keeps the typed pagination union (Record<{members|invitedMembers}, string>) — does not regress to Record<string, string>",
+        "A standalone MembersSearchAction is a React component (function returning JSX), NOT a hook returning a render function",
+        "MembersSearchAction uses `useQueryState` for both `search` and `pagination`",
+        "MembersSearchAction calls `setPagination(null)` whenever search changes (so both lists return to page 1)",
+        "getFspMembers.ts passes `search` through buildApiUrl (either via passing the full searchParams object or including search in the searchParams arg)",
+        "getPendingFspInvitations.ts passes `search` through buildApiUrl in the same way",
+        "MembersListPresentation.tsx (the first list) passes `renderActions={MembersSearchAction}` to its InteractiveList",
+        "MembersPendingInvitationsPresentation.tsx (the second list) does NOT pass `renderActions`",
+        "The page (src/app/admin/benutzer/page.tsx) destructures `search` from the parsed search params cache and passes it to both fetch calls",
+        "The page does NOT introduce a `<Suspense>` wrapper or per-list server container — keeps the existing inline `Promise.all` composition"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "build-list-with-full-actions",
+      "prompt": "Build a new list of submitted financing cases for the operations portal, end to end:\n\n- Feature path: `src/features/financingCases/lists/SubmittedFinancingCasesList/`\n- Request: `src/features/financingCases/fsp/backend/getSubmittedFinancingCases.ts`\n- Page: `src/app/operations/eingereicht/page.tsx`\n\nEndpoint: `GET /financial_service_providers/financing_cases/submitted`. Use `getPaginatedFspFinancingCases` from `@/features/financingCases/fsp/backend/server`. Item type: `FspFinancingCase` from `@/features/financingCases/fsp/backend/schema`.\n\nThe list needs the following actions:\n\n- **Search** — query param `search_term`.\n- **Sort** — values `created_at asc`, `created_at desc`, `submitted_at asc`, `submitted_at desc`.\n- **Group by status** — query param `q[status_eq]`, values `pending | under_review | accepted | rejected`.\n- **Reset** — clear all of the above.\n\nThe presentation can render minimal rows (just the case ID and status — no styling effort needed). Focus on getting the SearchParams, GroupConfigs, request file, container, presentation, items hooks, and the `useSubmittedFinancingCasesRenderActions` composition right. The page should parse searchParams once and render the server container directly — do not introduce a `<Suspense>` wrapper (that's not the pattern this codebase uses for single-list pages).",
+      "expected_output": "A complete new list with all four actions wired up. SearchParams declares pagination + search + sortBy enum + groupBy enum + status sub-enum. A GroupConfigs file maps each groupBy enum value to its query param + sub-enum values. The request file uses the if-else shape switching between `collectGroupedData` and `collectPaginatedData`. The container is a server component. The presentation uses `usePagination` and renders `<InteractiveList renderActions={...} />`. The renderActions hook composes SearchAction + SortByAction + GroupByAction + ResetAction inside a VStack/ActionRow layout.",
+      "files": [],
+      "expectations": [
+        "A SearchParams file is created and declares pagination (createBase64Parser), search (parseAsString.withDefault(\"\")), sortBy (parseAsStringEnum), groupBy (parseAsStringEnum)",
+        "SortByEnum has values for `created_at asc`, `created_at desc`, `submitted_at asc`, `submitted_at desc`",
+        "GroupByEnum has a STATUS value (and any other group dimensions if applicable)",
+        "A status sub-enum (e.g., SubmittedFinancingCasesGroupByStatusEnum) is declared with values pending, under_review, accepted, rejected",
+        "createSearchParamsCache and the parsed type are exported from the SearchParams file",
+        "A GroupConfigs file is created and maps GroupByEnum.STATUS to `{ queryParam: 'q[status_eq]', values: Object.values(<StatusEnum>) }` (the GroupConfig type only has queryParam + values; translated headings are built inline in the request file as a `titles: Record<string, string>` map)",
+        "The request file (getSubmittedFinancingCases.ts) uses the if-else pattern: if groupBy is set, call collectGroupedData; else call collectPaginatedData",
+        "The request file pre-initializes `listItems` before the if-else block",
+        "The request file passes the destructured fields (search, sortBy, etc.) into buildApiUrl's searchParams arg",
+        "The container is an async server component with no `'use client'` directive",
+        "The container imports the request and passes its result as `data` to the Presentation",
+        "use{ListName}SortByItems starts with an empty-string \"no sort\" entry",
+        "use{ListName}GroupByItems starts with a \"no grouping\" entry — either empty string or `GroupByEnum.NONE` value",
+        "useSubmittedFinancingCasesRenderActions calls `useListActions` with `searchParams`, `translations.label`, and `children`",
+        "The composition renders <SearchAction />, <SortByAction />, <GroupByAction />, <ResetAction />",
+        "The composition uses VStack and/or ActionRow for layout",
+        "The composition does NOT render <ArchivedAction /> (not requested for this list)",
+        "The presentation uses usePagination({ parserBuilder, listItems }) and renders <InteractiveList />",
+        "The presentation passes `renderActions={renderActions}` from useSubmittedFinancingCasesRenderActions",
+        "The page imports and renders the container (no Suspense wrapper)"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "build-date-range-action",
+      "prompt": "Build a new shared `DateRangeAction` slot for `useListActions`. It should be reusable across any list — the same way `SearchAction`, `GroupByAction`, etc. are.\n\n**File**: `src/shared/components/RenderActions/DateRangeAction.tsx`\n\n**URL state shape**: `dateRange = { from: string; to: string } | null` where `from` and `to` are ISO date strings (`YYYY-MM-DD`).\n\n**Backend mapping**: `from` → `q[created_at_gteq]=<from>`, `to` → `q[created_at_lteq]=<to>`. When the field is `null` or unset, no params should be emitted. Implement this generically inside `src/shared/backend/models/common/buildApiUrl.ts` (so any list that declares `dateRange` on its searchParams gets the mapping for free, mirroring how `archived` is handled today).\n\n**SearchParams type**: extend `BaseSearchParams` in `src/shared/types/searchParams.ts` to declare `dateRange` as an OPTIONAL field, so lists that don't need it aren't forced to declare it. Use `parseAsJson<{ from: string; to: string } | null>()` for the parser builder type.\n\n**Slot contract**: follow the same pattern as `ArchivedAction` and `SearchAction` — reads `dateRange` parser from `useListActionsContext`, throws if it's missing on the list's searchParams, registers itself for global Reset, persists across navigation via `usePersistedFilters`, resets pagination on every change. The component is `\"use client\"`.\n\nFor the visible UI, two `<Input type=\"date\" />` controls inside a `<Box flexBasis=\"100%\">` is enough — the focus is on the contract and the API mapping, not date-picker UX.",
+      "expected_output": "Three artifacts: (1) a new `DateRangeAction.tsx` that follows the six-step slot contract; (2) `BaseSearchParams` updated to include `dateRange?: ParserBuilder<{ from: string; to: string } | null>`; (3) `buildApiUrl.ts` extended with a generic branch that emits `q[created_at_gteq]` / `q[created_at_lteq]` when the `dateRange` field is present and non-null on the searchParams object.",
+      "files": [],
+      "expectations": [
+        "DateRangeAction.tsx has the `\"use client\"` directive",
+        "DateRangeAction uses useListActionsContext() to get startTransition, setPagination, searchParams, registerFilter",
+        "DateRangeAction throws an Error when searchParams.dateRange is undefined",
+        "DateRangeAction calls useQueryState(\"dateRange\", searchParams.dateRange.withOptions({ shallow: false, startTransition, throttleMs: 500 }))",
+        "DateRangeAction registers itself via useEffect → registerFilter({ key: \"dateRange\", reset: () => setDateRange(null) })",
+        "DateRangeAction calls usePersistedFilters with dateRange in setters/currentValues/defaultValues",
+        "DateRangeAction's change handler calls setDateRange(...) AND setPagination(null), wrapped in startTransition",
+        "DateRangeAction renders two <Input type=\"date\" /> controls (one for from, one for to)",
+        "BaseSearchParams (src/shared/types/searchParams.ts) adds an OPTIONAL field `dateRange?: ParserBuilder<{ from: string; to: string } | null>`",
+        "buildApiUrl.ts adds a typed interface (similar to SearchParamsWithArchived) for dateRange",
+        "buildApiUrl.ts emits `q[created_at_gteq]=<from>` and `q[created_at_lteq]=<to>` when dateRange is present and non-null on searchParams",
+        "buildApiUrl.ts does NOT emit those query params when dateRange is null or missing",
+        "The mapping logic lives in buildApiUrl, NOT inside DateRangeAction.tsx (keeps slot feature-agnostic)"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "decouple-archived-action",
+      "prompt": "The shared `ArchivedAction` at `src/shared/components/RenderActions/ArchivedAction.tsx` currently imports `FSPFinancingCasesGroupByEnum` and hardcodes the side effect of forcing `groupBy = NONE` when archived is on (and restoring `groupBy = STATUS` when archived is off). This couples a shared component to a feature-specific enum.\n\nRefactor:\n\n1. In `src/shared/components/RenderActions/ArchivedAction.tsx`:\n   - Remove the `FSPFinancingCasesGroupByEnum` import.\n   - Remove the `setGroupBy` block entirely. The shared component should not touch `groupBy`.\n   - Add an optional callback prop: `onArchivedChange?: (archived: boolean) => void`. Call it inside the `startTransition` block, after `setArchived` and `setPagination(null)`.\n   - Keep everything else identical: the throw-when-`archived`-is-missing check, the `useQueryState` binding, the `registerFilter` call, the `<ToggleGroup />` UI.\n\n2. In `src/features/financingCases/lists/FSPFinancingCasesList/useFSPFinancingCasesRenderActions.tsx`:\n   - Wire the `onArchivedChange` callback so the FSP-specific behavior moves out of the shared component: when archived becomes `true`, set `groupBy` to `FSPFinancingCasesGroupByEnum.NONE`; when it becomes `false`, set `groupBy` to `FSPFinancingCasesGroupByEnum.STATUS`. Use a `useQueryState` for `groupBy` at the consumer level so you have the setter to call from the callback.\n   - Don't change the rest of the composition (the existing search/group/sort/archived/reset slots, the `processedGroupByItems` disable logic for STATUS, the layout) — only thread the callback through.",
+      "expected_output": "Two updated files. `ArchivedAction.tsx` no longer imports any feature-specific enum and has an `onArchivedChange?: (archived: boolean) => void` prop. The cross-action effect lives entirely in `useFSPFinancingCasesRenderActions.tsx`, which acquires a `setGroupBy` setter and passes the callback to `<ArchivedAction />`.",
+      "files": [],
+      "expectations": [
+        "ArchivedAction.tsx no longer imports FSPFinancingCasesGroupByEnum (or any other feature-specific enum)",
+        "ArchivedAction.tsx no longer has a useQueryState for `groupBy` and no longer calls setGroupBy",
+        "ArchivedAction.tsx adds an optional `onArchivedChange?: (archived: boolean) => void` prop",
+        "ArchivedAction.tsx's handleToggle (or change handler) calls onArchivedChange?.(...) after setArchived and setPagination(null), inside the startTransition block",
+        "ArchivedAction.tsx keeps the throw-when-archived-is-missing check intact",
+        "ArchivedAction.tsx keeps the registerFilter useEffect intact",
+        "ArchivedAction.tsx keeps the <ToggleGroup /> UI unchanged",
+        "useFSPFinancingCasesRenderActions.tsx adds a useQueryState for groupBy to acquire setGroupBy",
+        "useFSPFinancingCasesRenderActions.tsx passes onArchivedChange to <ArchivedAction /> that sets groupBy to FSPFinancingCasesGroupByEnum.NONE when archived is true and FSPFinancingCasesGroupByEnum.STATUS when archived is false",
+        "useFSPFinancingCasesRenderActions.tsx still composes <SearchAction />, <GroupByAction />, <SortByAction />, <ArchivedAction />, <ResetAction />",
+        "useFSPFinancingCasesRenderActions.tsx preserves the processedGroupByItems STATUS-disable logic (when archived) — that pre-processing stays at the consumer level",
+        "useFSPFinancingCasesRenderActions.tsx preserves the existing VStack + ActionRow layout"
+      ]
+    }
+  ]
+}

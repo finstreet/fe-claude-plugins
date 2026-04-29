@@ -51,33 +51,23 @@ Invoked as `/finstreet-fe:<name>`. Most also trigger automatically based on cont
 ### Orchestration
 - `kickoff` — Decompose a freeform prompt into a skill-annotated task plan
 
-### Pages & UI
+### Composite features
+- `inquiry-process` — Multi-step form wizard using `@finstreet/forms` + `@finstreet/ui`
+- `contract-upload` — Contract upload page for signature process start
+- `document-exchange` — Document upload/download pages with collapsible request groups
+- `list-actions` — Pagination, search, sort, group, archived toggle, and reset for `InteractiveList`; also covers authoring new action slots
+- `e2e-test` — Playwright e2e tests (page objects, fixtures, form modules, dataTestIds)
+
+### Building blocks
 - `page` — Next.js page shells, metadata, header patterns, content wrappers
 - `loading` — `loading.tsx` skeleton pages mirroring page content structure
 - `ui` — PandaCSS layout primitives + `@finstreet/ui` component composition
 - `modal` — Modal store, component, and open button
-
-### Forms
 - `form` — Full `@finstreet/forms` flow: options, schema, useFormFields, formAction, defaults, config, FormFields, Form
 - `simple-form` — Lightweight action-only forms without input fields
-- `inquiry-process` — Multi-step form wizard using `@finstreet/forms` + `@finstreet/ui`
-
-### Lists & task groups
-- `list-actions` — Pagination, search, sort, filter, group for `InteractiveList`
 - `task-group` — `@finstreet/ui` TaskGroups with panels, actions, status
-
-### Business features
-- `document-exchange` — Document upload/download pages with collapsible request groups
-- `contract-upload` — Contract upload page for signature process start
-
-### Backend & data
 - `secure-fetch` — Type-safe server/client HTTP requests via `@finstreet/secure-fetch`
 - `mock-api` — Mock endpoints that plug into the secure-fetch pattern
-
-### Testing
-- `e2e-test` — Playwright e2e tests (page objects, fixtures, form modules, dataTestIds)
-
-### Project structure
 - `path-resolver` — Resolve feature/backend paths from naming conventions
 - `routes` — Add or look up entries in `routes.ts`
 
